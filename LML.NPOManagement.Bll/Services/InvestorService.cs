@@ -1,32 +1,46 @@
-﻿using LML.NPOManagement.Bll.Models;
-using LML.NPOManagement.Dal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
     public class InvestorService
     {
-        public IEnumerable<InvestorResponse> GetAllInvestors()
+        private IMapper _mapper;
+        public InvestorService()
         {
-            var investors = new NPOManagementContext().Investors.ToList();
-            foreach (var investor in investors)
+            var config = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Donation, DonationModel>();
+                cfg.CreateMap<Investor, InvestorModel>();
+            });
+            _mapper = config.CreateMapper();
+        }
+        public IEnumerable<InvestorModel> GetAllInvestors()
+        {
+            using(var investorContext = new NPOManagementContext())
             {
-                yield return new InvestorResponse(investor);
+                var investors = investorContext.Investors.ToList();
+                foreach (var investor in investors)
+                {
+                    var investorModel = _mapper.Map<Investor, InvestorModel>(investor);
+                    yield return investorModel;
+                }
             }
+                    
         }
 
-        public InvestorResponse? GetInvestorById(int id)
+        public InvestorModel GetInvestorById(int id)
         {
-            var investorEntity = new NPOManagementContext().Investors.Where(investor => investor.Id == id).FirstOrDefault();
-            if (investorEntity != null)
+            using(var dbContext = new NPOManagementContext())
             {
-                return new InvestorResponse(investorEntity);
+                var investor = dbContext.Investors.Where(investor => investor.Id == id).FirstOrDefault();
+                if (investor != null)
+                {
+                    var investorModel = _mapper.Map<Investor, InvestorModel>(investor);
+                    return investorModel;
+                }
+                return null;
             }
-            return null;
         }
     }
 }
