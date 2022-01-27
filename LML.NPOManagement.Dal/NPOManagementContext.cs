@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 
-namespace LML.NPOManagement.Dal
+namespace LML.NPOManagement.Dal.Models
 {
     public partial class NPOManagementContext : DbContext
     {
@@ -20,7 +19,6 @@ namespace LML.NPOManagement.Dal
 
         public virtual DbSet<Donation> Donations { get; set; } = null!;
         public virtual DbSet<Investor> Investors { get; set; } = null!;
-        public object Investor { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -49,9 +47,10 @@ namespace LML.NPOManagement.Dal
 
                 entity.Property(e => e.DateOfCharity).HasColumnType("datetime");
 
-                entity.HasOne(d => d.Name)
+                entity.HasOne(d => d.Investor)
                     .WithMany(p => p.Donations)
-                    .HasForeignKey(d => d.NameId)
+                    .HasForeignKey(d => d.InvestorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Table1_Table2");
             });
 
@@ -61,9 +60,9 @@ namespace LML.NPOManagement.Dal
 
                 entity.Property(e => e.Email).HasMaxLength(50);
 
-                entity.Property(e => e.LastName).HasMaxLength(50);
+                entity.Property(e => e.FirstName).HasMaxLength(50);
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.LastName).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);
