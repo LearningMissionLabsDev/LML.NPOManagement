@@ -12,6 +12,9 @@ namespace LML.NPOManagement.Bll.Services
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Investor, InvestorModel>();
+                cfg.CreateMap<DonationModel, Donation>();
+                cfg.CreateMap<InvestorModel, Investor>();
+
             });
             _mapper = config.CreateMapper();
         }

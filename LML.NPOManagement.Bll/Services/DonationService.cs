@@ -15,6 +15,8 @@ namespace LML.NPOManagement.Bll.Services
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Investor, InvestorModel>();
+                cfg.CreateMap<DonationModel, Donation>();
+                cfg.CreateMap<InvestorModel, Investor>();
             });
              _mapper = config.CreateMapper();
         }
@@ -46,14 +48,14 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-        //public void AddDonation(int nameId, decimal amount, DateTime dateOfCharity)
-        //{
-        //    var donation = new NPOManagementContext().Donations.Add(new DonationModel
-        //    {
-        //        DateOfCharity = dateOfCharity,
-        //        Amount = amount,
-        //        InvestorId = nameId
-        //    });
-        //}
+        public void AddDonation(DonationModel donationModel)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var donation = _mapper.Map<DonationModel, Donation>(donationModel);
+                dbContext.Donations.Add(donation);
+                dbContext.SaveChanges();
+            }
+        }
     }
 }
