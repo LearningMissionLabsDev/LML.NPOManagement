@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class InvestorService
+    public class InvestorService : IInvestorService
     {
         private IMapper _mapper;
         public InvestorService()
