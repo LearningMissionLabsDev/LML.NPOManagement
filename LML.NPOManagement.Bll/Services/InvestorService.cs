@@ -19,6 +19,17 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
+
+        public int AddInvestor(InvestorModel investorModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteInvestor(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<InvestorModel> GetAllInvestors()
         {
             using(var investorContext = new NPOManagementContext())
@@ -45,6 +56,11 @@ namespace LML.NPOManagement.Bll.Services
                 }
                 return null;
             }
+        }
+
+        public void ModifyInvestor(InvestorModel investorModel)
+        {
+            throw new NotImplementedException();
         }
     }
 }

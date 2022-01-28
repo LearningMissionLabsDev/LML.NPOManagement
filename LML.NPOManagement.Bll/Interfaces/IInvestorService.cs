@@ -11,5 +11,8 @@ namespace LML.NPOManagement.Bll.Independencies
     {
         public IEnumerable<InvestorModel> GetAllInvestors();
         public InvestorModel GetInvestorById(int id);
+        public int AddInvestor(InvestorModel investorModel);
+        public void ModifyInvestor(InvestorModel investorModel);
+        public void DeleteInvestor(int id);
     }
 }

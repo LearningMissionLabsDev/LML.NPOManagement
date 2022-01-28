@@ -3,8 +3,6 @@ using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -58,6 +56,16 @@ namespace LML.NPOManagement.Bll.Services
                 dbContext.SaveChanges();
                 return donation.Id;
             }
+        }
+
+        public void ModifyDonation(DonationModel donationModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteDonation(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
