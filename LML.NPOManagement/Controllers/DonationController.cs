@@ -4,6 +4,7 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using LML.NPOManagement.Request;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,6 +21,8 @@ namespace LML.NPOManagement.Controllers
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InvestorModel, InvestorResponse>();
+                cfg.CreateMap<DonationRequest, DonationModel>();
+                cfg.CreateMap<InvestorRequest, InvestorModel>();
             });
 
             _mapper = config.CreateMapper();
@@ -44,8 +47,12 @@ namespace LML.NPOManagement.Controllers
 
         // POST api/<DonationController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<DonationResponse> Post([FromBody] DonationRequest donationRequest)
         {
+            var addDonation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
+            var id = _donationService.AddDonation(addDonation);
+            var donationModel = _donationService.GetDonationById(id);
+            return _mapper.Map<DonationModel,DonationResponse>(donationModel);
         }
 
         // PUT api/<DonationController>/5

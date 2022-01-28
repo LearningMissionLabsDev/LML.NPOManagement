@@ -49,13 +49,14 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-        public void AddDonation(DonationModel donationModel)
+        public int AddDonation(DonationModel donationModel)
         {
             using (var dbContext = new NPOManagementContext())
             {
                 var donation = _mapper.Map<DonationModel, Donation>(donationModel);
                 dbContext.Donations.Add(donation);
                 dbContext.SaveChanges();
+                return donation.Id;
             }
         }
     }
