@@ -1,7 +1,7 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Bll.Services;
+using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,20 +14,23 @@ namespace LML.NPOManagement.Controllers
     public class DonationController : ControllerBase
     {
         private IMapper _mapper;
-        public DonationController()
+        private IDonationService _donationService;
+        public DonationController(IDonationService donationService)
         {
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InvestorModel, InvestorResponse>();
             });
+
             _mapper = config.CreateMapper();
+            _donationService = donationService;
         }
     
         // GET: api/<DonationController>
         [HttpGet]
         public IEnumerable<DonationResponse> Get()
         {
-            var donations = new DonationService().GetAllDonations().ToList();
+            var donations = _donationService.GetAllDonations().ToList();
             return _mapper.Map<List<DonationModel>,List<DonationResponse>>(donations);
         }
 
@@ -35,7 +38,7 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("{id}")]
         public DonationResponse Get(int id)
         {
-            var donation = new DonationService().GetDonationById(id);
+            var donation = _donationService.GetDonationById(id);
             return _mapper.Map<DonationModel, DonationResponse>(donation);
         }
 

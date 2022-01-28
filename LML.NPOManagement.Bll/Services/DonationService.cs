@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Linq;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class DonationService
+    public class DonationService : IDonationService
     {
         private IMapper _mapper;
         public DonationService()
