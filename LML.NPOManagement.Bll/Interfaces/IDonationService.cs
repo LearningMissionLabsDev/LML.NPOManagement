@@ -12,5 +12,7 @@ namespace LML.NPOManagement.Bll.Independencies
         public IEnumerable<DonationModel> GetAllDonations();
         public DonationModel GetDonationById(int id);
         public int AddDonation(DonationModel donationModel);
+        public void ModifyDonation(DonationModel donationModel);    
+        public void DeleteDonation(int id);
     }
 }
