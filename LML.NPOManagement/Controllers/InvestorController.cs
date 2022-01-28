@@ -52,8 +52,10 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<InvestorController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            var investor = new InvestorService().Delete;
+            return Ok();
         }
     }
 }

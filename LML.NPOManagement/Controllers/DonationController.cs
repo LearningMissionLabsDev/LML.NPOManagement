@@ -53,8 +53,22 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<DonationController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            if(id <=0)
+            {
+                return BadRequest();
+            }
+            var donationService = new DonationService();
+            var donationToDelete = donationService.GetDonationById(id);
+            if(donationToDelete == null)
+            {
+                return NotFound();           
+            }
+            donationService.Delete(id);
+
+            return Ok();
+            
         }
     }
 }
