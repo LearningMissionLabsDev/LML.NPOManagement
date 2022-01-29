@@ -58,14 +58,27 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
+        public void DeleteDonation(int id)
+        {
+            using (var dbcontext = new NPOManagementContext())
+            {
+                var donation = dbcontext.Donations.FirstOrDefault(d => d.Id == id);
+                if (donation != null)
+                {
+                    dbcontext.Donations.Remove(donation);
+                    dbcontext.SaveChanges();
+
+                }               
+            }
+          
+        }    
+
+
         public void ModifyDonation(DonationModel donationModel)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteDonation(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
+
