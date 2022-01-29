@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Bll.Services;
+using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,19 +14,22 @@ namespace LML.NPOManagement.Controllers
     public class InvestorController : ControllerBase
     {
         private IMapper _mapper;
-        public InvestorController()
+        private IInvestorService _investorService;
+        public InvestorController(IInvestorService investorService)
         {
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InvestorModel, InvestorResponse>();
             });
+
             _mapper = config.CreateMapper();
+            _investorService = investorService;
         }
         // GET: api/<InvestorController>
         [HttpGet]
         public IEnumerable<InvestorResponse> Get()
         {
-            var investors = new InvestorService().GetAllInvestors().ToList();
+            var investors = _investorService.GetAllInvestors().ToList();
             return _mapper.Map<List<InvestorModel>, List<InvestorResponse>>(investors);
         }
 
@@ -33,7 +37,7 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("{id}")]
         public InvestorResponse Get(int id)
         {
-            var investor = new InvestorService().GetInvestorById(id);
+            var investor = _investorService.GetInvestorById(id);
             return _mapper.Map<InvestorModel, InvestorResponse>(investor);
         }
 

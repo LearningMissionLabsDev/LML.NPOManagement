@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class DonationService
+    public class DonationService : IDonationService
     {
         private IMapper _mapper;
         public DonationService()
@@ -48,15 +47,17 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-        public void AddDonation(DonationModel donationModel)
+        public int AddDonation(DonationModel donationModel)
         {
             using (var dbContext = new NPOManagementContext())
             {
                 var donation = _mapper.Map<DonationModel, Donation>(donationModel);
                 dbContext.Donations.Add(donation);
                 dbContext.SaveChanges();
+                return donation.Id;
             }
         }
+
         public void DeleteDonation(int id)
         {
             using (var dbcontext = new NPOManagementContext())
@@ -71,6 +72,12 @@ namespace LML.NPOManagement.Bll.Services
             }
           
         }    
+
+
+        public void ModifyDonation(DonationModel donationModel)
+        {
+            throw new NotImplementedException();
+        }
 
     }
 }

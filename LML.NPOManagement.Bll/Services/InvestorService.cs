@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class InvestorService
+    public class InvestorService : IInvestorService
     {
         private IMapper _mapper;
         public InvestorService()
@@ -19,6 +20,17 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
+
+        public int AddInvestor(InvestorModel investorModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteInvestor(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<InvestorModel> GetAllInvestors()
         {
             using (var investorContext = new NPOManagementContext())
@@ -46,6 +58,7 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
+
         public void Delete(int id)
         {
             using (var dbcontext = new NPOManagementContext())
@@ -56,9 +69,13 @@ namespace LML.NPOManagement.Bll.Services
                     dbcontext.Investors.Remove(investor);
                     dbcontext.SaveChanges();
                 }
-               
-
             }
+
+        }
+
+        public void ModifyInvestor(InvestorModel investorModel)
+        {
+            throw new NotImplementedException();
         }
     }
 }
