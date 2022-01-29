@@ -21,16 +21,6 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public int AddInvestor(InvestorModel investorModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteInvestor(int id)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<InvestorModel> GetAllInvestors()
         {
             using (var investorContext = new NPOManagementContext())
@@ -58,24 +48,45 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-
-        public void Delete(int id)
+        public int AddInvestor(InvestorModel investorModel)
         {
-            using (var dbcontext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
-                var investor = dbcontext.Investors.Where(investor => investor.Id == id).FirstOrDefault();
-                if (investor != null)
-                {
-                    dbcontext.Investors.Remove(investor);
-                    dbcontext.SaveChanges();
-                }
+                var investor = _mapper.Map<InvestorModel, Investor>(investorModel);
+                dbContext.Investors.Add(investor);
+                dbContext.SaveChanges();
+                return investor.Id;
             }
-
         }
 
-        public void ModifyInvestor(InvestorModel investorModel)
+        public void DeleteInvestor(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investor = dbContext.Investors.FirstOrDefault(d => d.Id == id); 
+                if (investor != null)
+                {
+                    dbContext.Investors.Remove(investor);
+                    dbContext.SaveChanges();
+                }
+            }
+        }
+        public int ModifyInvestor(InvestorModel investorModel, int id)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investor = dbContext.Investors.FirstOrDefault(d => d.Id == id);
+                if (investor != null)
+                {
+                    investor.Id = id;
+                    investor.FirstName = investorModel.FirstName;
+                    investor.LastName = investorModel.LastName;
+                    investor.PhoneNumber = investorModel.PhoneNumber;
+                    investor.Email  = investorModel.Email;
+                    dbContext.SaveChanges();
+                }
+                return investor.Id;
+            }
         }
     }
 }

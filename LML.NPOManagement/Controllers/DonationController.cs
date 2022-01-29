@@ -57,25 +57,28 @@ namespace LML.NPOManagement.Controllers
 
         // PUT api/<DonationController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<DonationResponse> Put(int id, [FromBody] DonationRequest donationRequest)
         {
+            var modifyDonation = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
+            var donationId = _donationService.ModifyDonation(modifyDonation, id);
+            var donationModel = _donationService.GetDonationById(donationId);
+            return _mapper.Map<DonationModel, DonationResponse>(donationModel);
         }
 
         // DELETE api/<DonationController>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            if(id <=0)
+            if(id <= 0)
             {
                 return BadRequest();
             }
-            var donationService = new DonationService();
-            var donationToDelete = donationService.GetDonationById(id);
+            var donationToDelete = _donationService.GetDonationById(id);
             if(donationToDelete == null)
             {
                 return NotFound();           
             }
-            donationService.DeleteDonation(id);
+            _donationService.DeleteDonation(id);
 
             return Ok();
             
