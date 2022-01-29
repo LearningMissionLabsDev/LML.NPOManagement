@@ -59,6 +59,8 @@ namespace LML.NPOManagement.Controllers
         [HttpPut("{id}")]
         public async Task<DonationResponse> Put(int id, [FromBody] DonationRequest donationRequest)
         {
+            //...RG We need to convert the calls to asynch inside those methods. Currently all calls are synchronous.
+            //... todo: For that we need to convert the BLL methods to asynchronous as well. To be discussed.
             var modifyDonation = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
             var donationId = _donationService.ModifyDonation(modifyDonation, id);
             var donationModel = _donationService.GetDonationById(donationId);
