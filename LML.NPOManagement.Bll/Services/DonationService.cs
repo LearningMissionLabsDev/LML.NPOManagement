@@ -57,7 +57,7 @@ namespace LML.NPOManagement.Bll.Services
                 dbContext.SaveChanges();
             }
         }
-        public void Delete(int id)
+        public void DeleteDonation(int id)
         {
             using (var dbcontext = new NPOManagementContext())
             {
@@ -67,28 +67,11 @@ namespace LML.NPOManagement.Bll.Services
                     dbcontext.Donations.Remove(donation);
                     dbcontext.SaveChanges();
 
-                }
-                //Donation donation = new Donation() { Id = id };
-                //dbcontext.Donations.Attach(donation);
-                //dbcontext.Donations.Remove(donation);
-                //dbcontext.SaveChanges();
+                }               
             }
-            
-                
-            
-        }
-       
-        
-        
-        
-        
-    
+          
+        }    
 
     }
 }
 
-//public HttpResponseMessage Delete(int id)
-//{
-
-//    }
-//}

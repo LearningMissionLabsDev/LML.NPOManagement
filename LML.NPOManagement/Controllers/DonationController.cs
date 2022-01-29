@@ -65,7 +65,7 @@ namespace LML.NPOManagement.Controllers
             {
                 return NotFound();           
             }
-            donationService.Delete(id);
+            donationService.DeleteDonation(id);
 
             return Ok();
             
