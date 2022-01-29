@@ -60,25 +60,35 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteDonation(int id)
         {
-            using (var dbcontext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
-                var donation = dbcontext.Donations.FirstOrDefault(d => d.Id == id);
+                var donation = dbContext.Donations.FirstOrDefault(d => d.Id == id);
                 if (donation != null)
                 {
-                    dbcontext.Donations.Remove(donation);
-                    dbcontext.SaveChanges();
-
-                }               
+                    dbContext.Donations.Remove(donation);
+                    dbContext.SaveChanges();
+                }   
             }
-          
         }    
 
 
-        public void ModifyDonation(DonationModel donationModel)
+        public int ModifyDonation(DonationModel donationModel, int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var donation = dbContext.Donations.FirstOrDefault(d => d.Id == id);
+                if(donation != null)
+                {
+                    donation.Amount = donationModel.Amount;
+                    donation.InvestorId = donationModel.InvestorId;
+                    donation.DateOfCharity = donationModel.DateOfCharity;
+                    dbContext.SaveChanges();
+                }
+                return donation.Id;
+            }
         }
 
+        
     }
 }
 

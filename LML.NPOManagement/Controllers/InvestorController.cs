@@ -4,6 +4,7 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using LML.NPOManagement.Request;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,6 +21,9 @@ namespace LML.NPOManagement.Controllers
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InvestorModel, InvestorResponse>();
+                cfg.CreateMap<DonationRequest, DonationModel>();
+                cfg.CreateMap<InvestorRequest, InvestorModel>();
+
             });
 
             _mapper = config.CreateMapper();
@@ -43,22 +47,39 @@ namespace LML.NPOManagement.Controllers
 
         // POST api/<InvestorController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<InvestorResponse> Post([FromBody] InvestorRequest investorRequest)
         {
-           
+            var addInvestor = _mapper.Map<InvestorRequest, InvestorModel>(investorRequest);
+            var id = _investorService.AddInvestor(addInvestor);
+            var investorModel = _investorService.GetInvestorById(id);
+            return _mapper.Map<InvestorModel, InvestorResponse>(investorModel);
         }
 
         // PUT api/<InvestorController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<InvestorResponse> Put(int id, [FromBody] InvestorRequest investorRequest)
         {
+            var modifyInvestor = _mapper.Map<InvestorRequest, InvestorModel>(investorRequest);
+            var investorId = _investorService.ModifyInvestor(modifyInvestor, id);
+            var investorModel = _investorService.GetInvestorById(investorId);
+            return _mapper.Map<InvestorModel, InvestorResponse>(investorModel);
         }
 
         // DELETE api/<InvestorController>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var investor = new InvestorService().Delete;
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+            var investorToDelete = _investorService.GetInvestorById(id);
+            if (investorToDelete == null)
+            {
+                return NotFound();
+            }
+            _investorService.DeleteInvestor(id);
+
             return Ok();
         }
     }
