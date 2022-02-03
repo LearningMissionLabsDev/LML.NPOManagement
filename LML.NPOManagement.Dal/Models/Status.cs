@@ -12,7 +12,7 @@ namespace LML.NPOManagement.Dal.Models
         }
 
         public int Id { get; set; }
-        public string StatusTayp { get; set; } = null!;
+        public string StatusType { get; set; } = null!;
 
         public virtual ICollection<AccountManagerInfo> AccountManagerInfos { get; set; }
         public virtual ICollection<Beneficiary> Beneficiaries { get; set; }

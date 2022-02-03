@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Models
 {
@@ -19,7 +20,6 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<AccountManager> AccountManagers { get; set; } = null!;
         public virtual DbSet<AccountManagerInfo> AccountManagerInfos { get; set; } = null!;
         public virtual DbSet<Beneficiary> Beneficiaries { get; set; } = null!;
-        public virtual DbSet<ContactInfo> ContactInfos { get; set; } = null!;
         public virtual DbSet<Donation> Donations { get; set; } = null!;
         public virtual DbSet<Investor> Investors { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
@@ -27,10 +27,18 @@ namespace LML.NPOManagement.Dal.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            //            if (!optionsBuilder.IsConfigured)
+            //            {
+            //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+            //                optionsBuilder.UseSqlServer("Server=lmldb.cj8tmk4otjem.eu-west-1.rds.amazonaws.com,1433;Database=NPOManagement;User Id=lmladmin;Password=January2021");
+            //            }
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=lmldb.cj8tmk4otjem.eu-west-1.rds.amazonaws.com,1433;Database=NPOManagement;User Id=lmladmin;Password=January2021");
+                IConfigurationRoot configuration = new ConfigurationBuilder()
+                              .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                              .AddJsonFile("appsettings.json")
+                              .Build();
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             }
         }
 
@@ -40,14 +48,22 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("AccountManager");
 
-                entity.Property(e => e.AccountManagerCategory).HasMaxLength(100);
+                entity.Property(e => e.AccountManagerCategory)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.NarrowProfessional).HasMaxLength(100);
+                entity.Property(e => e.NarrowProfessional)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<AccountManagerInfo>(entity =>
             {
                 entity.ToTable("AccountManagerInfo");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(128)
@@ -55,7 +71,19 @@ namespace LML.NPOManagement.Dal.Models
 
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.MiddleName).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.AccountManagerCategory)
                     .WithMany(p => p.AccountManagerInfos)
@@ -80,13 +108,29 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("Beneficiary");
 
-                entity.Property(e => e.DateOfBirth)
-                    .HasMaxLength(10)
-                    .IsFixedLength();
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.MiddleName).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Beneficiaries)
@@ -112,23 +156,6 @@ namespace LML.NPOManagement.Dal.Models
 
                             j.ToTable("AccountManagerBeneficiry");
                         });
-            });
-
-            modelBuilder.Entity<ContactInfo>(entity =>
-            {
-                entity.ToTable("ContactInfo");
-
-                entity.Property(e => e.Email)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PhoneNumberOne)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.PhoneNumberTwo)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Donation>(entity =>
@@ -159,6 +186,8 @@ namespace LML.NPOManagement.Dal.Models
 
             modelBuilder.Entity<Role>(entity =>
             {
+                entity.ToTable("Role");
+
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Role1)
@@ -171,7 +200,7 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("Status");
 
-                entity.Property(e => e.StatusTayp)
+                entity.Property(e => e.StatusType)
                     .HasMaxLength(20)
                     .IsUnicode(false);
             });

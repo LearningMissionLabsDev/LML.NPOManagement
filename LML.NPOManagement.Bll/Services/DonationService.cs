@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Bll.Independencies;
-using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
+using LML.NPOManagement.Dal;
+using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
