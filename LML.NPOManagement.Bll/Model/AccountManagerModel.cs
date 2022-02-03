@@ -16,7 +16,7 @@ namespace LML.NPOManagement.Bll.Model
 
         public int Id { get; set; }
         public string AccountManagerCategory { get; set; } = null!;
-        public string? NarrowProfessional { get; set; }
+        public string NarrowProfessional { get; set; }
 
         public virtual ICollection<AccountManagerInfo> AccountManagerInfos { get; set; }
     }

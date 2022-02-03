@@ -2,5 +2,6 @@
 {
     public class StatusRequest
     {
+        public string StatusType { get; set; } = null!;
     }
 }

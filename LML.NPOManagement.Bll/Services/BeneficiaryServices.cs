@@ -26,5 +26,30 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
+
+        public int AddBeneficiary(BeneficiaryModel beneficiaryModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteBeneficiary(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<BeneficiaryModel> GetAllBeneficiary()
+        {
+            throw new NotImplementedException();
+        }
+
+        public BeneficiaryModel GetBeneficiaryById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int ModifyBeneficiary(BeneficiaryModel beneficiaryModel, int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

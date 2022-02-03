@@ -26,5 +26,30 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
+
+        public int AddAccountManager(AccountManagerModel accountManagerModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteAccountManager(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AccountManagerModel GetAccountManagerById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<AccountManagerModel> GetAllAccountManager()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int ModifyAccountManager(AccountManagerModel accountManagerModel, int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
