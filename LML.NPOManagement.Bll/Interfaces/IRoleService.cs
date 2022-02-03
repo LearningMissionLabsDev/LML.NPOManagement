@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
-    public interface IRole
+    public interface IRoleService
     {
         public IEnumerable<RoleModel> GetAllRole();
         public RoleModel GetRoleById(int id);

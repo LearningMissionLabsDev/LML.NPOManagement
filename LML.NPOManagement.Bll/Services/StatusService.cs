@@ -2,13 +2,18 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class AccountManagerInfoServices : IAccountManageInfo
+    public class StatusService : IStatusService
     {
         private IMapper _mapper;
-        public AccountManagerInfoServices()
+        public StatusService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -27,27 +32,12 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public int AddAccountManagerInfo(AccountManagerInfoModel accountManagerInfoModel)
+        public IEnumerable<StatusModel> GetAllStatus()
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteAccountManagerInfo(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public AccountManagerInfoModel GetAccountManagerInfoById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<AccountManagerInfoModel> GetAllAccountManagerInfo()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int ModifyAccountManagerInfo(AccountManagerInfoModel accountManagerInfoModel, int id)
+        public StatusModel GetStatusById(int id)
         {
             throw new NotImplementedException();
         }

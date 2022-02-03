@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
-    public interface IBeneficiary
+    public interface IBeneficiaryService
     {
         public IEnumerable<BeneficiaryModel> GetAllBeneficiary();
         public BeneficiaryModel GetBeneficiaryById(int id);

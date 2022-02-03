@@ -2,18 +2,13 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class StatusServices : IStatus
+    public class RoleService : IRoleService
     {
         private IMapper _mapper;
-        public StatusServices()
+        public RoleService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -32,12 +27,12 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public IEnumerable<StatusModel> GetAllStatus()
+        public IEnumerable<RoleModel> GetAllRole()
         {
             throw new NotImplementedException();
         }
 
-        public StatusModel GetStatusById(int id)
+        public RoleModel GetRoleById(int id)
         {
             throw new NotImplementedException();
         }
