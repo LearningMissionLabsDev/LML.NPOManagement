@@ -5,7 +5,7 @@ namespace LML.NPOManagement.Request
     public class DonationRequest
     {
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "vat es ara")]
+        [Range(1, int.MaxValue, ErrorMessage = "")]
         public int InvestorId { get; set; }
         [Required]
         [Range(10, double.MaxValue)]

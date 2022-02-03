@@ -5,10 +5,10 @@ using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class RoleServices : IRole
+    public class AccountManagerInfoService : IAccountManagerInfoService
     {
         private IMapper _mapper;
-        public RoleServices()
+        public AccountManagerInfoService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -27,12 +27,27 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public IEnumerable<RoleModel> GetAllRole()
+        public int AddAccountManagerInfo(AccountManagerInfoModel accountManagerInfoModel)
         {
             throw new NotImplementedException();
         }
 
-        public RoleModel GetRoleById(int id)
+        public void DeleteAccountManagerInfo(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AccountManagerInfoModel GetAccountManagerInfoById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<AccountManagerInfoModel> GetAllAccountManagerInfo()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int ModifyAccountManagerInfo(AccountManagerInfoModel accountManagerInfoModel, int id)
         {
             throw new NotImplementedException();
         }

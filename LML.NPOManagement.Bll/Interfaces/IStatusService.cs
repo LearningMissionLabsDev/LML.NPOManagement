@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
-    public interface IStatus
+    public interface IStatusService
     {
         public IEnumerable<StatusModel> GetAllStatus();
         public StatusModel GetStatusById(int id);

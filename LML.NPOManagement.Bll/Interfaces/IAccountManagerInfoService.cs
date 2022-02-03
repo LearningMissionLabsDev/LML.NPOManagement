@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
-    public interface IAccountManageInfo
+    public interface IAccountManagerInfoService
     {
         public IEnumerable<AccountManagerInfoModel> GetAllAccountManagerInfo();
         public AccountManagerInfoModel GetAccountManagerInfoById(int id);
