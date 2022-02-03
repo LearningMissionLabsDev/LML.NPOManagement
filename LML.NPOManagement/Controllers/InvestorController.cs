@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
-using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;

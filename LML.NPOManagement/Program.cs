@@ -1,5 +1,6 @@
 using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Bll.Services;
+using LML.NPOManagement.Dal.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IInvestorService, InvestorService>();
+builder.Services.AddDbContext<NPOManagementContext>();
 
 var app = builder.Build();
 

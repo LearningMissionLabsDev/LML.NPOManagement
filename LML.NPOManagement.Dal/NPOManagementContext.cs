@@ -17,8 +17,13 @@ namespace LML.NPOManagement.Dal.Models
         {
         }
 
+        public virtual DbSet<AccountManager> AccountManagers { get; set; } = null!;
+        public virtual DbSet<AccountManagerInfo> AccountManagerInfos { get; set; } = null!;
+        public virtual DbSet<Beneficiary> Beneficiaries { get; set; } = null!;
         public virtual DbSet<Donation> Donations { get; set; } = null!;
         public virtual DbSet<Investor> Investors { get; set; } = null!;
+        public virtual DbSet<Role> Roles { get; set; } = null!;
+        public virtual DbSet<Status> Statuses { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,12 +38,126 @@ namespace LML.NPOManagement.Dal.Models
                               .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                               .AddJsonFile("appsettings.json")
                               .Build();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultDbConnection"));
+                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AccountManager>(entity =>
+            {
+                entity.ToTable("AccountManager");
+
+                entity.Property(e => e.AccountManagerCategory)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NarrowProfessional)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AccountManagerInfo>(entity =>
+            {
+                entity.ToTable("AccountManagerInfo");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FirstName).HasMaxLength(50);
+
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.MiddleName).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.AccountManagerCategory)
+                    .WithMany(p => p.AccountManagerInfos)
+                    .HasForeignKey(d => d.AccountManagerCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountManagerInfo_AccountManager");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.AccountManagerInfos)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountManagerInfo_Roles");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany(p => p.AccountManagerInfos)
+                    .HasForeignKey(d => d.StatusId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountManagerInfo_Status");
+            });
+
+            modelBuilder.Entity<Beneficiary>(entity =>
+            {
+                entity.ToTable("Beneficiary");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FirstName).HasMaxLength(50);
+
+                entity.Property(e => e.Gender)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.MiddleName).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.Beneficiaries)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Beneficiary_Roles");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany(p => p.Beneficiaries)
+                    .HasForeignKey(d => d.StatusId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Beneficiary_Status");
+
+                entity.HasMany(d => d.AccountManagerInfos)
+                    .WithMany(p => p.Beneficiries)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "AccountManagerBeneficiry",
+                        l => l.HasOne<AccountManagerInfo>().WithMany().HasForeignKey("AccountManagerInfoId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_AccountManagerBeneficiry_AccountManagerInfo"),
+                        r => r.HasOne<Beneficiary>().WithMany().HasForeignKey("BeneficiryId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_AccountManagerBeneficiry_Beneficiary"),
+                        j =>
+                        {
+                            j.HasKey("BeneficiryId", "AccountManagerInfoId").HasName("PK_ClassroomStudent");
+
+                            j.ToTable("AccountManagerBeneficiry");
+                        });
+            });
+
             modelBuilder.Entity<Donation>(entity =>
             {
                 entity.ToTable("Donation");
@@ -63,6 +182,27 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
                 entity.Property(e => e.LastName).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.ToTable("Role");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Role1)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Role");
+            });
+
+            modelBuilder.Entity<Status>(entity =>
+            {
+                entity.ToTable("Status");
+
+                entity.Property(e => e.StatusType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
