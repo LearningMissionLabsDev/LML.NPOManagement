@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LML.NPOManagement.Bll.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,8 @@ namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IRole
     {
+        public IEnumerable<RoleModel> GetAllRole();
+        public RoleModel GetRoleById(int id);
+       
     }
 }

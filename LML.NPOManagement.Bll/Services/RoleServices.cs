@@ -26,5 +26,15 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
+
+        public IEnumerable<RoleModel> GetAllRole()
+        {
+            throw new NotImplementedException();
+        }
+
+        public RoleModel GetRoleById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

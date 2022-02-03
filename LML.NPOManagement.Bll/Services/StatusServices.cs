@@ -31,5 +31,15 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
+
+        public IEnumerable<StatusModel> GetAllStatus()
+        {
+            throw new NotImplementedException();
+        }
+
+        public StatusModel GetStatusById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
