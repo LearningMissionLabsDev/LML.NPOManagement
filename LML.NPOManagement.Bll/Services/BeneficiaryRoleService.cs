@@ -5,10 +5,10 @@ using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class BeneficiaryService : IBeneficiaryService
+    public class BeneficiaryRoleService : IBeneficiaryRoleService
     {
         private IMapper _mapper;
-        public BeneficiaryService()
+        public BeneficiaryRoleService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -29,29 +29,15 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public int AddBeneficiary(BeneficiaryModel beneficiaryModel)
+        public IEnumerable<BeneficiaryRoleModel> GetAllBeneficiaryRoles()
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteBeneficiary(int id)
+        public BeneficiaryRoleModel GetBeneficiaryRoleById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<BeneficiaryModel> GetAllBeneficiaries()
-        {
-            throw new NotImplementedException();
-        }
-
-        public BeneficiaryModel GetBeneficiaryById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int ModifyBeneficiary(BeneficiaryModel beneficiaryModel, int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

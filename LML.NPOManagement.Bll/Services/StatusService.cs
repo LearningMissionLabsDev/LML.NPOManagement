@@ -2,11 +2,6 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -19,15 +14,16 @@ namespace LML.NPOManagement.Bll.Services
             {
                 cfg.CreateMap<AccountManagerInfo, AccountManagerInfoModel>();
                 cfg.CreateMap<Beneficiary, BeneficiaryModel>();
-                cfg.CreateMap<Role, RoleModel>();
+                cfg.CreateMap<BeneficiaryRole, BeneficiaryRoleModel>();
                 cfg.CreateMap<Status, StatusModel>();
                 cfg.CreateMap<AccountManager, AccountManagerModel>();
+                cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
                 cfg.CreateMap<BeneficiaryModel, Beneficiary>();
-                cfg.CreateMap<RoleModel, Role>();
+                cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRole>();
                 cfg.CreateMap<StatusModel, Status>();
                 cfg.CreateMap<AccountManagerModel, AccountManager>();
-
+                cfg.CreateMap<AccountManagerRoleModel, AccountManagerRole>();
             });
             _mapper = config.CreateMapper();
         }

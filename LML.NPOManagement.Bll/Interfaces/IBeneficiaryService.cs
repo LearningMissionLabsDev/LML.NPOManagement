@@ -1,15 +1,10 @@
 ﻿using LML.NPOManagement.Bll.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IBeneficiaryService
     {
-        public IEnumerable<BeneficiaryModel> GetAllBeneficiary();
+        public IEnumerable<BeneficiaryModel> GetAllBeneficiaries();
         public BeneficiaryModel GetBeneficiaryById(int id);
         public int AddBeneficiary(BeneficiaryModel beneficiaryModel);
         public int ModifyBeneficiary(BeneficiaryModel beneficiaryModel, int id);

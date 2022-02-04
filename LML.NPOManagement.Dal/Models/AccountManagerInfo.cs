@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace LML.NPOManagement.Dal.Models
 {
     public partial class AccountManagerInfo
@@ -11,7 +9,7 @@ namespace LML.NPOManagement.Dal.Models
         }
 
         public int Id { get; set; }
-        public int RoleId { get; set; }
+        public int AccountManagerInfoRoleId { get; set; }
         public int StatusId { get; set; }
         public int AccountManagerCategoryId { get; set; }
         public string FirstName { get; set; } = null!;
@@ -26,7 +24,7 @@ namespace LML.NPOManagement.Dal.Models
         public string? Information { get; set; }
 
         public virtual AccountManager AccountManagerCategory { get; set; } = null!;
-        public virtual Role Role { get; set; } = null!;
+        public virtual AccountManagerRole AccountManagerInfoRole { get; set; } = null!;
         public virtual Status Status { get; set; } = null!;
 
         public virtual ICollection<Beneficiary> Beneficiries { get; set; }

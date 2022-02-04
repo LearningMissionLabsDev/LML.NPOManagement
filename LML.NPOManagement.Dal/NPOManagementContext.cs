@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Models
@@ -19,10 +16,11 @@ namespace LML.NPOManagement.Dal.Models
 
         public virtual DbSet<AccountManager> AccountManagers { get; set; } = null!;
         public virtual DbSet<AccountManagerInfo> AccountManagerInfos { get; set; } = null!;
+        public virtual DbSet<AccountManagerRole> AccountManagerRoles { get; set; } = null!;
         public virtual DbSet<Beneficiary> Beneficiaries { get; set; } = null!;
+        public virtual DbSet<BeneficiaryRole> BeneficiaryRoles { get; set; } = null!;
         public virtual DbSet<Donation> Donations { get; set; } = null!;
         public virtual DbSet<Investor> Investors { get; set; } = null!;
-        public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<Status> Statuses { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -91,17 +89,26 @@ namespace LML.NPOManagement.Dal.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountManagerInfo_AccountManager");
 
-                entity.HasOne(d => d.Role)
+                entity.HasOne(d => d.AccountManagerInfoRole)
                     .WithMany(p => p.AccountManagerInfos)
-                    .HasForeignKey(d => d.RoleId)
+                    .HasForeignKey(d => d.AccountManagerInfoRoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_Roles");
+                    .HasConstraintName("FK_AccountManagerInfo_AccountManagerRole");
 
                 entity.HasOne(d => d.Status)
                     .WithMany(p => p.AccountManagerInfos)
                     .HasForeignKey(d => d.StatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountManagerInfo_Status");
+            });
+
+            modelBuilder.Entity<AccountManagerRole>(entity =>
+            {
+                entity.ToTable("AccountManagerRole");
+
+                entity.Property(e => e.AccountManagerRoleType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Beneficiary>(entity =>
@@ -132,9 +139,9 @@ namespace LML.NPOManagement.Dal.Models
 
                 entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
-                entity.HasOne(d => d.Role)
+                entity.HasOne(d => d.BeneficiaryRole)
                     .WithMany(p => p.Beneficiaries)
-                    .HasForeignKey(d => d.RoleId)
+                    .HasForeignKey(d => d.BeneficiaryRoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Beneficiary_Roles");
 
@@ -156,6 +163,17 @@ namespace LML.NPOManagement.Dal.Models
 
                             j.ToTable("AccountManagerBeneficiry");
                         });
+            });
+
+            modelBuilder.Entity<BeneficiaryRole>(entity =>
+            {
+                entity.ToTable("BeneficiaryRole");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.BeneficiaryRoleType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Donation>(entity =>
@@ -182,18 +200,6 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
                 entity.Property(e => e.LastName).HasMaxLength(50);
-            });
-
-            modelBuilder.Entity<Role>(entity =>
-            {
-                entity.ToTable("Role");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Role1)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("Role");
             });
 
             modelBuilder.Entity<Status>(entity =>

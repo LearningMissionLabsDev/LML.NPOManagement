@@ -2,16 +2,15 @@
 
 namespace LML.NPOManagement.Bll.Model
 {
-    public class AccountManagerModel
+    public class AccountManagerRoleModel
     {
-        public AccountManagerModel()
+        public AccountManagerRoleModel()
         {
             AccountManagerInfos = new HashSet<AccountManagerInfo>();
         }
 
         public int Id { get; set; }
-        public string AccountManagerCategory { get; set; } = null!;
-        public string? NarrowProfessional { get; set; }
+        public string AccountManagerRoleType { get; set; } = null!;
 
         public virtual ICollection<AccountManagerInfo> AccountManagerInfos { get; set; }
     }
