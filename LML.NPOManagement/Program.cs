@@ -16,8 +16,9 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<IAccountManagerService, AccountManagerService>();
 builder.Services.AddScoped<IAccountManagerInfoService, AccountManagerInfoService>();
 builder.Services.AddScoped<IBeneficiaryService, BeneficiaryService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IBeneficiaryRoleService, BeneficiaryRoleService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<IAccountManagerRoleService, AccountManagerRoleService>();
 builder.Services.AddDbContext<NPOManagementContext>();
 
 var app = builder.Build();

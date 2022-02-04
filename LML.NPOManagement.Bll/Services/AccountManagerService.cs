@@ -14,14 +14,16 @@ namespace LML.NPOManagement.Bll.Services
             {
                 cfg.CreateMap<AccountManagerInfo, AccountManagerInfoModel>();
                 cfg.CreateMap<Beneficiary, BeneficiaryModel>();
-                cfg.CreateMap<Role, RoleModel>();
+                cfg.CreateMap<BeneficiaryRole, BeneficiaryRoleModel>();
                 cfg.CreateMap<Status, StatusModel>();
                 cfg.CreateMap<AccountManager, AccountManagerModel>();
+                cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
                 cfg.CreateMap<BeneficiaryModel, Beneficiary>();
-                cfg.CreateMap<RoleModel, Role>();
+                cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRole>();
                 cfg.CreateMap<StatusModel, Status>();
                 cfg.CreateMap<AccountManagerModel, AccountManager>();
+                cfg.CreateMap<AccountManagerRoleModel, AccountManagerRole>();
 
             });
             _mapper = config.CreateMapper();
@@ -42,7 +44,7 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AccountManagerModel> GetAllAccountManager()
+        public IEnumerable<AccountManagerModel> GetAllAccountManagers()
         {
             throw new NotImplementedException();
         }

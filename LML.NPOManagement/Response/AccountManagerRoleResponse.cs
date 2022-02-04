@@ -1,8 +1,8 @@
 ﻿namespace LML.NPOManagement.Response
 {
-    public class AccountManagerResponse
+    public class AccountManagerRoleResponse
     {
-        public string AccountManagerCategory { get; set; } = null!;
+        public string AccountManagerRoleType { get; set; } = null!;
 
         public virtual ICollection<AccountManagerInfoResponse> AccountManagerInfosRes { get; set; }
     }

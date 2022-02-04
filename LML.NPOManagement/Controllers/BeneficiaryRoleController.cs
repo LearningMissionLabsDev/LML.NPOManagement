@@ -11,26 +11,28 @@ namespace LML.NPOManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoleController : ControllerBase
+    public class BeneficiaryRoleController : ControllerBase
     {
 
         private IMapper _mapper;
-        private IRoleService _roleService;
+        private IBeneficiaryRoleService _roleService;
 
-        public RoleController(IRoleService roleService)
+        public BeneficiaryRoleController(IBeneficiaryRoleService roleService)
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountManagerInfoRequest, AccountManagerInfoModel>();
                 cfg.CreateMap<BeneficiaryRequest, BeneficiaryModel>();
-                cfg.CreateMap<RoleRequest, RoleModel>();
+                cfg.CreateMap<BeneficiaryRoleRequest, BeneficiaryRoleModel>();
                 cfg.CreateMap<StatusRequest, StatusModel>();
                 cfg.CreateMap<AccountManagerRequest, AccountManagerModel>();
+                cfg.CreateMap<AccountManagerRoleRequest, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfoResponse>();
                 cfg.CreateMap<BeneficiaryModel, BeneficiaryResponse>();
-                cfg.CreateMap<RoleModel, RoleResponse>();
+                cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRoleResponse>();
                 cfg.CreateMap<StatusModel, StatusResponse>();
                 cfg.CreateMap<AccountManagerModel, AccountManagerResponse>();
+                cfg.CreateMap<AccountManagerRoleModel, AccountManagerRoleRequest>();
 
             });
             _mapper = config.CreateMapper();

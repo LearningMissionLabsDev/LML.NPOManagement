@@ -5,34 +5,35 @@ using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class RoleService : IRoleService
+    public class AccountManagerRoleService : IAccountManagerRoleService
     {
         private IMapper _mapper;
-        public RoleService()
+        public AccountManagerRoleService()
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountManagerInfo, AccountManagerInfoModel>();
                 cfg.CreateMap<Beneficiary, BeneficiaryModel>();
-                cfg.CreateMap<Role, RoleModel>();
+                cfg.CreateMap<BeneficiaryRole, BeneficiaryRoleModel>();
                 cfg.CreateMap<Status, StatusModel>();
                 cfg.CreateMap<AccountManager, AccountManagerModel>();
+                cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
                 cfg.CreateMap<BeneficiaryModel, Beneficiary>();
-                cfg.CreateMap<RoleModel, Role>();
+                cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRole>();
                 cfg.CreateMap<StatusModel, Status>();
                 cfg.CreateMap<AccountManagerModel, AccountManager>();
+                cfg.CreateMap<AccountManagerRoleModel, AccountManagerRole>();
 
             });
             _mapper = config.CreateMapper();
         }
-
-        public IEnumerable<RoleModel> GetAllRole()
+        public AccountManagerRoleModel GetAccountManagerRoleById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public RoleModel GetRoleById(int id)
+        public IEnumerable<AccountManagerRoleModel> GetAllAccountManagerRoles()
         {
             throw new NotImplementedException();
         }

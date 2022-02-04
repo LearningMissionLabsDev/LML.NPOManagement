@@ -1,16 +1,15 @@
 ﻿
 namespace LML.NPOManagement.Dal.Models
 {
-    public partial class AccountManager
+    public partial class AccountManagerRole
     {
-        public AccountManager()
+        public AccountManagerRole()
         {
             AccountManagerInfos = new HashSet<AccountManagerInfo>();
         }
 
         public int Id { get; set; }
-        public string AccountManagerCategory { get; set; } = null!;
-        public string? NarrowProfessional { get; set; }
+        public string AccountManagerRoleType { get; set; } = null!;
 
         public virtual ICollection<AccountManagerInfo> AccountManagerInfos { get; set; }
     }

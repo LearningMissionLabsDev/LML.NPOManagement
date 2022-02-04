@@ -11,13 +11,11 @@ namespace LML.NPOManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StatusController : ControllerBase
+    public class AccountManagerRoleController : ControllerBase
     {
-
         private IMapper _mapper;
-        private IStatusService _statusService;
-
-        public StatusController(IStatusService statusService)
+        private IAccountManagerRoleService _accountManagerRoleService;
+        public AccountManagerRoleController(IAccountManagerRoleService accountManagerRoleService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -36,23 +34,22 @@ namespace LML.NPOManagement.Controllers
 
             });
             _mapper = config.CreateMapper();
-            _statusService = statusService; 
+            _accountManagerRoleService = accountManagerRoleService;
         }
-
-        // GET: api/<StatusController>
+        // GET: api/<AccountManagerRoleController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<StatusController>/5
+        // GET api/<AccountManagerRoleController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        
+      
     }
 }
