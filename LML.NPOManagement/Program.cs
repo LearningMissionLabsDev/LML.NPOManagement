@@ -13,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IInvestorService, InvestorService>();
-builder.Services.AddScoped<IAccountManagerService, AccountManagerService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountManagerInfoService, AccountManagerInfoService>();
 builder.Services.AddScoped<IBeneficiaryService, BeneficiaryService>();
 builder.Services.AddScoped<IBeneficiaryRoleService, BeneficiaryRoleService>();

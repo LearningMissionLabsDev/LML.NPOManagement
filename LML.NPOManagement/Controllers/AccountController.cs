@@ -11,12 +11,12 @@ namespace LML.NPOManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountManagerController : ControllerBase
+    public class AccountController : ControllerBase
     {
         private IMapper _mapper;
-        private IAccountManagerService _accountManagerService ;
+        private IAccountService _accountService;
 
-        public AccountManagerController(IAccountManagerService accountManagerService)
+        public AccountController(IAccountService accountService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -24,50 +24,46 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<BeneficiaryRequest, BeneficiaryModel>();
                 cfg.CreateMap<BeneficiaryRoleRequest, BeneficiaryRoleModel>();
                 cfg.CreateMap<StatusRequest, StatusModel>();
-                cfg.CreateMap<AccountManagerRequest, AccountManagerModel>();
+                cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountManagerRoleRequest, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfoResponse>();
                 cfg.CreateMap<BeneficiaryModel, BeneficiaryResponse>();
                 cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRoleResponse>();
                 cfg.CreateMap<StatusModel, StatusResponse>();
-                cfg.CreateMap<AccountManagerModel, AccountManagerResponse>();
+                cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountManagerRoleModel, AccountManagerRoleRequest>();
 
             });
             _mapper = config.CreateMapper();
-            _accountManagerService = accountManagerService;
+            _accountService = accountService;
         }
-
-
-
-
-        // GET: api/<AccountManager>
+        // GET: api/<AccountController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<AccountManager>/5
+        // GET api/<AccountController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        // POST api/<AccountManager>
+        // POST api/<AccountController>
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/<AccountManager>/5
+        // PUT api/<AccountController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/<AccountManager>/5
+        // DELETE api/<AccountController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
