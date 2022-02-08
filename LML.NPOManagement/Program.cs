@@ -19,6 +19,9 @@ builder.Services.AddScoped<IBeneficiaryService, BeneficiaryService>();
 builder.Services.AddScoped<IBeneficiaryRoleService, BeneficiaryRoleService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
 builder.Services.AddScoped<IAccountManagerRoleService, AccountManagerRoleService>();
+builder.Services.AddScoped<IAccountManagerInventoryService, AccountManagerInventoryService>();
+builder.Services.AddScoped<IBeneficiaryInventoryService, BeneficiaryInventoryService>();
+builder.Services.AddScoped<IInventoryTypeService, InventoryTypeService>();
 builder.Services.AddDbContext<NPOManagementContext>();
 
 var app = builder.Build();

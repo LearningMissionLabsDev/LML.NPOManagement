@@ -3,6 +3,11 @@ namespace LML.NPOManagement.Dal.Models
 {
     public partial class AccountManagerInfo
     {
+        public AccountManagerInfo()
+        {
+            AccountManagerInventories = new HashSet<AccountManagerInventory>();
+        }
+
         public int Id { get; set; }
         public int AccountManagerInfoRoleId { get; set; }
         public int StatusId { get; set; }
@@ -19,7 +24,8 @@ namespace LML.NPOManagement.Dal.Models
         public string? Information { get; set; }
 
         public virtual Account AccountManagerCategory { get; set; } = null!;
-        public virtual AccountManagerRole AccountManagerCategory1 { get; set; } = null!;
+        public virtual AccountManagerRole AccountManagerCategoryNavigation { get; set; } = null!;
         public virtual Status Status { get; set; } = null!;
+        public virtual ICollection<AccountManagerInventory> AccountManagerInventories { get; set; }
     }
 }

@@ -3,6 +3,11 @@ namespace LML.NPOManagement.Dal.Models
 {
     public partial class Beneficiary
     {
+        public Beneficiary()
+        {
+            BeneficiaryInventories = new HashSet<BeneficiaryInventory>();
+        }
+
         public int Id { get; set; }
         public int BeneficiaryRoleId { get; set; }
         public int StatusId { get; set; }
@@ -21,5 +26,6 @@ namespace LML.NPOManagement.Dal.Models
         public virtual Account BeneficiaryCategory { get; set; } = null!;
         public virtual BeneficiaryRole BeneficiaryRole { get; set; } = null!;
         public virtual Status Status { get; set; } = null!;
+        public virtual ICollection<BeneficiaryInventory> BeneficiaryInventories { get; set; }
     }
 }

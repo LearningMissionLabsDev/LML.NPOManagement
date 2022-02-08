@@ -11,11 +11,12 @@ namespace LML.NPOManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountManagerRoleController : ControllerBase
+    public class BeneficiaryInventoryController : ControllerBase
     {
         private IMapper _mapper;
-        private IAccountManagerRoleService _accountManagerRoleService;
-        public AccountManagerRoleController(IAccountManagerRoleService accountManagerRoleService)
+        private IBeneficiaryInventoryService _beneficiaryInventoryService;
+
+        public BeneficiaryInventoryController(IBeneficiaryInventoryService beneficiaryInventoryService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -40,22 +41,38 @@ namespace LML.NPOManagement.Controllers
 
             });
             _mapper = config.CreateMapper();
-            _accountManagerRoleService = accountManagerRoleService;
+            _beneficiaryInventoryService = beneficiaryInventoryService;
         }
-        // GET: api/<AccountManagerRoleController>
+        // GET: api/<BeneficiaryInventoryController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<AccountManagerRoleController>/5
+        // GET api/<BeneficiaryInventoryController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-      
+        // POST api/<BeneficiaryInventoryController>
+        [HttpPost]
+        public void Post([FromBody] string value)
+        {
+        }
+
+        // PUT api/<BeneficiaryInventoryController>/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] string value)
+        {
+        }
+
+        // DELETE api/<BeneficiaryInventoryController>/5
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+        }
     }
 }
