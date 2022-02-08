@@ -2,7 +2,8 @@
 {
     public class AccountResponse
     {
-        public string AccountCategory { get; set; } = null!;
+        public string AccountName { get; set; } = null!;
+        public string AccountDescription { get; set; }
 
         public virtual ICollection<AccountManagerInfoResponse> AccountManagerInfosRes { get; set; }
         public virtual ICollection<BeneficiaryResponse> BeneficiariesRes { get; set; }

@@ -10,7 +10,8 @@ namespace LML.NPOManagement.Bll.Model
         }
 
         public int Id { get; set; }
-        public string AccountCategory { get; set; } = null!;
+        public string AccountName { get; set; } = null!;
+        public string AccountDescription { get; set; }
 
         public virtual ICollection<AccountManagerInfoModel> AccountManagerInfos { get; set; }
         public virtual ICollection<BeneficiaryModel> Beneficiaries { get; set; }

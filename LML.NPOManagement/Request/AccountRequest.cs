@@ -2,6 +2,7 @@
 {
     public class AccountRequest
     {
-        public string AccountCategory { get; set; } = null!;
+        public string AccountName { get; set; } = null!;
+        public string AccountDescription { get; set; }
     }
 }
