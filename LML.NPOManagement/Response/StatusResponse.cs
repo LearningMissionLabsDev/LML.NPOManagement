@@ -1,8 +1,10 @@
-﻿namespace LML.NPOManagement.Response
+﻿using LML.NPOManagement.Bll.Model;
+
+namespace LML.NPOManagement.Response
 {
     public class StatusResponse
     {
-        public string StatusType { get; set; } = null!;
+        public ActivityStatus ActivityStatusType { get; set; } 
 
         public virtual ICollection<AccountManagerInfoResponse> AccountManagerInfosRes { get; set; }
         public virtual ICollection<BeneficiaryResponse> BeneficiariesRes { get; set; }

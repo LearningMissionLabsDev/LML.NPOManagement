@@ -5,10 +5,10 @@ using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class AccountService : IAccountService
+    public class BeneficiaryInventoryService : IBeneficiaryInventoryService
     {
         private IMapper _mapper;
-        public AccountService()
+        public BeneficiaryInventoryService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -34,27 +34,27 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
-        public int AddAccountManagerInfo(AccountModel accountModel)
+        public int AddBeneficiaryInventory(BeneficiaryInventoryModel beneficiaryInventoryModel)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteAccount(int id)
+        public void DeleteBeneficiaryInventory(int id)
         {
             throw new NotImplementedException();
         }
 
-        public AccountModel GetAccountById(int id)
+        public IEnumerable<BeneficiaryInventoryModel> GetAllBeneficiaryInventories()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AccountModel> GetAllAccounts()
+        public BeneficiaryInventoryModel GetBeneficiaryInventoryById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public int ModifyAccount(AccountModel accountModel, int id)
+        public int ModifyBeneficiaryInventory(BeneficiaryInventoryModel beneficiaryInventoryModel, int id)
         {
             throw new NotImplementedException();
         }

@@ -5,10 +5,10 @@ using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class AccountService : IAccountService
+    public class InventoryTypeService : IInventoryTypeService
     {
         private IMapper _mapper;
-        public AccountService()
+        public InventoryTypeService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -19,7 +19,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<BeneficiaryInventory, BeneficiaryInventoryModel>();
+                cfg.CreateMap<BeneficiaryInventory,BeneficiaryInventoryModel>();
                 cfg.CreateMap<AccountManagerInventory, AccountManagerInventoryModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
                 cfg.CreateMap<BeneficiaryModel, Beneficiary>();
@@ -34,27 +34,27 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
-        public int AddAccountManagerInfo(AccountModel accountModel)
+        public int AddInventoryType(InventoryTypeModel inventoryTypeModel)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteAccount(int id)
+        public void DeleteInventoryType(int id)
         {
             throw new NotImplementedException();
         }
 
-        public AccountModel GetAccountById(int id)
+        public IEnumerable<InventoryTypeModel> GetAllInventoryTypes()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AccountModel> GetAllAccounts()
+        public InventoryTypeModel GetInventoryTypeById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public int ModifyAccount(AccountModel accountModel, int id)
+        public int ModifyInventoryType(InventoryTypeModel inventoryTypeModel, int id)
         {
             throw new NotImplementedException();
         }

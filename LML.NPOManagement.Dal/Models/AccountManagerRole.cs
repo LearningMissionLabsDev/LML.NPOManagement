@@ -1,4 +1,5 @@
 ﻿
+
 namespace LML.NPOManagement.Dal.Models
 {
     public partial class AccountManagerRole

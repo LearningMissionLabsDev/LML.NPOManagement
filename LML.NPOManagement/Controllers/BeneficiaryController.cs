@@ -26,12 +26,18 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<StatusRequest, StatusModel>();
                 cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountManagerRoleRequest, AccountManagerRoleModel>();
+                cfg.CreateMap<AccountManagerInventoryRequest, AccountManagerInventoryModel>();
+                cfg.CreateMap<BeneficiaryInventoryRequest, BeneficiaryInventoryModel>();
+                cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfoResponse>();
                 cfg.CreateMap<BeneficiaryModel, BeneficiaryResponse>();
                 cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRoleResponse>();
                 cfg.CreateMap<StatusModel, StatusResponse>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountManagerRoleModel, AccountManagerRoleRequest>();
+                cfg.CreateMap<AccountManagerInventoryModel, AccountManagerInventoryResponse>();
+                cfg.CreateMap<BeneficiaryInventoryModel, BeneficiaryInventoryResponse>();
+                cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
 
             });
             _mapper = config.CreateMapper();

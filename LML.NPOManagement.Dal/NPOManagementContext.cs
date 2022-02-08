@@ -14,12 +14,15 @@ namespace LML.NPOManagement.Dal.Models
         {
         }
 
-        public virtual DbSet<Account> Accounts { get; set; } = null!;       
+        public virtual DbSet<Account> Accounts { get; set; } = null!;
         public virtual DbSet<AccountManagerInfo> AccountManagerInfos { get; set; } = null!;
+        public virtual DbSet<AccountManagerInventory> AccountManagerInventories { get; set; } = null!;
         public virtual DbSet<AccountManagerRole> AccountManagerRoles { get; set; } = null!;
         public virtual DbSet<Beneficiary> Beneficiaries { get; set; } = null!;
+        public virtual DbSet<BeneficiaryInventory> BeneficiaryInventories { get; set; } = null!;
         public virtual DbSet<BeneficiaryRole> BeneficiaryRoles { get; set; } = null!;
         public virtual DbSet<Donation> Donations { get; set; } = null!;
+        public virtual DbSet<InventoryType> InventoryTypes { get; set; } = null!;
         public virtual DbSet<Investor> Investors { get; set; } = null!;
         public virtual DbSet<Status> Statuses { get; set; } = null!;
 
@@ -46,9 +49,9 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("Account");
 
-                entity.Property(e => e.AccountCategory)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.AccountDescription).HasColumnType("ntext");
+
+                entity.Property(e => e.AccountName).HasMaxLength(50);
             });
 
             modelBuilder.Entity<AccountManagerInfo>(entity =>
@@ -65,9 +68,7 @@ namespace LML.NPOManagement.Dal.Models
 
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
-                entity.Property(e => e.Gender)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
+                entity.Property(e => e.Gender).HasMaxLength(50);
 
                 entity.Property(e => e.LastName).HasMaxLength(50);
 
@@ -85,9 +86,7 @@ namespace LML.NPOManagement.Dal.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_AccountManagerInfo_Account");
 
-             
-
-                entity.HasOne(d => d.AccountManagerCategory1)
+                entity.HasOne(d => d.AccountManagerCategoryNavigation)
                     .WithMany(p => p.AccountManagerInfos)
                     .HasForeignKey(d => d.AccountManagerCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -100,13 +99,31 @@ namespace LML.NPOManagement.Dal.Models
                     .HasConstraintName("FK_AccountManagerInfo_Status1");
             });
 
+            modelBuilder.Entity<AccountManagerInventory>(entity =>
+            {
+                entity.ToTable("AccountManagerInventory");
+
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasColumnType("ntext");
+
+                entity.HasOne(d => d.AccountManagerInfo)
+                    .WithMany(p => p.AccountManagerInventories)
+                    .HasForeignKey(d => d.AccountManagerInfoId)
+                    .HasConstraintName("FK_AccountManagerInventory_AccountManagerInfo");
+
+                entity.HasOne(d => d.InventoryType)
+                    .WithMany(p => p.AccountManagerInventories)
+                    .HasForeignKey(d => d.InventoryTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountManagerInventory_InventoryType");
+            });
+
             modelBuilder.Entity<AccountManagerRole>(entity =>
             {
                 entity.ToTable("AccountManagerRole");
 
-                entity.Property(e => e.AccountManagerRoleType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.AccountManagerRoleType).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Beneficiary>(entity =>
@@ -156,6 +173,28 @@ namespace LML.NPOManagement.Dal.Models
                     .HasConstraintName("FK_Beneficiary_Status1");
             });
 
+            modelBuilder.Entity<BeneficiaryInventory>(entity =>
+            {
+                entity.ToTable("BeneficiaryInventory");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasColumnType("ntext");
+
+                entity.HasOne(d => d.Beneficiary)
+                    .WithMany(p => p.BeneficiaryInventories)
+                    .HasForeignKey(d => d.BeneficiaryId)
+                    .HasConstraintName("FK_BeneficiaryInventory_Beneficiary");
+
+                entity.HasOne(d => d.InventoryType)
+                    .WithMany(p => p.BeneficiaryInventories)
+                    .HasForeignKey(d => d.InventoryTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_BeneficiaryInventory_InventoryType");
+            });
+
             modelBuilder.Entity<BeneficiaryRole>(entity =>
             {
                 entity.ToTable("BeneficiaryRole");
@@ -182,6 +221,15 @@ namespace LML.NPOManagement.Dal.Models
                     .HasConstraintName("FK_Table1_Table2");
             });
 
+            modelBuilder.Entity<InventoryType>(entity =>
+            {
+                entity.ToTable("InventoryType");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<Investor>(entity =>
             {
                 entity.ToTable("Investor");
@@ -197,9 +245,7 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("Status");
 
-                entity.Property(e => e.StatusType)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
+                entity.Property(e => e.StatusType).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);

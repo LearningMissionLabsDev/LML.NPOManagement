@@ -1,17 +1,16 @@
-﻿using LML.NPOManagement.Dal.Models;
-
+﻿
 namespace LML.NPOManagement.Bll.Model
 {
     public class BeneficiaryRoleModel
     {
         public BeneficiaryRoleModel()
         {
-            Beneficiaries = new HashSet<Beneficiary>();
+            Beneficiaries = new HashSet<BeneficiaryModel>();
         }
 
         public int Id { get; set; }
         public string BeneficiaryRoleType { get; set; } = null!;
 
-        public virtual ICollection<Beneficiary> Beneficiaries { get; set; }
+        public virtual ICollection<BeneficiaryModel> Beneficiaries { get; set; }
     }
 }
