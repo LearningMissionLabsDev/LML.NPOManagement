@@ -23,13 +23,13 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<BeneficiaryRequest, BeneficiaryModel>();
                 cfg.CreateMap<BeneficiaryRoleRequest, BeneficiaryRoleModel>();
                 cfg.CreateMap<StatusRequest, StatusModel>();
-                cfg.CreateMap<AccountManagerRequest, AccountManagerModel>();
+                cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountManagerRoleRequest, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfoResponse>();
                 cfg.CreateMap<BeneficiaryModel, BeneficiaryResponse>();
                 cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRoleResponse>();
                 cfg.CreateMap<StatusModel, StatusResponse>();
-                cfg.CreateMap<AccountManagerModel, AccountManagerResponse>();
+                cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountManagerRoleModel, AccountManagerRoleRequest>();
 
             });

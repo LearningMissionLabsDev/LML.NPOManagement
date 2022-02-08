@@ -14,7 +14,7 @@ namespace LML.NPOManagement.Dal.Models
         {
         }
 
-        public virtual DbSet<AccountManager> AccountManagers { get; set; } = null!;
+        public virtual DbSet<Account> Accounts { get; set; } = null!;       
         public virtual DbSet<AccountManagerInfo> AccountManagerInfos { get; set; } = null!;
         public virtual DbSet<AccountManagerRole> AccountManagerRoles { get; set; } = null!;
         public virtual DbSet<Beneficiary> Beneficiaries { get; set; } = null!;
@@ -42,16 +42,12 @@ namespace LML.NPOManagement.Dal.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AccountManager>(entity =>
+            modelBuilder.Entity<Account>(entity =>
             {
-                entity.ToTable("AccountManager");
+                entity.ToTable("Account");
 
-                entity.Property(e => e.AccountManagerCategory)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.NarrowProfessional)
-                    .HasMaxLength(100)
+                entity.Property(e => e.AccountCategory)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
@@ -87,19 +83,21 @@ namespace LML.NPOManagement.Dal.Models
                     .WithMany(p => p.AccountManagerInfos)
                     .HasForeignKey(d => d.AccountManagerCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_AccountManager");
+                    .HasConstraintName("FK_AccountManagerInfo_Account");
 
-                entity.HasOne(d => d.AccountManagerInfoRole)
+             
+
+                entity.HasOne(d => d.AccountManagerCategory1)
                     .WithMany(p => p.AccountManagerInfos)
-                    .HasForeignKey(d => d.AccountManagerInfoRoleId)
+                    .HasForeignKey(d => d.AccountManagerCategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_AccountManagerRole");
+                    .HasConstraintName("FK_AccountManagerInfo_AccountManagerRole1");
 
                 entity.HasOne(d => d.Status)
                     .WithMany(p => p.AccountManagerInfos)
                     .HasForeignKey(d => d.StatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_Status");
+                    .HasConstraintName("FK_AccountManagerInfo_Status1");
             });
 
             modelBuilder.Entity<AccountManagerRole>(entity =>
@@ -139,30 +137,23 @@ namespace LML.NPOManagement.Dal.Models
 
                 entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
+                entity.HasOne(d => d.BeneficiaryCategory)
+                    .WithMany(p => p.Beneficiaries)
+                    .HasForeignKey(d => d.BeneficiaryCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Beneficiary_Account");
+
                 entity.HasOne(d => d.BeneficiaryRole)
                     .WithMany(p => p.Beneficiaries)
                     .HasForeignKey(d => d.BeneficiaryRoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Beneficiary_Roles");
+                    .HasConstraintName("FK_Beneficiary_BeneficiaryRole");
 
                 entity.HasOne(d => d.Status)
                     .WithMany(p => p.Beneficiaries)
                     .HasForeignKey(d => d.StatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Beneficiary_Status");
-
-                entity.HasMany(d => d.AccountManagerInfos)
-                    .WithMany(p => p.Beneficiries)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "AccountManagerBeneficiry",
-                        l => l.HasOne<AccountManagerInfo>().WithMany().HasForeignKey("AccountManagerInfoId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_AccountManagerBeneficiry_AccountManagerInfo"),
-                        r => r.HasOne<Beneficiary>().WithMany().HasForeignKey("BeneficiryId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_AccountManagerBeneficiry_Beneficiary"),
-                        j =>
-                        {
-                            j.HasKey("BeneficiryId", "AccountManagerInfoId").HasName("PK_ClassroomStudent");
-
-                            j.ToTable("AccountManagerBeneficiry");
-                        });
+                    .HasConstraintName("FK_Beneficiary_Status1");
             });
 
             modelBuilder.Entity<BeneficiaryRole>(entity =>

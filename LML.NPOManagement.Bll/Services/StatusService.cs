@@ -16,13 +16,13 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<Beneficiary, BeneficiaryModel>();
                 cfg.CreateMap<BeneficiaryRole, BeneficiaryRoleModel>();
                 cfg.CreateMap<Status, StatusModel>();
-                cfg.CreateMap<AccountManager, AccountManagerModel>();
+                cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
                 cfg.CreateMap<BeneficiaryModel, Beneficiary>();
                 cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRole>();
                 cfg.CreateMap<StatusModel, Status>();
-                cfg.CreateMap<AccountManagerModel, AccountManager>();
+                cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<AccountManagerRoleModel, AccountManagerRole>();
             });
             _mapper = config.CreateMapper();

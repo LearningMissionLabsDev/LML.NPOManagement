@@ -5,10 +5,10 @@ using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class AccountManagerService : IAccountManagerService
+    public class AccountService : IAccountService
     {
         private IMapper _mapper;
-        public AccountManagerService()
+        public AccountService()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -16,40 +16,39 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<Beneficiary, BeneficiaryModel>();
                 cfg.CreateMap<BeneficiaryRole, BeneficiaryRoleModel>();
                 cfg.CreateMap<Status, StatusModel>();
-                cfg.CreateMap<AccountManager, AccountManagerModel>();
+                cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
                 cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
                 cfg.CreateMap<BeneficiaryModel, Beneficiary>();
                 cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRole>();
                 cfg.CreateMap<StatusModel, Status>();
-                cfg.CreateMap<AccountManagerModel, AccountManager>();
+                cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<AccountManagerRoleModel, AccountManagerRole>();
 
             });
             _mapper = config.CreateMapper();
         }
-
-        public int AddAccountManager(AccountManagerModel accountManagerModel)
+        public int AddAccountManagerInfo(AccountModel accountModel)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteAccountManager(int id)
+        public void DeleteAccount(int id)
         {
             throw new NotImplementedException();
         }
 
-        public AccountManagerModel GetAccountManagerById(int id)
+        public AccountModel GetAccountById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<AccountManagerModel> GetAllAccountManagers()
+        public IEnumerable<AccountModel> GetAllAccounts()
         {
             throw new NotImplementedException();
         }
 
-        public int ModifyAccountManager(AccountManagerModel accountManagerModel, int id)
+        public int ModifyAccount(AccountModel accountModel, int id)
         {
             throw new NotImplementedException();
         }

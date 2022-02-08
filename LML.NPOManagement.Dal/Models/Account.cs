@@ -1,17 +1,18 @@
 ﻿
 namespace LML.NPOManagement.Dal.Models
 {
-    public partial class AccountManager
+    public partial class Account
     {
-        public AccountManager()
+        public Account()
         {
             AccountManagerInfos = new HashSet<AccountManagerInfo>();
+            Beneficiaries = new HashSet<Beneficiary>();
         }
 
         public int Id { get; set; }
-        public string AccountManagerCategory { get; set; } = null!;
-        public string? NarrowProfessional { get; set; }
+        public string AccountCategory { get; set; } = null!;
 
         public virtual ICollection<AccountManagerInfo> AccountManagerInfos { get; set; }
+        public virtual ICollection<Beneficiary> Beneficiaries { get; set; }
     }
 }
