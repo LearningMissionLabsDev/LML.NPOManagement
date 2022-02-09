@@ -47,18 +47,18 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<StatusController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<StatusResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var statuses = _statusService.GetAllStatus().ToList();
+            return _mapper.Map<List<StatusModel>, List<StatusResponse>>(statuses);
         }
 
         // GET api/<StatusController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public StatusResponse Get(int id)
         {
-            return "value";
+            var status = _statusService.GetStatusById(id);
+            return _mapper.Map<StatusModel, StatusResponse>(status);
         }
-
-        
     }
 }

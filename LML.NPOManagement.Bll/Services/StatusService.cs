@@ -36,12 +36,32 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<StatusModel> GetAllStatus()
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var statuses = dbContext.Statuses.ToList();
+
+                foreach (var status in statuses)
+                {
+                    var StatusModel = _mapper.Map<Status,StatusModel>(status);
+                    yield return StatusModel;
+                }
+            }
+            
         }
 
         public StatusModel GetStatusById(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var status = dbContext.Statuses.Where(status => status.Id == id).FirstOrDefault();
+                if (status != null)
+                {
+                    var StatusModel = _mapper.Map<Status, StatusModel>(status);
+                    return StatusModel;
+                }
+                return null;
+            }
+           
         }
     }
 }
