@@ -45,16 +45,18 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<BeneficiaryInventoryController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<BeneficiaryInventoryResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var beneficiaryInventory = _beneficiaryInventoryService.GetAllBeneficiaryInventories().ToList();
+            return _mapper.Map<List<BeneficiaryInventoryModel>,List<BeneficiaryInventoryResponse>>(beneficiaryInventory);
         }
 
         // GET api/<BeneficiaryInventoryController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public BeneficiaryInventoryResponse Get(int id)
         {
-            return "value";
+            var beneficiaryInventory = _beneficiaryInventoryService.GetBeneficiaryInventoryById(id);
+            return _mapper.Map<BeneficiaryInventoryModel,BeneficiaryInventoryResponse>(beneficiaryInventory);
         }
 
         // POST api/<BeneficiaryInventoryController>

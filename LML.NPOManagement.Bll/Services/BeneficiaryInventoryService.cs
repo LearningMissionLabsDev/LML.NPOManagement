@@ -46,12 +46,36 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<BeneficiaryInventoryModel> GetAllBeneficiaryInventories()
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var beneficiaryInventories = dbContext.BeneficiaryInventories.ToList();
+
+                foreach (var beneficiaryInventory in beneficiaryInventories)
+                {
+                    var beneficiaryInventoryModel = _mapper.
+                    Map<BeneficiaryInventory, BeneficiaryInventoryModel>(beneficiaryInventory);
+
+                    yield return beneficiaryInventoryModel;
+                }
+            }
         }
 
         public BeneficiaryInventoryModel GetBeneficiaryInventoryById(int id)
         {
-            throw new NotImplementedException();
+            using( var dbContext = new NPOManagementContext())
+            {
+                var beneficiaryInventory = dbContext.BeneficiaryInventories.
+                Where(bi => bi.Id == id).FirstOrDefault();
+
+                if(beneficiaryInventory != null)
+                {
+                    var beneficiaryInventoryModel = _mapper.
+                    Map<BeneficiaryInventory, BeneficiaryInventoryModel>(beneficiaryInventory);
+
+                    return beneficiaryInventoryModel;
+                }
+                return null;
+            }
         }
 
         public int ModifyBeneficiaryInventory(BeneficiaryInventoryModel beneficiaryInventoryModel, int id)
