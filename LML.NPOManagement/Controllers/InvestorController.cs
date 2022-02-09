@@ -22,6 +22,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InvestorModel, InvestorResponse>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
                 cfg.CreateMap<InvestorRequest, InvestorModel>();
+                cfg.CreateMap<InvestorModel, InvestorRequest>();
 
             });
 
