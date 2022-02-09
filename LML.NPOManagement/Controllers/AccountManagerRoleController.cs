@@ -44,16 +44,18 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<AccountManagerRoleController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<AccountManagerRoleResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var accountManagerRoles = _accountManagerRoleService.GetAllAccountManagerRoles().ToList();
+            return _mapper.Map<List<AccountManagerRoleModel>, List<AccountManagerRoleResponse>>(accountManagerRoles);
         }
 
         // GET api/<AccountManagerRoleController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public AccountManagerRoleResponse Get(int id)
         {
-            return "value";
+            var accountManagerRole = _accountManagerRoleService.GetAccountManagerRoleById(id);
+            return _mapper.Map<AccountManagerRoleModel, AccountManagerRoleResponse>(accountManagerRole);
         }
 
       

@@ -48,16 +48,18 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<RoleController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<BeneficiaryRoleResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var beneficiaryRoles = _roleService.GetAllBeneficiaryRoles().ToList();
+            return _mapper.Map<List<BeneficiaryRoleModel>, List<BeneficiaryRoleResponse>>(beneficiaryRoles);
         }
 
         // GET api/<RoleController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public BeneficiaryRoleResponse Get(int id)
         {
-            return "value";
+            var beneficiaryRole = _roleService.GetBeneficiaryRoleById(id);
+            return _mapper.Map<BeneficiaryRoleModel, BeneficiaryRoleResponse>(beneficiaryRole);
         }
 
        
