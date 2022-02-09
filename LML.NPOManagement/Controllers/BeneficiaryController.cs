@@ -47,16 +47,18 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<BeneficiaryController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<BeneficiaryResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var beneficiary = _beneficiaryService.GetAllBeneficiaries().ToList();
+            return _mapper.Map<List<BeneficiaryModel>,List<BeneficiaryResponse>>(beneficiary);
         }
 
         // GET api/<BeneficiaryController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public BeneficiaryResponse Get(int id)
         {
-            return "value";
+            var beneficiary = _beneficiaryService.GetBeneficiaryById(id);
+            return _mapper.Map<BeneficiaryModel,BeneficiaryResponse>(beneficiary);
         }
 
         // POST api/<BeneficiaryController>

@@ -46,12 +46,32 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<InventoryTypeModel> GetAllInventoryTypes()
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var inventoryTypes = dbContext.InventoryTypes.ToList();
+
+                foreach (var inventoryType in inventoryTypes)
+                {
+                    var inventoryTypeModel = _mapper.Map<InventoryType, InventoryTypeModel>(inventoryType);
+                    yield return inventoryTypeModel;
+                }
+            }
         }
 
         public InventoryTypeModel GetInventoryTypeById(int id)
         {
-            throw new NotImplementedException();
+            using( var dbContext = new NPOManagementContext())
+            {
+                var inventoryType = dbContext.InventoryTypes.Where(it => it.Id == id).FirstOrDefault();
+
+                if (inventoryType != null)
+                {
+                    var inventoryTypeModel = _mapper.Map<InventoryType, InventoryTypeModel>(inventoryType);
+
+                    return inventoryTypeModel;
+                }
+                return null;
+            }
         }
 
         public int ModifyInventoryType(InventoryTypeModel inventoryTypeModel, int id)

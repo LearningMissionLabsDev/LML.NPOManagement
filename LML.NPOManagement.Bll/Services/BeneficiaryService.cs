@@ -47,12 +47,31 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<BeneficiaryModel> GetAllBeneficiaries()
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var beneficiaries = dbContext.Beneficiaries.ToList();
+
+                foreach (var beneficiary in beneficiaries)
+                {
+                    var beneficiaryModel = _mapper.Map<Beneficiary, BeneficiaryModel>(beneficiary);
+                    yield return beneficiaryModel;
+                }
+            }
         }
 
         public BeneficiaryModel GetBeneficiaryById(int id)
         {
-            throw new NotImplementedException();
+            using( var dbContext = new NPOManagementContext())
+            {
+                var beneficiary = dbContext.Beneficiaries.Where(b => b.Id == id).FirstOrDefault();
+
+                if (beneficiary != null)
+                {
+                    var beneficiModel = _mapper.Map<Beneficiary, BeneficiaryModel>(beneficiary);
+                    return beneficiModel;
+                }
+                return null;
+            }
         }
 
         public int ModifyBeneficiary(BeneficiaryModel beneficiaryModel, int id)

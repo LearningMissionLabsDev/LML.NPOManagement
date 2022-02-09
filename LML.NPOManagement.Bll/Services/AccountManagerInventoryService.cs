@@ -46,12 +46,37 @@ namespace LML.NPOManagement.Bll.Services
 
         public AccountManagerInventoryModel GetAccountManagerInventoryById(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var accountManagerInventories = dbContext.AccountManagerInventories.Where
+                (accountManagerInventory => accountManagerInventory.Id == id).FirstOrDefault();
+
+                if (accountManagerInventories != null)
+                {
+                    var accountManagerInventoriesModel = _mapper.
+                    Map<AccountManagerInventory, AccountManagerInventoryModel>(accountManagerInventories);
+
+                    return accountManagerInventoriesModel;
+                }
+                return null;
+
+            }
         }
 
         public IEnumerable<AccountManagerInventoryModel> GetAllAccountManagerInventories()
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var accountManagerInventories = dbContext.AccountManagerInventories.ToList();
+
+                foreach (var accountManagerInventory in accountManagerInventories)
+                {
+                    var accountManagerInventoryModel = _mapper.
+                    Map<AccountManagerInventory, AccountManagerInventoryModel>(accountManagerInventory);
+
+                    yield return accountManagerInventoryModel;  
+                }
+            }
         }
 
         public int ModifyAccountManagerInventory(AccountManagerInventoryModel accountManagerInventoryModel, int id)
