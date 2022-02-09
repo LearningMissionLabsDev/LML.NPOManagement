@@ -44,34 +44,62 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<AccountManagerInfoController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<AccountManagerInfoResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var accountManagerInfo = _accountManagerInfoService.GetAllAccountManagerInfos().ToList();
+
+            return _mapper.Map<List<AccountManagerInfoModel>, List<AccountManagerInfoResponse>>(accountManagerInfo);
         }
 
         // GET api/<AccountManagerInfoController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public AccountManagerInfoResponse Get(int id)
         {
-            return "value";
+            var accountManagerInfo = _accountManagerInfoService.GetAccountManagerInfoById(id);
+
+            return _mapper.Map<AccountManagerInfoModel, AccountManagerInfoResponse>(accountManagerInfo);
         }
 
         // POST api/<AccountManagerInfoController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<AccountManagerInfoResponse> Post([FromBody] AccountManagerInfoRequest accountManagerInfoRequest)
         {
+            var addAccountManagerInfo = _mapper.Map<AccountManagerInfoRequest, AccountManagerInfoModel>(accountManagerInfoRequest);
+            var id = _accountManagerInfoService.AddAccountManagerInfo(addAccountManagerInfo);
+            var accountManagerInfoModel = _accountManagerInfoService.GetAccountManagerInfoById(id);
+
+            return _mapper.Map<AccountManagerInfoModel, AccountManagerInfoResponse>(accountManagerInfoModel);
         }
 
         // PUT api/<AccountManagerInfoController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<AccountManagerInfoResponse> Put(int id, [FromBody] AccountManagerInfoRequest accountManagerInfoRequest)
         {
+            var modifyAccountManagerInfo = _mapper.Map<AccountManagerInfoRequest, AccountManagerInfoModel>(accountManagerInfoRequest);
+            var accountManagerInfoId = _accountManagerInfoService.ModifyAccountManagerInfo(modifyAccountManagerInfo, id);
+            var accountManagerInfoModel = _accountManagerInfoService.GetAccountManagerInfoById(accountManagerInfoId);
+
+            return _mapper.Map<AccountManagerInfoModel, AccountManagerInfoResponse>(accountManagerInfoModel);
         }
 
         // DELETE api/<AccountManagerInfoController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            if (id == 0)
+            {
+                return BadRequest();
+            }
+
+            var accountManagerInfoToDelete = _accountManagerInfoService.GetAccountManagerInfoById(id);
+            if (accountManagerInfoToDelete == null)
+            {
+                return NotFound();
+            }
+
+            _accountManagerInfoService.DeleteAccountManagerInfo(id);
+
+            return Ok();
         }
     }
 }
