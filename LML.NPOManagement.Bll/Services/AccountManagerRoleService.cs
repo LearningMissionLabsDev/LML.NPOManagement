@@ -2,6 +2,7 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -36,12 +37,30 @@ namespace LML.NPOManagement.Bll.Services
         }
         public AccountManagerRoleModel GetAccountManagerRoleById(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var accountManagerRole = dbContext.AccountManagerRoles.Include(d => d.AccountManagerInfos).Where(accountManagerRole => accountManagerRole.Id == id).FirstOrDefault();
+                if (accountManagerRole != null)
+                {
+                    var accountManagerRoleModel = _mapper.Map<AccountManagerRole, AccountManagerRoleModel>(accountManagerRole);
+                    return accountManagerRoleModel;
+                }
+                return null;
+            }
         }
 
         public IEnumerable<AccountManagerRoleModel> GetAllAccountManagerRoles()
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var accountManagerRoles = dbContext.AccountManagerRoles.ToList();
+
+                foreach (var accountManagerRole in accountManagerRoles)
+                {
+                    var accountManagerRoleModel = _mapper.Map<AccountManagerRole, AccountManagerRoleModel>(accountManagerRole);
+                    yield return accountManagerRoleModel;
+                }
+            }
         }
     }
 }

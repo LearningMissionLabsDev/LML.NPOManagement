@@ -2,6 +2,7 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -37,12 +38,30 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<BeneficiaryRoleModel> GetAllBeneficiaryRoles()
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var beneficiaryRoles = dbContext.BeneficiaryRoles.ToList();
+
+                foreach (var beneficiaryRole in beneficiaryRoles)
+                {
+                    var beneficiaryRoleModel = _mapper.Map<BeneficiaryRole, BeneficiaryRoleModel>(beneficiaryRole);
+                    yield return beneficiaryRoleModel;
+                }
+            }
         }
 
         public BeneficiaryRoleModel GetBeneficiaryRoleById(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var beneficiaryRole = dbContext.BeneficiaryRoles.Include(d => d.Beneficiaries).Where(beneficiaryRole => beneficiaryRole.Id == id).FirstOrDefault();
+                if (beneficiaryRole != null)
+                {
+                    var beneficiaryRoleModel = _mapper.Map<BeneficiaryRole, BeneficiaryRoleModel>(beneficiaryRole);
+                    return beneficiaryRoleModel;
+                }
+                return null;
+            }
         }
 
     }
