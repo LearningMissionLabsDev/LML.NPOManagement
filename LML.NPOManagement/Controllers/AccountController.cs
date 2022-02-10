@@ -45,34 +45,58 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<AccountController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<AccountManagerInfoResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var accounts = _accountService.GetAllAccounts().ToList();
+            return _mapper.Map<List<AccountModel>, List<AccountManagerInfoResponse>>(accounts);
         }
 
         // GET api/<AccountController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public AccountManagerInfoResponse Get(int id)
         {
-            return "value";
+
+            var account = _accountService.GetAccountById(id);
+            return _mapper.Map<AccountModel, AccountManagerInfoResponse>(account);
         }
 
         // POST api/<AccountController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<AccountManagerInfoResponse> Post([FromBody] AccountManagerInfoRequest accountManagerInfoRequest)
         {
+            var addAccount = _mapper.Map<AccountManagerInfoRequest, AccountModel>(accountManagerInfoRequest);
+            var id = _accountService.AddAccountManagerInfo(addAccount);
+            var accountModel = _accountService.GetAccountById(id);
+            return _mapper.Map<AccountModel, AccountManagerInfoResponse>(accountModel);
         }
 
         // PUT api/<AccountController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<AccountManagerInfoResponse> Put(int id, [FromBody] AccountManagerInfoRequest accountManagerInfoRequest)
         {
+            var modifyAccount = _mapper.Map<AccountManagerInfoRequest, AccountModel>(accountManagerInfoRequest);
+            var accountId = _accountService.ModifyAccount(modifyAccount, id);
+            var accountModel = _accountService.GetAccountById(accountId);
+            return _mapper.Map<AccountModel, AccountManagerInfoResponse>(accountModel);
         }
 
         // DELETE api/<AccountController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+            var accountForDelete = _accountService.GetAccountById(id);
+            if (accountForDelete == null)
+            {
+                return NotFound();
+            }
+           _accountService.DeleteAccount(id);
+
+            return Ok();
+
         }
     }
 }
