@@ -42,8 +42,8 @@ namespace LML.NPOManagement.Bll.Services
 
                 foreach (var status in statuses)
                 {
-                    var StatusModel = _mapper.Map<Status,StatusModel>(status);
-                    yield return StatusModel;
+                    var statusModel = _mapper.Map<Status,StatusModel>(status);
+                    yield return statusModel;
                 }
             }
             
@@ -53,11 +53,11 @@ namespace LML.NPOManagement.Bll.Services
         {
             using (var dbContext = new NPOManagementContext())
             {
-                var status = dbContext.Statuses.Where(status => status.Id == id).FirstOrDefault();
+                var status = dbContext.statuses.Where(status => status.Id == id).FirstOrDefault();
                 if (status != null)
                 {
-                    var StatusModel = _mapper.Map<Status, StatusModel>(status);
-                    return StatusModel;
+                    var statusModel = _mapper.Map<Status,StatusModel>(status);
+                    return statusModel;
                 }
                 return null;
             }

@@ -13,10 +13,8 @@ namespace LML.NPOManagement.Controllers
     [ApiController]
     public class StatusController : ControllerBase
     {
-
         private IMapper _mapper;
         private IStatusService _statusService;
-
         public StatusController(IStatusService statusService)
         {
             var config = new MapperConfiguration(cfg =>
@@ -52,7 +50,6 @@ namespace LML.NPOManagement.Controllers
             var statuses = _statusService.GetAllStatus().ToList();
             return _mapper.Map<List<StatusModel>, List<StatusResponse>>(statuses);
         }
-
         // GET api/<StatusController>/5
         [HttpGet("{id}")]
         public StatusResponse Get(int id)
