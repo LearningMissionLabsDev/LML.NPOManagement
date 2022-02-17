@@ -33,27 +33,24 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
         }
-
         public IEnumerable<StatusModel> GetAllStatus()
         {
             using (var dbContext = new NPOManagementContext())
             {
                 var statuses = dbContext.Statuses.ToList();
-
                 foreach (var status in statuses)
                 {
-                    var statusModel = _mapper.Map<Status,StatusModel>(status);
-                    yield return statusModel;
+                   var statusModel = _mapper.Map<Status,StatusModel>(status);
+                   yield return statusModel;
                 }
             }
-            
         }
 
         public StatusModel GetStatusById(int id)
         {
             using (var dbContext = new NPOManagementContext())
             {
-                var status = dbContext.statuses.Where(status => status.Id == id).FirstOrDefault();
+                var status = dbContext.Statuses.Where(s => s.Id == id).FirstOrDefault();
                 if (status != null)
                 {
                     var statusModel = _mapper.Map<Status,StatusModel>(status);
@@ -61,7 +58,6 @@ namespace LML.NPOManagement.Bll.Services
                 }
                 return null;
             }
-           
         }
     }
 }
