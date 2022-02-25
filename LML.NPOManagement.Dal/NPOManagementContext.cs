@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Models
@@ -15,16 +18,24 @@ namespace LML.NPOManagement.Dal.Models
         }
 
         public virtual DbSet<Account> Accounts { get; set; } = null!;
-        public virtual DbSet<AccountManagerInfo> AccountManagerInfos { get; set; } = null!;
-        public virtual DbSet<AccountManagerInventory> AccountManagerInventories { get; set; } = null!;
-        public virtual DbSet<AccountManagerRole> AccountManagerRoles { get; set; } = null!;
-        public virtual DbSet<Beneficiary> Beneficiaries { get; set; } = null!;
-        public virtual DbSet<BeneficiaryInventory> BeneficiaryInventories { get; set; } = null!;
-        public virtual DbSet<BeneficiaryRole> BeneficiaryRoles { get; set; } = null!;
+        public virtual DbSet<AccountProgress> AccountProgresses { get; set; } = null!;
+        public virtual DbSet<Attachment> Attachments { get; set; } = null!;
+        public virtual DbSet<DailySchedule> DailySchedules { get; set; } = null!;
         public virtual DbSet<Donation> Donations { get; set; } = null!;
         public virtual DbSet<InventoryType> InventoryTypes { get; set; } = null!;
-        public virtual DbSet<Investor> Investors { get; set; } = null!;
-        public virtual DbSet<Status> Statuses { get; set; } = null!;
+        public virtual DbSet<InvestorInformation> InvestorInformations { get; set; } = null!;
+        public virtual DbSet<InvestorTierType> InvestorTierTypes { get; set; } = null!;
+        public virtual DbSet<MeetingSchedule> MeetingSchedules { get; set; } = null!;
+        public virtual DbSet<Notification> Notifications { get; set; } = null!;
+        public virtual DbSet<NotificationType> NotificationTypes { get; set; } = null!;
+        public virtual DbSet<Role> Roles { get; set; } = null!;
+        public virtual DbSet<Template> Templates { get; set; } = null!;
+        public virtual DbSet<TemplateType> TemplateTypes { get; set; } = null!;
+        public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
+        public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
+        public virtual DbSet<UserType> UserTypes { get; set; } = null!;
+        public virtual DbSet<WeeklySchedule> WeeklySchedules { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -52,158 +63,54 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.AccountDescription).HasColumnType("ntext");
 
                 entity.Property(e => e.AccountName).HasMaxLength(50);
+
+                entity.HasMany(d => d.Users)
+                    .WithMany(p => p.Accounts)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "AccountUserInformationConnection",
+                        l => l.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_AccountUserInformationConnection_User"),
+                        r => r.HasOne<Account>().WithMany().HasForeignKey("AccountId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_AccountUserInformationConnection_Account"),
+                        j =>
+                        {
+                            j.HasKey("AccountId", "UserId").HasName("PK_AccountBeneficiaryConnaction");
+
+                            j.ToTable("AccountUserInformationConnection");
+                        });
             });
 
-            modelBuilder.Entity<AccountManagerInfo>(entity =>
+            modelBuilder.Entity<AccountProgress>(entity =>
             {
-                entity.ToTable("AccountManagerInfo");
+                entity.ToTable("AccountProgress");
 
-                entity.Property(e => e.CreateDate).HasColumnType("datetime");
-
-                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
-
-                entity.Property(e => e.Email)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FirstName).HasMaxLength(50);
-
-                entity.Property(e => e.Gender).HasMaxLength(50);
-
-                entity.Property(e => e.LastName).HasMaxLength(50);
-
-                entity.Property(e => e.MiddleName).HasMaxLength(50);
-
-                entity.Property(e => e.PhoneNumber)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-
-                entity.HasOne(d => d.AccountManagerCategory)
-                    .WithMany(p => p.AccountManagerInfos)
-                    .HasForeignKey(d => d.AccountManagerCategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_Account");
-
-                entity.HasOne(d => d.AccountManagerCategoryNavigation)
-                    .WithMany(p => p.AccountManagerInfos)
-                    .HasForeignKey(d => d.AccountManagerCategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_AccountManagerRole1");
-
-                entity.HasOne(d => d.Status)
-                    .WithMany(p => p.AccountManagerInfos)
-                    .HasForeignKey(d => d.StatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInfo_Status1");
-            });
-
-            modelBuilder.Entity<AccountManagerInventory>(entity =>
-            {
-                entity.ToTable("AccountManagerInventory");
-
-                entity.Property(e => e.Date).HasColumnType("datetime");
+                entity.Property(e => e.Id).HasComment("From Progress in account");
 
                 entity.Property(e => e.Description).HasColumnType("ntext");
 
-                entity.HasOne(d => d.AccountManagerInfo)
-                    .WithMany(p => p.AccountManagerInventories)
-                    .HasForeignKey(d => d.AccountManagerInfoId)
-                    .HasConstraintName("FK_AccountManagerInventory_AccountManagerInfo");
-
-                entity.HasOne(d => d.InventoryType)
-                    .WithMany(p => p.AccountManagerInventories)
-                    .HasForeignKey(d => d.InventoryTypeId)
+                entity.HasOne(d => d.Account)
+                    .WithMany(p => p.AccountProgresses)
+                    .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_AccountManagerInventory_InventoryType");
+                    .HasConstraintName("FK_AccountProgress_Account");
             });
 
-            modelBuilder.Entity<AccountManagerRole>(entity =>
+            modelBuilder.Entity<Attachment>(entity =>
             {
-                entity.ToTable("AccountManagerRole");
-
-                entity.Property(e => e.AccountManagerRoleType).HasMaxLength(50);
+                entity.ToTable("Attachment");
             });
 
-            modelBuilder.Entity<Beneficiary>(entity =>
+            modelBuilder.Entity<DailySchedule>(entity =>
             {
-                entity.ToTable("Beneficiary");
+                entity.ToTable("DailySchedule");
 
-                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+                entity.Property(e => e.EndTime).HasColumnType("datetime");
 
-                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+                entity.Property(e => e.StartTime).HasColumnType("datetime");
 
-                entity.Property(e => e.Email)
-                    .HasMaxLength(128)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FirstName).HasMaxLength(50);
-
-                entity.Property(e => e.Gender)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.LastName).HasMaxLength(50);
-
-                entity.Property(e => e.MiddleName).HasMaxLength(50);
-
-                entity.Property(e => e.PhoneNumber)
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-
-                entity.HasOne(d => d.BeneficiaryCategory)
-                    .WithMany(p => p.Beneficiaries)
-                    .HasForeignKey(d => d.BeneficiaryCategoryId)
+                entity.HasOne(d => d.WeeklySchedule)
+                    .WithMany(p => p.DailySchedules)
+                    .HasForeignKey(d => d.WeeklyScheduleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Beneficiary_Account");
-
-                entity.HasOne(d => d.BeneficiaryRole)
-                    .WithMany(p => p.Beneficiaries)
-                    .HasForeignKey(d => d.BeneficiaryRoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Beneficiary_BeneficiaryRole");
-
-                entity.HasOne(d => d.Status)
-                    .WithMany(p => p.Beneficiaries)
-                    .HasForeignKey(d => d.StatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Beneficiary_Status1");
-            });
-
-            modelBuilder.Entity<BeneficiaryInventory>(entity =>
-            {
-                entity.ToTable("BeneficiaryInventory");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Date).HasColumnType("datetime");
-
-                entity.Property(e => e.Description).HasColumnType("ntext");
-
-                entity.HasOne(d => d.Beneficiary)
-                    .WithMany(p => p.BeneficiaryInventories)
-                    .HasForeignKey(d => d.BeneficiaryId)
-                    .HasConstraintName("FK_BeneficiaryInventory_Beneficiary");
-
-                entity.HasOne(d => d.InventoryType)
-                    .WithMany(p => p.BeneficiaryInventories)
-                    .HasForeignKey(d => d.InventoryTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_BeneficiaryInventory_InventoryType");
-            });
-
-            modelBuilder.Entity<BeneficiaryRole>(entity =>
-            {
-                entity.ToTable("BeneficiaryRole");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.BeneficiaryRoleType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                    .HasConstraintName("FK_DailySchedule_WeeklySchedule");
             });
 
             modelBuilder.Entity<Donation>(entity =>
@@ -218,7 +125,7 @@ namespace LML.NPOManagement.Dal.Models
                     .WithMany(p => p.Donations)
                     .HasForeignKey(d => d.InvestorId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Table1_Table2");
+                    .HasConstraintName("FK_Donation_InvestorInformation");
             });
 
             modelBuilder.Entity<InventoryType>(entity =>
@@ -230,22 +137,215 @@ namespace LML.NPOManagement.Dal.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<Investor>(entity =>
+            modelBuilder.Entity<InvestorInformation>(entity =>
             {
-                entity.ToTable("Investor");
+                entity.ToTable("InvestorInformation");
 
-                entity.Property(e => e.Email).HasMaxLength(50);
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.InvestorInformations)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_InvestorInformation_User");
+            });
+
+            modelBuilder.Entity<InvestorTierType>(entity =>
+            {
+                entity.ToTable("InvestorTierType");
+
+                entity.Property(e => e.InvestorTier).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<MeetingSchedule>(entity =>
+            {
+                entity.ToTable("MeetingSchedule");
+
+                entity.Property(e => e.DateInYear).HasColumnType("datetime");
+
+                entity.HasOne(d => d.WeeklySchedule)
+                    .WithMany(p => p.MeetingSchedules)
+                    .HasForeignKey(d => d.WeeklyScheduleId)
+                    .HasConstraintName("FK_MeetingSchedule_WeeklySchedule1");
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.ToTable("Notification");
+
+                entity.Property(e => e.Body).HasColumnType("ntext");
+
+                entity.Property(e => e.Metadate).HasColumnType("ntext");
+
+                entity.Property(e => e.Reminder).HasMaxLength(50);
+
+                entity.Property(e => e.Subject)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Attachment)
+                    .WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.AttachmentId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Notification_Attachment");
+
+                entity.HasOne(d => d.MeetingSchedule)
+                    .WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.MeetingScheduleId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Notification_MeetingSchedule");
+
+                entity.HasMany(d => d.NotificationTypes)
+                    .WithMany(p => p.Notifications)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "NotificationBroadcast",
+                        l => l.HasOne<NotificationType>().WithMany().HasForeignKey("NotificationTypeId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_NotificationBroadcast_NotificationType"),
+                        r => r.HasOne<Notification>().WithMany().HasForeignKey("NotificationId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_NotificationBroadcast_Notification"),
+                        j =>
+                        {
+                            j.HasKey("NotificationId", "NotificationTypeId");
+
+                            j.ToTable("NotificationBroadcast");
+                        });
+
+                entity.HasMany(d => d.Users)
+                    .WithMany(p => p.Notifications)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "Notification2User",
+                        l => l.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_Notification2User_User"),
+                        r => r.HasOne<Notification>().WithMany().HasForeignKey("NotificationId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_Notification2User_Notification"),
+                        j =>
+                        {
+                            j.HasKey("NotificationId", "UserId").HasName("PK_AccounManagerRoleConnection");
+
+                            j.ToTable("Notification2User");
+                        });
+            });
+
+            modelBuilder.Entity<NotificationType>(entity =>
+            {
+                entity.ToTable("NotificationType");
+
+                entity.Property(e => e.Description).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.ToTable("Role");
+
+                entity.Property(e => e.UserRole).HasMaxLength(50);
+
+                entity.HasMany(d => d.Users)
+                    .WithMany(p => p.Roles)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "UserRoleConnection",
+                        l => l.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_UserRoleConnection_User"),
+                        r => r.HasOne<Role>().WithMany().HasForeignKey("RoleId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_UserRoleConnection_Role"),
+                        j =>
+                        {
+                            j.HasKey("RoleId", "UserId");
+
+                            j.ToTable("UserRoleConnection");
+                        });
+            });
+
+            modelBuilder.Entity<Template>(entity =>
+            {
+                entity.ToTable("Template");
+
+                entity.Property(e => e.Uri).HasColumnName("URI");
+
+                entity.HasOne(d => d.TemplateType)
+                    .WithMany(p => p.Templates)
+                    .HasForeignKey(d => d.TemplateTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Template_TemplateType");
+            });
+
+            modelBuilder.Entity<TemplateType>(entity =>
+            {
+                entity.ToTable("TemplateType");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Description).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Password).HasMaxLength(250);
+
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(d => d.UserInformation)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.UserInformationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_User_UserInformation");
+
+                entity.HasOne(d => d.UserType)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.UserTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_User_UserType");
+            });
+
+            modelBuilder.Entity<UserInformation>(entity =>
+            {
+                entity.ToTable("UserInformation");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
 
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
+                entity.Property(e => e.Information).HasColumnType("ntext");
+
                 entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.MiddleName).HasMaxLength(50);
+
+                entity.Property(e => e.PhoneNumber).HasMaxLength(50);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Status>(entity =>
+            modelBuilder.Entity<UserInventory>(entity =>
             {
-                entity.ToTable("Status");
+                entity.ToTable("UserInventory");
 
-                entity.Property(e => e.StatusType).HasMaxLength(50);
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasColumnType("ntext");
+
+                entity.HasOne(d => d.InventoryType)
+                    .WithMany(p => p.UserInventories)
+                    .HasForeignKey(d => d.InventoryTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_AccountManagerInventory_InventoryType");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserInventories)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_UserInventory_User");
+            });
+
+            modelBuilder.Entity<UserType>(entity =>
+            {
+                entity.ToTable("UserType");
+
+                entity.Property(e => e.Description).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<WeeklySchedule>(entity =>
+            {
+                entity.ToTable("WeeklySchedule");
+
+                entity.Property(e => e.DayOfWeek).HasMaxLength(50);
             });
 
             OnModelCreatingPartial(modelBuilder);

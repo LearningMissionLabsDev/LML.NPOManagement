@@ -1,18 +1,18 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
 namespace LML.NPOManagement.Bll.Model
 {
     public class InventoryTypeModel
     {
         public InventoryTypeModel()
         {
-            AccountManagerInventories = new HashSet<AccountManagerInventoryModel>();
-            BeneficiaryInventories = new HashSet<BeneficiaryInventoryModel>();
+            UserInventories = new HashSet<UserInventoryModel>();
         }
 
         public int Id { get; set; }
-        public string Description { get; set; } = null!;
+        public string Description { get; set; } 
 
-        public virtual ICollection<AccountManagerInventoryModel> AccountManagerInventories { get; set; }
-        public virtual ICollection<BeneficiaryInventoryModel> BeneficiaryInventories { get; set; }
+        public virtual ICollection<UserInventoryModel> UserInventories { get; set; }
     }
 }

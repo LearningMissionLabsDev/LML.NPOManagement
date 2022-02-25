@@ -1,4 +1,8 @@
-using LML.NPOManagement.Bll.Independencies;
+//using LML.NPOManagement.Bll.Independencies;
+//using LML.NPOManagement.Bll.Interfaces;
+//using LML.NPOManagement.Bll.Services;
+//using LML.NPOManagement.Dal.Models;
+
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Dal.Models;
@@ -11,17 +15,26 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IDonationService, DonationService>();
-builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IAccountManagerInfoService, AccountManagerInfoService>();
-builder.Services.AddScoped<IBeneficiaryService, BeneficiaryService>();
-builder.Services.AddScoped<IBeneficiaryRoleService, BeneficiaryRoleService>();
-builder.Services.AddScoped<IStatusService, StatusService>();
-builder.Services.AddScoped<IAccountManagerRoleService, AccountManagerRoleService>();
-builder.Services.AddScoped<IAccountManagerInventoryService, AccountManagerInventoryService>();
-builder.Services.AddScoped<IBeneficiaryInventoryService, BeneficiaryInventoryService>();
+builder.Services.AddScoped<IAccountProgressService, AccountProgressService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<IDailyScheduleService, DailyScheduleService>();
+builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IInventoryTypeService, InventoryTypeService>();
+builder.Services.AddScoped<IInvestorInformationService, InvestorInformationService>();
+builder.Services.AddScoped<IInvestorTierService, InvestorTierService>();
+builder.Services.AddScoped<IInvestorTierTypeService, InvestorTierTypeService>();
+builder.Services.AddScoped<IMeetingScheduleService, MeetingScheduleService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationTypeService, NotificationTypeService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ITemplateService, TemplateService>();
+builder.Services.AddScoped<ITemplateTypeService, TemplateTypeService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserInformationService, UserInformationService>();
+builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
+builder.Services.AddScoped<IUserTypeService, UserTypeService>();
+builder.Services.AddScoped<IWeeklyScheduleService, WeeklyScheduleService>();
 builder.Services.AddDbContext<NPOManagementContext>();
 
 var app = builder.Build();

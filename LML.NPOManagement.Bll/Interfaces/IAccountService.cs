@@ -6,7 +6,7 @@ namespace LML.NPOManagement.Bll.Interfaces
     {
         public IEnumerable<AccountModel> GetAllAccounts();
         public AccountModel GetAccountById(int id);
-        public int AddAccountManagerInfo(AccountModel accountModel);
+        public int AddAccount(AccountModel accountModel);
         public int ModifyAccount(AccountModel accountModel, int id);
         public void DeleteAccount(int id);
     }

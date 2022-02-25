@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Model;
-using LML.NPOManagement.Bll.Independencies;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 using LML.NPOManagement.Request;
+using LML.NPOManagement.Bll.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,17 +17,54 @@ namespace LML.NPOManagement.Controllers
         private IDonationService _donationService;
         public DonationController(IDonationService donationService)
         {
-            var config = new MapperConfiguration(cfg => {
-                cfg.CreateMap<DonationModel, DonationResponse>();
-                cfg.CreateMap<InvestorModel, InvestorResponse>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<AccountRequest, AccountModel>();
+                cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
+                cfg.CreateMap<AttachmentRequest, AttachmentModel>();
+                cfg.CreateMap<DailyScheduleRequest, DailyScheduleModel>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
-                cfg.CreateMap<InvestorRequest, InvestorModel>();
-            });
+                cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
+                cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
+                cfg.CreateMap<InvestorTierRequest, InvestorTierModel>();
+                cfg.CreateMap<InvestorTierTypeRequest, InvestorTierTypeModel>();
+                cfg.CreateMap<MeetingScheduleRequest, MeetingScheduleModel>();
+                cfg.CreateMap<NotificationRequest, NotificationModel>();
+                cfg.CreateMap<NotificationTypeRequest, NotificationTypeModel>();
+                cfg.CreateMap<RoleRequest, RoleModel>();
+                cfg.CreateMap<TemplateRequest, TemplateModel>();
+                cfg.CreateMap<TemplateTypeRequest, TemplateTypeModel>();
+                cfg.CreateMap<UserInformationRequest, UserInformationModel>();
+                cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
+                cfg.CreateMap<UserRequest, UserModel>();
+                cfg.CreateMap<UserTypeRequest, UserTypeModel>();
+                cfg.CreateMap<WeeklyScheduleRequest, WeeklyScheduleModel>();
+                cfg.CreateMap<AccountModel, AccountResponse>();
+                cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
+                cfg.CreateMap<AttachmentModel, AttachmentResponse>();
+                cfg.CreateMap<DailyScheduleModel, DailyScheduleResponse>();
+                cfg.CreateMap<DonationModel, DonationResponse>();
+                cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
+                cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
+                cfg.CreateMap<InvestorTierModel, InvestorTierResponse>();
+                cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
+                cfg.CreateMap<MeetingScheduleModel, MeetingScheduleResponse>();
+                cfg.CreateMap<NotificationModel, NotificationResponse>();
+                cfg.CreateMap<NotificationTypeModel, NotificationTypeResponse>();
+                cfg.CreateMap<RoleModel, RoleResponse>();
+                cfg.CreateMap<TemplateModel, TemplateResponse>();
+                cfg.CreateMap<TemplateTypeModel, TemplateTypeResponse>();
+                cfg.CreateMap<UserInformationModel, UserInformationResponse>();
+                cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
+                cfg.CreateMap<UserModel, UserResponse>();
+                cfg.CreateMap<UserTypeModel, UserTypeResponse>();
+                cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
 
+
+            });
             _mapper = config.CreateMapper();
             _donationService = donationService;
         }
-    
         // GET: api/<DonationController>
         [HttpGet]
         public IEnumerable<DonationResponse> Get()

@@ -1,10 +1,18 @@
-﻿namespace LML.NPOManagement.Response
+﻿using System;
+using System.Collections.Generic;
+
+namespace LML.NPOManagement.Response
 {
     public class InventoryTypeResponse
     {
-        public string Description { get; set; } = null!;
+        public InventoryTypeResponse()
+        {
+            UserInventories = new HashSet<UserInventoryResponse>();
+        }
 
-        public virtual ICollection<AccountManagerInventoryResponse> AccountManagerInventoriesRes { get; set; }
-        public virtual ICollection<BeneficiaryInventoryResponse> BeneficiaryInventoriesRes { get; set; }
+        public int Id { get; set; }
+        public string Description { get; set; } 
+
+        public virtual ICollection<UserInventoryResponse> UserInventories { get; set; }
     }
 }
