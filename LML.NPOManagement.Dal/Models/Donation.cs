@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+
 namespace LML.NPOManagement.Dal.Models
 {
     public partial class Donation
@@ -8,6 +10,6 @@ namespace LML.NPOManagement.Dal.Models
         public decimal Amount { get; set; }
         public DateTime DateOfCharity { get; set; }
 
-        public virtual Investor Investor { get; set; } = null!;
+        public virtual InvestorInformation Investor { get; set; } = null!;
     }
 }
