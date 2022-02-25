@@ -1,16 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LML.NPOManagement.Request
 {
     public class DonationRequest
     {
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "")]
         public int InvestorId { get; set; }
-        [Required]
-        [Range(10, double.MaxValue)]
         public decimal Amount { get; set; }
-        [Required]
         public DateTime DateOfCharity { get; set; }
+
     }
 }

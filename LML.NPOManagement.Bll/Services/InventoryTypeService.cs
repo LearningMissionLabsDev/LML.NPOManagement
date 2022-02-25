@@ -2,6 +2,11 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -12,28 +17,46 @@ namespace LML.NPOManagement.Bll.Services
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<AccountManagerInfo, AccountManagerInfoModel>();
-                cfg.CreateMap<Beneficiary, BeneficiaryModel>();
-                cfg.CreateMap<BeneficiaryRole, BeneficiaryRoleModel>();
-                cfg.CreateMap<Status, StatusModel>();
+                cfg.CreateMap<AccountProgress, AccountProgressModel>();
+                cfg.CreateMap<Attachment, AttachmentModel>();
+                cfg.CreateMap<DailySchedule, DailyScheduleModel>();
+                cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
-                cfg.CreateMap<AccountManagerRole, AccountManagerRoleModel>();
+                cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<BeneficiaryInventory,BeneficiaryInventoryModel>();
-                cfg.CreateMap<AccountManagerInventory, AccountManagerInventoryModel>();
-                cfg.CreateMap<AccountManagerInfoModel, AccountManagerInfo>();
-                cfg.CreateMap<BeneficiaryModel, Beneficiary>();
-                cfg.CreateMap<BeneficiaryRoleModel, BeneficiaryRole>();
-                cfg.CreateMap<StatusModel, Status>();
+                cfg.CreateMap<InvestorTier, InvestorTierModel>();
+                cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
+                cfg.CreateMap<Notification, NotificationModel>();
+                cfg.CreateMap<NotificationType, NotificationTypeModel>();
+                cfg.CreateMap<Template, TemplateModel>();
+                cfg.CreateMap<TemplateType, TemplateTypeModel>();
+                cfg.CreateMap<UserInformation, UserInformationModel>();
+                cfg.CreateMap<UserInventory, UserInventoryModel>();
+                cfg.CreateMap<User, UserModel>();
+                cfg.CreateMap<UserType, UserTypeModel>();
+                cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
+                cfg.CreateMap<AccountProgressModel, AccountProgress>();
+                cfg.CreateMap<AttachmentModel, Attachment>();
+                cfg.CreateMap<DailyScheduleModel, DailySchedule>();
+                cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
-                cfg.CreateMap<AccountManagerRoleModel, AccountManagerRole>();
+                cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<BeneficiaryInventoryModel, BeneficiaryInventory>();
-                cfg.CreateMap<AccountManagerInventoryModel, AccountManagerInventory>();
-
+                cfg.CreateMap<InvestorTierModel, InvestorTier>();
+                cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
+                cfg.CreateMap<NotificationModel, Notification>();
+                cfg.CreateMap<NotificationTypeModel, NotificationType>();
+                cfg.CreateMap<TemplateModel, Template>();
+                cfg.CreateMap<TemplateTypeModel, TemplateType>();
+                cfg.CreateMap<UserInformationModel, UserInformation>();
+                cfg.CreateMap<UserInventoryModel, UserInventory>();
+                cfg.CreateMap<UserModel, User>();
+                cfg.CreateMap<UserTypeModel, UserType>();
+                cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
             });
             _mapper = config.CreateMapper();
         }
+
         public int AddInventoryType(InventoryTypeModel inventoryTypeModel)
         {
             throw new NotImplementedException();
@@ -46,32 +69,12 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<InventoryTypeModel> GetAllInventoryTypes()
         {
-            using(var dbContext = new NPOManagementContext())
-            {
-                var inventoryTypes = dbContext.InventoryTypes.ToList();
-
-                foreach (var inventoryType in inventoryTypes)
-                {
-                    var inventoryTypeModel = _mapper.Map<InventoryType, InventoryTypeModel>(inventoryType);
-                    yield return inventoryTypeModel;
-                }
-            }
+            throw new NotImplementedException();
         }
 
         public InventoryTypeModel GetInventoryTypeById(int id)
         {
-            using( var dbContext = new NPOManagementContext())
-            {
-                var inventoryType = dbContext.InventoryTypes.Where(it => it.Id == id).FirstOrDefault();
-
-                if (inventoryType != null)
-                {
-                    var inventoryTypeModel = _mapper.Map<InventoryType, InventoryTypeModel>(inventoryType);
-
-                    return inventoryTypeModel;
-                }
-                return null;
-            }
+            throw new NotImplementedException();
         }
 
         public int ModifyInventoryType(InventoryTypeModel inventoryTypeModel, int id)
