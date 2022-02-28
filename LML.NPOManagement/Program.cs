@@ -1,8 +1,3 @@
-//using LML.NPOManagement.Bll.Independencies;
-//using LML.NPOManagement.Bll.Interfaces;
-//using LML.NPOManagement.Bll.Services;
-//using LML.NPOManagement.Dal.Models;
-
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Dal.Models;
@@ -22,7 +17,6 @@ builder.Services.AddScoped<IDailyScheduleService, DailyScheduleService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IInventoryTypeService, InventoryTypeService>();
 builder.Services.AddScoped<IInvestorInformationService, InvestorInformationService>();
-builder.Services.AddScoped<IInvestorTierService, InvestorTierService>();
 builder.Services.AddScoped<IInvestorTierTypeService, InvestorTierTypeService>();
 builder.Services.AddScoped<IMeetingScheduleService, MeetingScheduleService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

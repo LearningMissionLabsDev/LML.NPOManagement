@@ -60,9 +60,9 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("Account");
 
-                entity.Property(e => e.AccountDescription).HasColumnType("ntext");
+                entity.Property(e => e.Description).HasColumnType("ntext");
 
-                entity.Property(e => e.AccountName).HasMaxLength(50);
+                entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.HasMany(d => d.Users)
                     .WithMany(p => p.Accounts)
@@ -140,6 +140,11 @@ namespace LML.NPOManagement.Dal.Models
             modelBuilder.Entity<InvestorInformation>(entity =>
             {
                 entity.ToTable("InvestorInformation");
+
+                entity.HasOne(d => d.InvestorTier)
+                    .WithMany(p => p.InvestorInformations)
+                    .HasForeignKey(d => d.InvestorTierId)
+                    .HasConstraintName("FK_InvestorInformation_InvestorTierType");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.InvestorInformations)

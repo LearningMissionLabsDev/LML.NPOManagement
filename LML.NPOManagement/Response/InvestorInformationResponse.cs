@@ -14,7 +14,6 @@ namespace LML.NPOManagement.Response
         public int UserId { get; set; }
         public int InvestorTierId { get; set; }
 
-        public virtual InvestorTierResponse InvestorTier { get; set; }
         public virtual UserResponse User { get; set; }
         public virtual ICollection<DonationResponse> Donations { get; set; }
     }

@@ -14,7 +14,7 @@ namespace LML.NPOManagement.Bll.Model
         }
 
         public int Id { get; set; }
-        public string UserRole { get; set; } = null!;
+        public string UserRole { get; set; } 
 
         public virtual ICollection<UserModel> Users { get; set; }
     }

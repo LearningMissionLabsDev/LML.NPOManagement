@@ -27,7 +27,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<DonationRequest, DonationModel>();
                 cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
-                cfg.CreateMap<InvestorTierRequest, InvestorTierModel>();
                 cfg.CreateMap<InvestorTierTypeRequest, InvestorTierTypeModel>();
                 cfg.CreateMap<MeetingScheduleRequest, MeetingScheduleModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
@@ -47,7 +46,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
-                cfg.CreateMap<InvestorTierModel, InvestorTierResponse>();
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
                 cfg.CreateMap<MeetingScheduleModel, MeetingScheduleResponse>();
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
