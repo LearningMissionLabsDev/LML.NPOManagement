@@ -12,8 +12,8 @@ namespace LML.NPOManagement.Dal.Models
         }
 
         public int Id { get; set; }
-        public string AccountName { get; set; } = null!;
-        public string? AccountDescription { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
 
         public virtual ICollection<AccountProgress> AccountProgresses { get; set; }
 

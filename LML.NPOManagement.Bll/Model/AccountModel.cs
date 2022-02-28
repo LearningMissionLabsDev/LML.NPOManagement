@@ -1,10 +1,8 @@
-﻿using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace LML.NPOManagement.Bll.Model
 {
-    public class AccountModel
+    public  class AccountModel
     {
         public AccountModel()
         {
@@ -13,8 +11,8 @@ namespace LML.NPOManagement.Bll.Model
         }
 
         public int Id { get; set; }
-        public string AccountName { get; set; } = null!;
-        public string AccountDescription { get; set; }
+        public string Name { get; set; } 
+        public string Description { get; set; }
 
         public virtual ICollection<AccountProgressModel> AccountProgresses { get; set; }
 
