@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -10,9 +9,13 @@ namespace LML.NPOManagement.Bll.Model
             DailySchedules = new HashSet<DailyScheduleModel>();
             MeetingSchedules = new HashSet<MeetingScheduleModel>();
         }
-
+        public WeeklyScheduleModel(WeeklySchedule weeklySchedule)
+        {
+            weeklySchedule.Id = Id;
+            weeklySchedule.DayOfWeek = DayofWeek;
+        }
         public int Id { get; set; }
-        public WeeklyScheduleEnum weeklySchedule { get; set; } 
+        public string DayofWeek { get; set; } 
 
         public virtual ICollection<DailyScheduleModel> DailySchedules { get; set; }
         public virtual ICollection<MeetingScheduleModel> MeetingSchedules { get; set; }
