@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -12,7 +8,11 @@ namespace LML.NPOManagement.Bll.Model
         {
             Users = new HashSet<UserModel>();
         }
-
+        public RoleModel(Role role)
+        {
+            role.Id = Id;
+            role.UserRole = UserRole;
+        }
         public int Id { get; set; }
         public string UserRole { get; set; } 
 

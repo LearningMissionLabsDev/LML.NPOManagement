@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -10,7 +9,16 @@ namespace LML.NPOManagement.Bll.Model
             NotificationTypes = new HashSet<NotificationTypeModel>();
             Users = new HashSet<UserModel>();
         }
-
+        public NotificationModel(Notification notification)
+        {
+            notification.Id = Id;
+            notification.MeetingScheduleId = MeetingScheduleId;
+            notification.Subject = Subject;
+            notification.Body = Body;
+            notification.AttachmentId = AttachmentId;
+            notification.Metadate = Metadate;
+            notification.Reminder = Reminder;
+        }
         public int Id { get; set; }
         public int MeetingScheduleId { get; set; }
         public string Subject { get; set; } 

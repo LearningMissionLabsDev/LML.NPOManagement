@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Model 
 { 
@@ -9,7 +8,11 @@ namespace LML.NPOManagement.Bll.Model
         {
             Templates = new HashSet<TemplateModel>();
         }
-
+        public TemplateTypeModel(TemplateType templateType)
+        {
+            templateType.Id = Id;
+            templateType.Description = Description;
+        }
         public int Id { get; set; }
         public string Description { get; set; } 
 

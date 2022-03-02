@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -12,9 +8,13 @@ namespace LML.NPOManagement.Bll.Model
         {
             InvestorInformations = new HashSet<InvestorInformationModel>();
         }
-
+        public InvestorTierTypeModel(InvestorTierType investorTier)
+        {
+            investorTier.Id = Id;
+            investorTier.InvestorTier = InvestorTier;
+        }
         public int Id { get; set; }
-        public InvestorTier investorTier { get; set; } 
+        public string InvestorTier { get; set; } 
 
         public virtual ICollection<InvestorInformationModel> InvestorInformations { get; set; }
     }

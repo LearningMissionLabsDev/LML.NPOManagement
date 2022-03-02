@@ -64,6 +64,8 @@ namespace LML.NPOManagement.Dal.Models
 
                 entity.Property(e => e.Name).HasMaxLength(50);
 
+                entity.Property(e => e.Status).HasMaxLength(50);
+
                 entity.HasMany(d => d.Users)
                     .WithMany(p => p.Accounts)
                     .UsingEntity<Dictionary<string, object>>(

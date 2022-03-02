@@ -10,10 +10,10 @@ namespace LML.NPOManagement.Dal.Models
             AccountProgresses = new HashSet<AccountProgress>();
             Users = new HashSet<User>();
         }
-
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
+        public string? Status { get; set; }
 
         public virtual ICollection<AccountProgress> AccountProgresses { get; set; }
 

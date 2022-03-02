@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -9,7 +8,12 @@ namespace LML.NPOManagement.Bll.Model
         {
             Notifications = new HashSet<NotificationModel>();
         }
-
+        public AttachmentModel(Attachment attachment)
+        {
+            attachment.Id = Id;
+            attachment.NotificationId = NotificationId;
+            attachment.AttachmentData = AttachmentData;
+        }
         public int Id { get; set; }
         public int NotificationId { get; set; }
         public byte[] AttachmentData { get; set; } 
