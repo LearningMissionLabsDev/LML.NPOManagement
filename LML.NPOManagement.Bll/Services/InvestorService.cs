@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
-    public class InvestorInformationService : IInvestorInformationService
+    public class InvestorService : IInvestorService
     {
         private IMapper _mapper;
-        public InvestorInformationService()
+        public InvestorService()
         {
             var config = new MapperConfiguration(cfg =>
             {

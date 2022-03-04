@@ -11,11 +11,11 @@ namespace LML.NPOManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InvestorInformationController : ControllerBase
+    public class InvestorController : ControllerBase
     {
         private IMapper _mapper;
-        private IInvestorInformationService _investorInformationService;
-        public InvestorInformationController(IInvestorInformationService investorInformationService)
+        private IInvestorService _investorInformationService;
+        public InvestorController(IInvestorService investorInformationService)
         {
             var config = new MapperConfiguration(cfg =>
             {

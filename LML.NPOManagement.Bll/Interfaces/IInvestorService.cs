@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
-    public interface IInvestorInformationService
+    public interface IInvestorService
     {
         public IEnumerable<InvestorInformationModel> GetAllInvestorInformations();
         public InvestorInformationModel GetInvestorInformationById(int id);

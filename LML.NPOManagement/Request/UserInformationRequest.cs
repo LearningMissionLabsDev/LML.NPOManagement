@@ -10,6 +10,6 @@
         public DateTime UpdateDate { get; set; }
         public string PhoneNumber { get; set; }
         public int Gender { get; set; }
-        public string UserInfo { get; set; }
+        public string UserMetadata { get; set; }
     }
 }

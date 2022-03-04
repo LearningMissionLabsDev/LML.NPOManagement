@@ -70,12 +70,12 @@ namespace LML.NPOManagement.Controllers
         }
 
         // GET: api/<UserController>
-        //[HttpGet]
-        //public IEnumerable<UserTypeResponse> GetUserTypes()//return user type table id,description 
-        //{
-        //    var userType = _userTypeService.GetAllUserTypes().ToList();
-        //    return _mapper.Map<List<UserTypeModel>, List<UserTypeResponse>>(userType);
-        //}
+        [HttpGet("userTypes")]
+        public IEnumerable<string> GetUserTypes()//return user type table id,description 
+        {
+
+            return new string[] { "value1", "value2" };
+        }
         //GET api/<UserController>/5
         [HttpGet("{id}")]
         public string Get(int id)
@@ -84,8 +84,8 @@ namespace LML.NPOManagement.Controllers
         }
 
         // POST api/<UserController>
-        [HttpPost]
-        public ActionResult PostUser([FromBody] UserRegistrationRequest userRegistrationRequest)
+        [HttpPost("register")]
+        public ActionResult UserRegistration([FromBody] UserRegistrationRequest userRegistrationRequest)
         {
             var userTypeModel = _mapper.Map<UserTypeRequest, UserTypeModel>(userRegistrationRequest.UserTypeRequest);
             var userModel = _mapper.Map<UserRequest,UserModel>(userRegistrationRequest.UserRequest);
@@ -95,7 +95,17 @@ namespace LML.NPOManagement.Controllers
             var addUser = _userService.AddUser(userModel);
             return Ok();
         }
-        
+        [HttpPost("login")]
+        public void Userlogin([FromBody] UserRequest userRequest)
+        {
+            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
+            if(userModel != null)
+            {
+
+            }
+            //var loginUser = _userService.;
+        }
+
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
