@@ -8,11 +8,6 @@ namespace LML.NPOManagement.Bll.Model
         {
             InvestorInformations = new HashSet<InvestorInformationModel>();
         }
-        public InvestorTierTypeModel(InvestorTierType investorTier)
-        {
-            investorTier.Id = Id;
-            investorTier.InvestorTier = InvestorTier;
-        }
         public int Id { get; set; }
         public string InvestorTier { get; set; } 
 

@@ -8,11 +8,7 @@ namespace LML.NPOManagement.Bll.Model
         {
             Notifications = new HashSet<NotificationModel>();
         }
-        public NotificationTypeModel(NotificationType notificationType)
-        {
-            notificationType.Id = Id;
-            notificationType.Description = Description;
-        }
+
         public int Id { get; set; }
         public string Description { get; set; } 
 

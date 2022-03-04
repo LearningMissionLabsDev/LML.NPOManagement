@@ -24,7 +24,7 @@ namespace LML.NPOManagement.Controllers
         public IEnumerable<DonationResponse> Get()
         {
             var donations = _donationService.GetAllDonations().ToList();
-            return _mapper.Map<List<DonationModel>,List<DonationResponse>>(donations);
+            return _mapper.Map<List<DonationModel>, List<DonationResponse>>(donations);
         }
 
         // GET api/<DonationController>/5
@@ -42,7 +42,7 @@ namespace LML.NPOManagement.Controllers
             var addDonation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
             var id = _donationService.AddDonation(addDonation);
             var donationModel = _donationService.GetDonationById(id);
-            return _mapper.Map<DonationModel,DonationResponse>(donationModel);
+            return _mapper.Map<DonationModel, DonationResponse>(donationModel);
         }
 
         // PUT api/<DonationController>/5
@@ -51,7 +51,7 @@ namespace LML.NPOManagement.Controllers
         {
             //...RG We need to convert the calls to asynch inside those methods. Currently all calls are synchronous.
             //... todo: For that we need to convert the BLL methods to asynchronous as well. To be discussed.
-            var modifyDonation = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
+            var modifyDonation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
             var donationId = _donationService.ModifyDonation(modifyDonation, id);
             var donationModel = _donationService.GetDonationById(donationId);
             return _mapper.Map<DonationModel, DonationResponse>(donationModel);
@@ -61,19 +61,19 @@ namespace LML.NPOManagement.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            if(id <= 0)
+            if (id <= 0)
             {
                 return BadRequest();
             }
             var donationToDelete = _donationService.GetDonationById(id);
-            if(donationToDelete == null)
+            if (donationToDelete == null)
             {
-                return NotFound();           
+                return NotFound();
             }
             _donationService.DeleteDonation(id);
 
             return Ok();
-            
+
         }
     }
 }

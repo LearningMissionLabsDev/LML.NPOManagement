@@ -8,11 +8,7 @@ namespace LML.NPOManagement.Bll.Model
         {
             Templates = new HashSet<TemplateModel>();
         }
-        public TemplateTypeModel(TemplateType templateType)
-        {
-            templateType.Id = Id;
-            templateType.Description = Description;
-        }
+
         public int Id { get; set; }
         public string Description { get; set; } 
 

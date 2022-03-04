@@ -2,11 +2,6 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -31,8 +26,8 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<User, UserModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
+                cfg.CreateMap<User, UserModel>();
                 cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
@@ -48,8 +43,8 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserModel, User>();
                 cfg.CreateMap<UserTypeModel, UserType>();
+                cfg.CreateMap<UserModel, User>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
             });
             _mapper = config.CreateMapper();
@@ -57,9 +52,35 @@ namespace LML.NPOManagement.Bll.Services
 
         public int AddUser(UserModel userModel)
         {
-            throw new NotImplementedException();
-        }
+            using(var dbContext = new NPOManagementContext())
+            {
+                var addUser = _mapper.Map<UserModel,User>(userModel);
 
+                dbContext.SaveChanges();
+                return 0;
+            }
+        }
+        private string GetUserType()
+        {
+           throw new NotImplementedException();
+        }
+        public int AddUserType(UserTypeModel userTypeModel)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+
+                return 0;
+            }
+        }
+        public int AddUserInformation(UserInformationModel userInformation)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+               
+                dbContext.SaveChanges();
+                return 0;
+            }
+        }
         public void DeleteUser(int id)
         {
             throw new NotImplementedException();

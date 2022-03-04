@@ -9,11 +9,7 @@ namespace LML.NPOManagement.Bll.Model
             DailySchedules = new HashSet<DailyScheduleModel>();
             MeetingSchedules = new HashSet<MeetingScheduleModel>();
         }
-        public WeeklyScheduleModel(WeeklySchedule weeklySchedule)
-        {
-            weeklySchedule.Id = Id;
-            weeklySchedule.DayOfWeek = DayofWeek;
-        }
+
         public int Id { get; set; }
         public string DayofWeek { get; set; } 
 

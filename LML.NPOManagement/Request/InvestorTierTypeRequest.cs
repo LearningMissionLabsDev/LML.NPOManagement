@@ -1,6 +1,6 @@
 ﻿namespace LML.NPOManagement.Request
 {
-    public class AccountRequest
+    public class InvestorTierTypeRequest
     {
     }
 }

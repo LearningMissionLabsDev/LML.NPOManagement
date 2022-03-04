@@ -12,6 +12,8 @@ namespace LML.NPOManagement.Bll.Interfaces
         public IEnumerable<UserModel> GetAllUsers();
         public UserModel GetUserById(int id);
         public int AddUser(UserModel userModel);
+        public int AddUserType(UserTypeModel userTypeModel);
+        public int AddUserInformation(UserInformationModel userInformation);
         public int ModifyUser(UserModel userModel, int id);
         public void DeleteUser(int id);
     }

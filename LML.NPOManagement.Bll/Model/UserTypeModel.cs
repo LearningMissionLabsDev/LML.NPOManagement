@@ -8,11 +8,6 @@ namespace LML.NPOManagement.Bll.Model
         {
             Users = new HashSet<UserModel>();
         }
-        public UserTypeModel(UserType userType)
-        {
-            userType.Id = Id;
-            userType.Description = Description;
-        }
         public int Id { get; set; }
         public string Description { get; set; } 
 
