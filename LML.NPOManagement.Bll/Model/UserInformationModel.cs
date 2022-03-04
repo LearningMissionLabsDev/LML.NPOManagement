@@ -8,19 +8,6 @@ namespace LML.NPOManagement.Bll.Model
         {
             Users = new HashSet<UserModel>();
         }
-        public UserInformationModel(UserInformation userInformation)
-        {
-            userInformation.Id = Id;
-            userInformation.FirstName = FirstName;
-            userInformation.LastName = LastName;
-            userInformation.MiddleName = MiddleName;
-            userInformation.DateOfBirth = DateOfBirth;
-            userInformation.CreateDate = CreateDate;
-            userInformation.UpdateDate = UpdateDate;
-            userInformation.PhoneNumber = PhoneNumber;
-            userInformation.Gender = Gender;
-            userInformation.Information = UserInfo;
-        }
         public int Id { get; set; }
         public string FirstName { get; set; } 
         public string LastName { get; set; } 

@@ -10,3 +10,4 @@ namespace LML.NPOManagement.Bll.Model
     {
     }
 }
+

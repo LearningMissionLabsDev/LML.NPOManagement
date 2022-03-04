@@ -9,13 +9,6 @@ namespace LML.NPOManagement.Bll.Model
             AccountProgresses = new HashSet<AccountProgressModel>();
             Users = new HashSet<UserModel>();
         }
-        public AccountModel(Account account)
-        {
-            account.Id = Id;
-            account.Name = Name;
-            account.Description = Description;
-            account.Status = Status;
-        }
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }

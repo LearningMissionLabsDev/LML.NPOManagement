@@ -26,7 +26,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<User, UserModel>();
                 cfg.CreateMap<UserType,UserTypeModel>();
                 cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
@@ -43,7 +42,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserModel, User>();
                 cfg.CreateMap<UserTypeModel, UserType>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
             });

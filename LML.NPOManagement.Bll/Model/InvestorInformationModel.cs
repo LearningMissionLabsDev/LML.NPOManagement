@@ -8,15 +8,9 @@ namespace LML.NPOManagement.Bll.Model
         {
             Donations = new HashSet<DonationModel>();
         }
-        public InvestorInformationModel(InvestorInformation investorInformation)
-        {
-            investorInformation.Id = Id;
-            investorInformation.UserId = UserId;
-            investorInformation.InvestorTierId = (int)InvestorTierId;
-        }
         public int Id { get; set; }
         public int UserId { get; set; }
-        public InvestorTier InvestorTierId { get; set; }
+        public InvestorTierTypeModel InvestorTierId { get; set; }
 
         public virtual InvestorTierTypeModel InvestorTier { get; set; }
         public virtual UserModel User { get; set; }

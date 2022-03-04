@@ -28,7 +28,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<MeetingScheduleRequest, MeetingScheduleModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<TemplateRequest, TemplateModel>();
-                cfg.CreateMap<UserRegistrationRequest, UserInformationModel>();
+                cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<WeeklyScheduleRequest, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();

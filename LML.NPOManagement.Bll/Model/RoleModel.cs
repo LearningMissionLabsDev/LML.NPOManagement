@@ -8,11 +8,7 @@ namespace LML.NPOManagement.Bll.Model
         {
             Users = new HashSet<UserModel>();
         }
-        public RoleModel(Role role)
-        {
-            role.Id = Id;
-            role.UserRole = UserRole;
-        }
+
         public int Id { get; set; }
         public string UserRole { get; set; } 
 

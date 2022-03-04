@@ -11,15 +11,6 @@ namespace LML.NPOManagement.Bll.Model
             Accounts = new HashSet<AccountModel>();
             Notifications = new HashSet<NotificationModel>();
         }
-        public UserModel(User user)
-        {
-            user.Id = Id;
-            user.UserTypeId = Id;
-            user.UserInformationId = UserInformationId;
-            user.Email = Email;
-            user.Password = Password;
-            user.Status = Status;
-        }
         public int Id { get; set; }
         public int UserTypeId { get; set; }
         public int UserInformationId { get; set; }
