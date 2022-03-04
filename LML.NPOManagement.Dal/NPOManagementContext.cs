@@ -292,12 +292,6 @@ namespace LML.NPOManagement.Dal.Models
                     .HasForeignKey(d => d.UserInformationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_User_UserInformation");
-
-                entity.HasOne(d => d.UserType)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.UserTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_User_UserType");
             });
 
             modelBuilder.Entity<UserInformation>(entity =>
@@ -346,6 +340,19 @@ namespace LML.NPOManagement.Dal.Models
                 entity.ToTable("UserType");
 
                 entity.Property(e => e.Description).HasMaxLength(50);
+
+                entity.HasMany(d => d.Users)
+                    .WithMany(p => p.UserTypes)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "User2UserType",
+                        l => l.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_User2UserType_User"),
+                        r => r.HasOne<UserType>().WithMany().HasForeignKey("UserTypeId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_User2UserType_UserType"),
+                        j =>
+                        {
+                            j.HasKey("UserTypeId", "UserId").HasName("PK_User2UserTypeConnection");
+
+                            j.ToTable("User2UserType");
+                        });
             });
 
             modelBuilder.Entity<WeeklySchedule>(entity =>

@@ -10,20 +10,23 @@ namespace LML.NPOManagement.Bll.Model
             UserInventories = new HashSet<UserInventoryModel>();
             Accounts = new HashSet<AccountModel>();
             Notifications = new HashSet<NotificationModel>();
+            Roles = new HashSet<RoleModel>();
+            UserTypes = new HashSet<UserTypeModel>();
         }
-        public int Id { get; set; }
-        public int UserTypeId { get; set; }
-        public int UserInformationId { get; set; }
-        public string Email { get; set; } 
-        public string Password { get; set; } 
-        public string Status { get; set; }
 
-        public virtual UserInformationModel UserInformation { get; set; } 
-        public virtual UserTypeModel UserType { get; set; } 
+        public int Id { get; set; }
+        public int UserInformationId { get; set; }
+        public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string? Status { get; set; }
+
+        public virtual UserInformationModel UserInformation { get; set; } = null!;
         public virtual ICollection<InvestorInformationModel> InvestorInformations { get; set; }
         public virtual ICollection<UserInventoryModel> UserInventories { get; set; }
 
         public virtual ICollection<AccountModel> Accounts { get; set; }
         public virtual ICollection<NotificationModel> Notifications { get; set; }
+        public virtual ICollection<RoleModel> Roles { get; set; }
+        public virtual ICollection<UserTypeModel> UserTypes { get; set; }
     }
 }

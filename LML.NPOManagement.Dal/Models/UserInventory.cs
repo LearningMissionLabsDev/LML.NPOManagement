@@ -9,7 +9,7 @@ namespace LML.NPOManagement.Dal.Models
         public int InventoryTypeId { get; set; }
         public int? UserId { get; set; }
         public DateTime Date { get; set; }
-        public string Metadate { get; set; } = null!;
+        public string Metadata { get; set; } = null!;
         public string? Description { get; set; }
 
         public virtual InventoryType InventoryType { get; set; } = null!;

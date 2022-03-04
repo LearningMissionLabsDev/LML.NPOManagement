@@ -1,5 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
+﻿
 namespace LML.NPOManagement.Bll.Model
 {
     public partial class AccountModel
@@ -9,6 +8,7 @@ namespace LML.NPOManagement.Bll.Model
             AccountProgresses = new HashSet<AccountProgressModel>();
             Users = new HashSet<UserModel>();
         }
+
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
@@ -18,4 +18,3 @@ namespace LML.NPOManagement.Bll.Model
 
         public virtual ICollection<UserModel> Users { get; set; }
     }
-}
