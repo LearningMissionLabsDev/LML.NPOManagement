@@ -4,6 +4,7 @@ using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -83,29 +84,6 @@ namespace LML.NPOManagement.Controllers
             return "value";
         }
 
-        // POST api/<UserController>
-        [HttpPost("register")]
-        public ActionResult UserRegistration([FromBody] UserRegistrationRequest userRegistrationRequest)
-        {
-            var userTypeModel = _mapper.Map<UserTypeRequest, UserTypeModel>(userRegistrationRequest.UserTypeRequest);
-            var userModel = _mapper.Map<UserRequest,UserModel>(userRegistrationRequest.UserRequest);
-            var userInformationModel = _mapper.Map<UserInformationRequest, UserInformationModel>(userRegistrationRequest.UserInformationRequest);
-            var addUserInformation = _userService.AddUserInformation(userInformationModel);
-            var addUserType = _userService.AddUserType(userTypeModel);
-            var addUser = _userService.AddUser(userModel);
-            return Ok();
-        }
-        [HttpPost("login")]
-        public void Userlogin([FromBody] UserRequest userRequest)
-        {
-            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
-            if(userModel != null)
-            {
-
-            }
-            //var loginUser = _userService.;
-        }
-
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
@@ -116,6 +94,61 @@ namespace LML.NPOManagement.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+        public static Login login = new Login();
+        // POST api/<UserController>
+        [HttpPost]
+        public async Task<ActionResult<Login>> VerifayRegistor([FromBody] UserRequest userRequest)
+        {
+            CreatePasswordHash(userRequest.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            login.Email = userRequest.Email;
+            login.PasswordHash = passwordHash;
+            login.PasswordSalt = passwordSalt;
+            if(!VerifayPasswordHash(userRequest.Password, login.PasswordHash, login.PasswordSalt))
+            {
+                
+            }
+            return Ok(userRequest);
+
+        }
+        [HttpPost("userInfo")]
+        public async Task<ActionResult<Login>> Registor([FromBody] UserInformationRequest userInformationRequest)
+        {
+            var userInfo = _mapper.Map<UserInformationRequest,UserInformationModel>(userInformationRequest);
+            var addUserInfo = _userService.AddUserInformation(userInfo);
+            return Ok(userInformationRequest);
+
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> Login([FromBody] UserRequest userRequest)
+        {
+            if (login.Email != userRequest.Email)
+            {
+                return BadRequest("User not faund");
+            }
+            if (!VerifayPasswordHash(userRequest.Password, login.PasswordHash, login.PasswordSalt))
+            {
+                return BadRequest("Wrong password");
+            }
+            return Ok("My Creyzi Token");
+        }
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+        private bool VerifayPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
         }
     }
 }

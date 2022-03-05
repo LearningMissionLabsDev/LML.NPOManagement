@@ -18,3 +18,4 @@ namespace LML.NPOManagement.Bll.Model
 
         public virtual ICollection<UserModel> Users { get; set; }
     }
+}
