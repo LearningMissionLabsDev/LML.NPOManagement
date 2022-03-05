@@ -72,10 +72,18 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserController>
         [HttpGet("userTypes")]
-        public IEnumerable<string> GetUserTypes()//return user type table id,description 
+        public IEnumerable<UserType> GetUserTypes()//return user type table id,description 
         {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var userTypes = dbContext.UserTypes.ToList();
 
-            return new string[] { "value1", "value2" };
+                foreach (var userType in userTypes)
+                {
+                    var userTypeModel = _mapper.Map<UserType, UserTypeModel>(userTypes);
+                    yield return userTypeModel;
+                }
+            }
         }
         //GET api/<UserController>/5
         [HttpGet("{id}")]
