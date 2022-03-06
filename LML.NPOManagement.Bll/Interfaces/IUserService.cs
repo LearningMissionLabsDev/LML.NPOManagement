@@ -16,5 +16,5 @@ namespace LML.NPOManagement.Bll.Interfaces
         public int AddUserInformation(UserInformationModel userInformation);
         public int ModifyUser(UserModel userModel, int id);
         public void DeleteUser(int id);
-    }
+            }
 }

@@ -92,8 +92,19 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            if (id<=0)
+            {
+                return BadRequest();
+            }
+            var getUser = _userService.GetUserById(id);
+            if (getUser != null)
+            {
+                _userService.DeleteUser(id);
+                return Ok();
+            }
+            return BadRequest("Record not found");
         }
         public static Login login = new Login();
         // POST api/<UserController>
