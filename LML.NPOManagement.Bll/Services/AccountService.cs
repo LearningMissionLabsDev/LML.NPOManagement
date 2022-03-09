@@ -55,22 +55,49 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteAccount(int id)
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var delatAccount = dbContext.Accounts.Where(da => da.Id == id).FirstOrDefault();
+                if (delatAccount != null)
+                {
+                    dbContext.SaveChanges();
+                }
+            }
         }
 
         public AccountModel GetAccountById(int id)
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var account = dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefault();
+                if (account != null)
+                {
+                    var accountModel = _mapper.Map<Account,AccountModel>(account);
+                    return accountModel;
+                }
+                return null;
+            }
         }
 
         public IEnumerable<AccountModel> GetAllAccounts()
         {
-            throw new NotImplementedException();
+            using (var dbContex = new NPOManagementContext())
+            {
+                var accounts = dbContex.Accounts.ToList();
+                
+                foreach (var account in accounts)
+                {
+                    var accountModel = _mapper.Map<Account, AccountModel>(account);
+                    yield return accountModel;
+                }
+            }
         }
 
         public int ModifyAccount(AccountModel accountModel, int id)
         {
             throw new NotImplementedException();
         }
+
+      
     }
 }

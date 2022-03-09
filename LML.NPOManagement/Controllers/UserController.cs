@@ -67,35 +67,49 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<UserController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<UserResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var userModel = _userService.GetAllUsers().ToList();
+            return _mapper.Map<List<UserModel>,List<UserResponse>>(userModel);
         }
 
         // GET: api/<UserController>
         [HttpGet("userTypes")]
-        public IEnumerable<string> GetUserTypes()//return user type table id,description 
+        public IEnumerable<UserTypeResponse> GetUserTypes()//return user type table id,description 
         {
-
-            return new string[] { "value1", "value2" };
+            var userTypes = _userService.GetAllUserTypes().ToList();
+            return _mapper.Map<List<UserTypeModel>,List<UserTypeResponse>>(userTypes);
         }
         //GET api/<UserController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public UserResponse Get(int id)
         {
-            return "value";
+            var user = _userService.GetUserById(id);
+            return _mapper.Map<UserModel,UserResponse>(user);
         }
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ActionResult Put(int id, [FromBody] UserRequest userRequest)
         {
+            var user = _mapper.Map<UserRequest,UserModel>(userRequest);
+            var modifyUser = _userService.ModifyUser(user, id);
+            if (modifyUser)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
+            var user = _userService.GetUserById(id);
+            if(user != null)
+            {
+                _userService.DeleteUser(id);
+            }
             return BadRequest();
         }
         
@@ -115,11 +129,11 @@ namespace LML.NPOManagement.Controllers
         {
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var result = await _userService.Registration(userModel, _configuration);
-            if (result)
+            if (!result)
             {
                     
             }
-            return Ok(result);
+            return Ok();
         }
 
 

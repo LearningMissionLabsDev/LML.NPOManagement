@@ -54,24 +54,55 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public int AddUser(UserModel userModel)
-        {
-            throw new NotImplementedException();
-        }
 
         public void DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var user = dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
+                user.Status = "Closed";
+                dbContext.SaveChanges();
+            }
         }
 
         public IEnumerable<UserModel> GetAllUsers()
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var users = dbContext.Users.ToList();
+                foreach (var user in users)
+                {
+                    var userModels = _mapper.Map<User, UserModel>(user);
+                    yield return userModels;
+                }
+            }
+        }
+
+        public IEnumerable<UserTypeModel>  GetAllUserTypes()
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var types = dbContext.UserTypes.ToList();
+                foreach (var type in types)
+                {
+                    var userType = _mapper.Map<UserType, UserTypeModel>(type);
+                    yield return userType;
+                }
+            }
         }
 
         public UserModel GetUserById(int id)
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var user = dbContext.Users.Where(x => x.Id == id).FirstOrDefault();
+                if (user != null)
+                {
+                    var userModel = _mapper.Map<User,UserModel>(user);
+                    return userModel;
+                }
+                return null;
+            }
         }
 
         public async Task<UserModel> Login(UserModel userModel, IConfiguration configuration)
@@ -92,9 +123,20 @@ namespace LML.NPOManagement.Bll.Services
             return null;
         }
 
-        public int ModifyUser(UserModel userModel, int id)
+        public bool ModifyUser(UserModel userModel, int id)
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var user = dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
+                var verifyUser = BC.Verify(userModel.Password,user.Password);
+                if (verifyUser)
+                {
+                    var modifyUser = _mapper.Map<UserModel, User>(userModel);
+                    dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
         }
 
         public async Task<bool> Registration(UserModel userModel, IConfiguration configuration)

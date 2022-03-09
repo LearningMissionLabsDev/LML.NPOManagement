@@ -64,16 +64,18 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<AccountController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<AccountResponse> Get()
         {
-            return new string[] { "value1", "value2" };
+            var accounts = _accountService.GetAllAccounts().ToList();
+            return _mapper.Map<List<AccountModel>,List<AccountResponse>>(accounts);
         }
 
         // GET api/<AccountController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public AccountResponse Get(int id)
         {
-            return "value";
+            var account = _accountService.GetAccountById(id);
+            return _mapper.Map<AccountModel,AccountResponse>(account);
         }
 
         // POST api/<AccountController>
@@ -92,6 +94,7 @@ namespace LML.NPOManagement.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            _accountService.DeleteAccount(id);
         }
     }
 }
