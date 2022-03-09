@@ -11,9 +11,9 @@ namespace LML.NPOManagement.Bll.Interfaces
     public interface IUserService
     {
         public IEnumerable<UserModel> GetAllUsers();
+        public IEnumerable<UserTypeModel> GetAllUserTypes();
         public UserModel GetUserById(int id);
-        public int AddUser(UserModel userModel);
-        public int ModifyUser(UserModel userModel, int id);
+        public bool ModifyUser(UserModel userModel, int id);
         public void DeleteUser(int id);
         Task<UserModel> Login(UserModel userModel, IConfiguration configuration);
         Task<bool> Registration(UserModel userModel, IConfiguration configuration);
