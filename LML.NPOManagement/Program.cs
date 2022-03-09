@@ -23,8 +23,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI();   
 }
+
+
+// Custom JWT AUTH Middleware
+app.UseMiddleware<JwtMiddleware>();
+
 
 app.UseHttpsRedirection();
 

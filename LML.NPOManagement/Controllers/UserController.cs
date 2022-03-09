@@ -16,7 +16,8 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private IUserService _userService;
-        public UserController(IUserService userService)
+        private IConfiguration _configuration;
+        public UserController(IUserService userService, IConfiguration configuration)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -62,6 +63,7 @@ namespace LML.NPOManagement.Controllers
             });
             _mapper = config.CreateMapper();
             _userService = userService;
+            _configuration = configuration;
         }
         // GET: api/<UserController>
         [HttpGet]
@@ -92,63 +94,41 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            return BadRequest();
         }
-        public static Login login = new Login();
-        // POST api/<UserController>
-        [HttpPost]
-        public async Task<ActionResult<Login>> VerifayRegistor([FromBody] UserRequest userRequest)
-        {
-            CreatePasswordHash(userRequest.Password, out byte[] passwordHash, out byte[] passwordSalt);
+        
 
-            login.Email = userRequest.Email;
-            login.PasswordHash = passwordHash;
-            login.PasswordSalt = passwordSalt;
-            if(!VerifayPasswordHash(userRequest.Password, login.PasswordHash, login.PasswordSalt))
-            {
-                
-            }
-            return Ok(userRequest);
-
-        }
-        [HttpPost("userInfo")]
-        public async Task<ActionResult<Login>> Registor([FromBody] UserInformationRequest userInformationRequest)
-        {
-            var userInfo = _mapper.Map<UserInformationRequest,UserInformationModel>(userInformationRequest);
-            var addUserInfo = _userService.AddUserInformation(userInfo);
-            return Ok(userInformationRequest);
-
-        }
+        // POST api/<UserController>       
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login([FromBody] UserRequest userRequest)
+        public async Task<ActionResult<UserModel>> Login([FromBody] UserRequest userRequest)
         {
-            if (login.Email != userRequest.Email)
-            {
-                return BadRequest("User not faund");
-            }
-            if (!VerifayPasswordHash(userRequest.Password, login.PasswordHash, login.PasswordSalt))
-            {
-                return BadRequest("Wrong password");
-            }
-            return Ok("My Creyzi Token");
+            var userModel = _mapper.Map<UserRequest,UserModel>(userRequest);
+            return await _userService.Login(userModel, _configuration);
         }
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+
+
+        [HttpPost("verifyRegistration")]
+        public async Task<ActionResult> VerifyRegistration([FromBody] UserRequest userRequest)
         {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
+            var result = await _userService.Registration(userModel, _configuration);
+            if (result)
             {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                    
             }
+            return Ok(result);
         }
-        private bool VerifayPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
-            }
+
+
+
+        [HttpPost("registration")]
+        public async Task<ActionResult<int>> Registration([FromBody] UserInformationRequest userInformationRequest)
+        {            
+            var userInformationModel = _mapper.Map<UserInformationRequest, UserInformationModel>(userInformationRequest);
+            return await _userService.UserInformationRegistration(userInformationModel);           
         }
     }
 }
