@@ -2,6 +2,10 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using BC = BCrypt.Net.BCrypt;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -52,35 +56,9 @@ namespace LML.NPOManagement.Bll.Services
 
         public int AddUser(UserModel userModel)
         {
-            using(var dbContext = new NPOManagementContext())
-            {
-                var addUser = _mapper.Map<UserModel,User>(userModel);
+            throw new NotImplementedException();
+        }
 
-                dbContext.SaveChanges();
-                return 0;
-            }
-        }
-        private string GetUserType()
-        {
-           throw new NotImplementedException();
-        }
-        public int AddUserType(UserTypeModel userTypeModel)
-        {
-            using (var dbContext = new NPOManagementContext())
-            {
-
-                return 0;
-            }
-        }
-        public int AddUserInformation(UserInformationModel userInformation)
-        {
-            using (var dbContext = new NPOManagementContext())
-            {
-               
-                dbContext.SaveChanges();
-                return 0;
-            }
-        }
         public void DeleteUser(int id)
         {
             throw new NotImplementedException();
@@ -96,9 +74,52 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
+        public async Task<UserModel> Login(UserModel userModel, IConfiguration configuration)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                string encPass = BC.HashPassword(userModel.Password);
+
+                var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
+                if (user != null && BC.Verify(userModel.Password, user.Password))
+                {
+                    var userModelMapper = _mapper.Map<User, UserModel>(user);
+                    userModelMapper.Password = null;
+                    userModelMapper.Token = TokenCreationHelper.GenerateJwtToken(userModelMapper, configuration);
+                    return userModelMapper;
+                }
+            }
+            return null;
+        }
+
         public int ModifyUser(UserModel userModel, int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> Registration(UserModel userModel, IConfiguration configuration)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                string encPass = BC.HashPassword(userModel.Password);
+
+                var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
+                if (user == null )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel)
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var userInfo = _mapper.Map<UserInformationModel, UserInformation>(userInformationModel);
+                dbContext.UserInformations.Add(userInfo);
+                dbContext.SaveChanges();
+                return userInfo.Id;
+            }
         }
     }
 }

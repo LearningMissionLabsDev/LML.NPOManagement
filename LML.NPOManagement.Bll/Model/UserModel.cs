@@ -18,6 +18,7 @@ namespace LML.NPOManagement.Bll.Model
         public int UserInformationId { get; set; }
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
+        public string Token { get; set; } = null!;
         public string? Status { get; set; }
 
         public virtual UserInformationModel UserInformation { get; set; } = null!;
