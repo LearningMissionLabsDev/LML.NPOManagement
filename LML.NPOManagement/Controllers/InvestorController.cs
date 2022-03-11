@@ -75,6 +75,12 @@ namespace LML.NPOManagement.Controllers
         {
             return "value";
         }
+        // GET api/<InvestorInformationController>/5
+        [HttpGet("year")]
+        public string GetDonationByYear(DateTime dateTime)
+        {
+            return "value";
+        }
 
         // POST api/<InvestorInformationController>
         [HttpPost]
