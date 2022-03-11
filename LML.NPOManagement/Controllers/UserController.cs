@@ -96,11 +96,11 @@ namespace LML.NPOManagement.Controllers
         {
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var result = await _userService.Registration(userModel, _configuration);
-            if (!result)
+            if (result == null)
             {
-                    
+                return Ok(); 
             }
-            return Ok();
+            return StatusCode(409);
         }
 
 

@@ -32,7 +32,7 @@ namespace LML.NPOManagement.Bll.Services
             using(var dbContext = new NPOManagementContext())
             {
                 var user = dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
-                user.Status = "Closed";
+                user.Status = Convert.ToString(StatusEnumModel.Closed);
                 dbContext.SaveChanges();
             }
         }
@@ -111,19 +111,24 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
-        public async Task<bool> Registration(UserModel userModel, IConfiguration configuration)
+        public async Task<UserModel> Registration(UserModel userModel, IConfiguration configuration)
         {
             using (var dbContext = new NPOManagementContext())
-            {
-                string encPass = BC.HashPassword(userModel.Password);
-
+            {              
                 var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
-                if (user == null )
+
+                if (user == null || user.Status != Convert.ToString(StatusEnumModel.Closed))
                 {
-                    return false;
+                    string encPass = BC.HashPassword(userModel.Password);
+                    var addUser = _mapper.Map<UserModel, User>(userModel);
+                    dbContext.Users.Add(addUser);
+                    dbContext.SaveChanges();
+                    var newUser = _mapper.Map<User,UserModel>(addUser);
+                    newUser.Password = null;
+                    return newUser;
                 }
-            }
-            return true;
+                return null;
+            }           
         }
         public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel)
         {
