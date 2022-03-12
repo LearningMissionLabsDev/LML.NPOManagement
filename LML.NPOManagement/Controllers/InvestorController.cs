@@ -111,7 +111,7 @@ namespace LML.NPOManagement.Controllers
         {
             var investor = _mapper.Map<InvestorInformationRequest, InvestorInformationModel>(investorInformationRequest);
             var modifyInvestor = _investorInformationService.ModifyInvestorInformation(investor, id);
-            if (modifyInvestor)
+            if (modifyInvestor != null)
             {
                 return Ok();
             }
@@ -127,6 +127,7 @@ namespace LML.NPOManagement.Controllers
             {
                 _investorInformationService.DeleteInvestorInformation(id);
             }
+
             return BadRequest();
         }
     }

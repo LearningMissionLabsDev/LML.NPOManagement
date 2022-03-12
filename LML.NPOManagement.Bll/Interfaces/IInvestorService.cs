@@ -14,7 +14,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         public InvestorInformationModel GetInvestorInformationById(int id);
         public DonationModel GetDonationById(int id);
         public int AddInvestorInformation(InvestorInformationModel investorInformationModel);
-        public bool ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id);
+        public InvestorInformationModel ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id);
         public void DeleteInvestorInformation(int id);
     }
 }

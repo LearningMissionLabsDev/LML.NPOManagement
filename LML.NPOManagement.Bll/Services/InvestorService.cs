@@ -100,18 +100,19 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-        public bool ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
+        public InvestorInformationModel ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
         {
             using (var dbContext = new NPOManagementContext())
             {
-                var investor = dbContext.Users.Where(i => i.Id == id).FirstOrDefault();
+                var investor = dbContext.InvestorInformations.Where(i => i.Id == id).FirstOrDefault();
                 if (investor != null)
                 {
                     var modifyInvestor = _mapper.Map<InvestorInformationModel, InvestorInformation>(investorInformationModel);
                     dbContext.SaveChanges();
-                    return true;
+                    var newInvestor = _mapper.Map<InvestorInformation, InvestorInformationModel>(modifyInvestor);
+                    return newInvestor;
                 }
-                return false;
+                return null;
             }
         }
     }
