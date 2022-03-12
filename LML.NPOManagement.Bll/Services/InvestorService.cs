@@ -2,7 +2,6 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using BC = BCrypt.Net.BCrypt;
 
 
 namespace LML.NPOManagement.Bll.Services
