@@ -75,6 +75,22 @@ namespace LML.NPOManagement.Controllers
         {
             return "value";
         }
+
+        // GET: api/<InvestorInformationController>
+        [HttpGet("donation")]
+        public IEnumerable<DonationResponse> GetAllDonation()
+        {
+            var donation = _investorInformationService.GetAllDonation().ToList();
+            return _mapper.Map<List<DonationModel>,List<DonationResponse>>(donation);
+        }
+
+        // GET api/<InvestorInformationController>/5
+        [HttpGet("donationid")]
+        public DonationResponse GetDonationById(int id)
+        {
+            var donation = _investorInformationService.GetDonationById(id);
+            return _mapper.Map<DonationModel,DonationResponse>(donation);
+        }
         // GET api/<InvestorInformationController>/5
         [HttpGet("year")]
         public string GetDonationByYear(DateTime dateTime)

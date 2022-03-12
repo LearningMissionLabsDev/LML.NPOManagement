@@ -2,11 +2,7 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -73,6 +69,31 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
+        public IEnumerable<DonationModel> GetAllDonation()
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var donations = dbContext.Donations.ToList();
+                foreach (var donation in donations)
+                {
+                    var donationModel = _mapper.Map<Donation, DonationModel>(donation);
+                    yield return donationModel;
+                }
+            }
+        }
+
+        public DonationModel GetDonationById(int id)
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var donation = dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
+                if(donation != null)
+                {
+                    return _mapper.Map<Donation, DonationModel>(donation);
+                }
+                return null;
+            }
+        }
         public int ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
         {
             throw new NotImplementedException();
