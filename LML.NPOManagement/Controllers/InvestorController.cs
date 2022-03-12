@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -106,14 +107,28 @@ namespace LML.NPOManagement.Controllers
 
         // PUT api/<InvestorInformationController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ActionResult Put(int id, [FromBody] InvestorInformationRequest investorInformationRequest)
         {
+            var investor = _mapper.Map<InvestorInformationRequest, InvestorInformationModel>(investorInformationRequest);
+            var modifyInvestor = _investorInformationService.ModifyInvestorInformation(investor, id);
+            if (modifyInvestor != null)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         // DELETE api/<InvestorInformationController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            var investor = _investorInformationService.GetInvestorInformationById(id);
+            if (investor != null)
+            {
+                _investorInformationService.DeleteInvestorInformation(id);
+            }
+
+            return BadRequest();
         }
     }
 }
