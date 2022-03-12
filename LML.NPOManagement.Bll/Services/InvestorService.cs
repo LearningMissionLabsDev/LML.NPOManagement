@@ -2,6 +2,7 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using BC = BCrypt.Net.BCrypt;
 
 
 namespace LML.NPOManagement.Bll.Services
@@ -56,7 +57,12 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteInvestorInformation(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investor = dbContext.InvestorInformations.Where(i => i.Id == id).FirstOrDefault();
+                investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
+                dbContext.SaveChanges();
+            }
         }
 
         public IEnumerable<InvestorInformationModel> GetAllInvestorInformations()
@@ -94,9 +100,19 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-        public int ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
+        public bool ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investor = dbContext.Users.Where(i => i.Id == id).FirstOrDefault();
+                if (investor != null)
+                {
+                    var modifyInvestor = _mapper.Map<InvestorInformationModel, InvestorInformation>(investorInformationModel);
+                    dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
         }
     }
 }
