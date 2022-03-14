@@ -54,12 +54,12 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public void DeleteInvestorInformation(int id)
+        public void DeleteDonation(int id)
         {
             using (var dbContext = new NPOManagementContext())
             {
-                var investor = dbContext.InvestorInformations.Where(i => i.Id == id).FirstOrDefault();
-                investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
+                var donation = dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
+                donation.Investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
                 dbContext.SaveChanges();
             }
         }
@@ -99,17 +99,17 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
-        public InvestorInformationModel ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
+        public DonationModel ModifyDonation(DonationModel donationModel, int id)
         {
             using (var dbContext = new NPOManagementContext())
             {
-                var investor = dbContext.InvestorInformations.Where(i => i.Id == id).FirstOrDefault();
-                if (investor != null)
+                var donation = dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
+                if (donation != null)
                 {
-                    var modifyInvestor = _mapper.Map<InvestorInformationModel, InvestorInformation>(investorInformationModel);
+                    var modifyDonation = _mapper.Map<DonationModel, Donation>(donationModel);
                     dbContext.SaveChanges();
-                    var newInvestor = _mapper.Map<InvestorInformation, InvestorInformationModel>(modifyInvestor);
-                    return newInvestor;
+                    var newDonation = _mapper.Map<Donation, DonationModel>(modifyDonation);
+                    return newDonation;
                 }
                 return null;
             }
