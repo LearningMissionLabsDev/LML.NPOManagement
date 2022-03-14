@@ -67,12 +67,28 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<InvestorInformationModel> GetAllInvestorInformations()
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investors = dbContext.InvestorInformations.ToList();
+                foreach (var investor in investors)
+                {
+                    var InvestorModel = _mapper.Map<InvestorInformation, InvestorInformationModel>(investor);
+                    yield return InvestorModel;
+                }
+            }
         }
 
         public InvestorInformationModel GetInvestorInformationById(int id)
         {
-            throw new NotImplementedException();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investor = dbContext.InvestorInformations.Where(d => d.Id == id).FirstOrDefault();
+                if (investor != null)
+                {
+                    return _mapper.Map<InvestorInformation, InvestorInformationModel>(investor);
+                }
+                return null;
+            }
         }
 
         public IEnumerable<DonationModel> GetAllDonation()

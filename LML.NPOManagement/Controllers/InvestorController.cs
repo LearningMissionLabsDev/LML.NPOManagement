@@ -65,16 +65,20 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<InvestorInformationController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<InvestorInformationResponse> GetAllInvestorInformations()
         {
-            return new string[] { "value1", "value2" };
+            var investor = _investorInformationService.GetAllInvestorInformations().ToList();
+            return _mapper.Map<List<InvestorInformationModel>, List<InvestorInformationResponse>>(investor);
+           
         }
 
         // GET api/<InvestorInformationController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public InvestorInformationResponse GetInvestorInformationById(int id)
         {
-            return "value";
+            var investor = _investorInformationService.GetInvestorInformationById(id);
+            return _mapper.Map<InvestorInformationModel, InvestorInformationResponse>(investor);
+          
         }
 
         // GET: api/<InvestorInformationController>
