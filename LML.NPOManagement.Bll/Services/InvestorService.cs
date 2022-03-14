@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
@@ -100,6 +100,20 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
         }
+        public IEnumerable< DonationModel> GetYearlyDonation(DateTime year)
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var donationList = dbContext.Donations.Where(d => d.DateOfCharity == year).ToList();
+                foreach (var donation in donationList)
+                {
+                    var donationModel = _mapper.Map<Donation, DonationModel>(donation);
+                    yield return donationModel;
+                }
+                
+            }
+           
+        }
         public InvestorInformationModel ModifyInvestorInformation(InvestorInformationModel investorInformationModel, int id)
         {
             using (var dbContext = new NPOManagementContext())
@@ -114,6 +128,19 @@ namespace LML.NPOManagement.Bll.Services
                 }
                 return null;
             }
+        }       
+
+        public void AddDonationById(int donationId)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var donation = dbContext.Donations.Where(d => d.Id == donationId).FirstOrDefault();
+                donation.Investor.Donations.Add(donation);
+                dbContext.SaveChanges();
+            }
+
         }
+
+       
     }
 }

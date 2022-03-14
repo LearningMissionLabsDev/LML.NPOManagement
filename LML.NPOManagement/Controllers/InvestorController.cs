@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
@@ -15,7 +15,7 @@ namespace LML.NPOManagement.Controllers
     public class InvestorController : ControllerBase
     {
         private IMapper _mapper;
-        private IInvestorService _investorInformationService;
+        private IInvestorService _investorInformationService;        
         public InvestorController(IInvestorService investorInformationService)
         {
             var config = new MapperConfiguration(cfg =>
@@ -86,7 +86,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         // GET api/<InvestorInformationController>/5
-        [HttpGet("donationid")]
+        [HttpGet("donationByid")]
         public DonationResponse GetDonationById(int id)
         {
             var donation = _investorInformationService.GetDonationById(id);
@@ -94,15 +94,19 @@ namespace LML.NPOManagement.Controllers
         }
         // GET api/<InvestorInformationController>/5
         [HttpGet("year")]
-        public string GetDonationByYear(DateTime dateTime)
+        public IEnumerable<DonationResponse> GetDonationByYear(DateTime year)
         {
-            return "value";
+            var donation = _investorInformationService.GetYearlyDonation(year).ToList();
+            return _mapper.Map<List<DonationModel>, List<DonationResponse>>(donation);
+
         }
 
         // POST api/<InvestorInformationController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost ("id")]
+        public void AddDonationById(int id, [FromBody] DonationRequest donationRequest)
         {
+            var donation = _investorInformationService.AddDonationById;
+            
         }
 
         // PUT api/<InvestorInformationController>/5
