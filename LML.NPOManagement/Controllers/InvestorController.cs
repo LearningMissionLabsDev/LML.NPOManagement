@@ -105,8 +105,11 @@ namespace LML.NPOManagement.Controllers
         [HttpPost ("id")]
         public void AddDonationById(int id, [FromBody] DonationRequest donationRequest)
         {
-            var donation = _investorInformationService.AddDonationById;
-            
+            var donation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
+            if (donation != null)
+            {
+               _investorInformationService.AddDonationById(id);
+            }                            
         }
 
         // PUT api/<InvestorInformationController>/5

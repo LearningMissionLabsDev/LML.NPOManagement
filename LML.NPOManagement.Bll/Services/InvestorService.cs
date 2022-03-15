@@ -135,10 +135,14 @@ namespace LML.NPOManagement.Bll.Services
             using (var dbContext = new NPOManagementContext())
             {
                 var donation = dbContext.Donations.Where(d => d.Id == donationId).FirstOrDefault();
-                donation.Investor.Donations.Add(donation);
-                dbContext.SaveChanges();
+                if (donation !=null)
+                {
+                    donation.Investor.Donations.Add(donation);
+                    dbContext.SaveChanges();
+                }
+               
             }
-
+           
         }
 
        
