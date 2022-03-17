@@ -111,11 +111,11 @@ namespace LML.NPOManagement.Controllers
 
         // PUT api/<InvestorInformationController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] InvestorInformationRequest investorInformationRequest)
+        public ActionResult Put(int id, [FromBody] DonationRequest donationRequest)
         {
-            var investor = _mapper.Map<InvestorInformationRequest, InvestorInformationModel>(investorInformationRequest);
-            var modifyInvestor = _investorInformationService.ModifyInvestorInformation(investor, id);
-            if (modifyInvestor != null)
+            var donation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
+            var modifyDonation = _investorInformationService.ModifyDonation(donation, id);
+            if (modifyDonation != null)
             {
                 return Ok();
             }
@@ -126,10 +126,10 @@ namespace LML.NPOManagement.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var investor = _investorInformationService.GetInvestorInformationById(id);
-            if (investor != null)
+            var donation = _investorInformationService.GetDonationById(id);
+            if (donation != null)
             {
-                _investorInformationService.DeleteInvestorInformation(id);
+                _investorInformationService.DeleteDonation(id);
             }
 
             return BadRequest();
