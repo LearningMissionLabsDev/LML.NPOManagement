@@ -5,12 +5,8 @@ namespace LML.NPOManagement.Dal.Models
 {
     public partial class UserInformation
     {
-        public UserInformation()
-        {
-            Users = new HashSet<User>();
-        }
-
         public int Id { get; set; }
+        public int UserId { get; set; }
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
         public string? MiddleName { get; set; }
@@ -19,8 +15,8 @@ namespace LML.NPOManagement.Dal.Models
         public DateTime UpdateDate { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public int Gender { get; set; }
-        public string? Information { get; set; }
+        public string? Metadata { get; set; }
 
-        public virtual ICollection<User> Users { get; set; }
+        public virtual User User { get; set; } = null!;
     }
 }

@@ -1,8 +1,7 @@
 ﻿namespace LML.NPOManagement.Request
 {
-    public class UserRequest
-    {        
-        public string Email { get; set; }
-        public string Password { get; set; }
+    public class UserRequest : LoginRequest
+    {     
+        public string ConfirmPassword { get; set; }
     }
 }

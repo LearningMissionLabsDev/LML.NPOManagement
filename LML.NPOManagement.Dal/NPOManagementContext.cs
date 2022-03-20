@@ -286,12 +286,6 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.Password).HasMaxLength(250);
 
                 entity.Property(e => e.Status).HasMaxLength(50);
-
-                entity.HasOne(d => d.UserInformation)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.UserInformationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_User_UserInformation");
             });
 
             modelBuilder.Entity<UserInformation>(entity =>
@@ -304,15 +298,21 @@ namespace LML.NPOManagement.Dal.Models
 
                 entity.Property(e => e.FirstName).HasMaxLength(50);
 
-                entity.Property(e => e.Information).HasColumnType("ntext");
-
                 entity.Property(e => e.LastName).HasMaxLength(50);
+
+                entity.Property(e => e.Metadata).HasColumnType("ntext");
 
                 entity.Property(e => e.MiddleName).HasMaxLength(50);
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(50);
 
                 entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserInformations)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserInformation_User");
             });
 
             modelBuilder.Entity<UserInventory>(entity =>
@@ -345,8 +345,8 @@ namespace LML.NPOManagement.Dal.Models
                     .WithMany(p => p.UserTypes)
                     .UsingEntity<Dictionary<string, object>>(
                         "User2UserType",
-                        l => l.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_User2UserType_User"),
-                        r => r.HasOne<UserType>().WithMany().HasForeignKey("UserTypeId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_User2UserType_UserType"),
+                        l => l.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_User2UserType_User1"),
+                        r => r.HasOne<UserType>().WithMany().HasForeignKey("UserTypeId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_User2UserType_UserType1"),
                         j =>
                         {
                             j.HasKey("UserTypeId", "UserId").HasName("PK_User2UserTypeConnection");

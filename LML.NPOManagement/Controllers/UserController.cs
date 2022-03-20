@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace LML.NPOManagement.Controllers
         private IMapper _mapper;
         private IUserService _userService;
         private IConfiguration _configuration;
+
         public UserController(IUserService userService, IConfiguration configuration)
         {
             var config = new MapperConfiguration(cfg =>
@@ -59,6 +61,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
+                cfg.CreateMap<LoginRequest, UserModel>();
 
             });
             _mapper = config.CreateMapper();
@@ -90,6 +93,7 @@ namespace LML.NPOManagement.Controllers
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult Put(int id, [FromBody] UserRequest userRequest)
         {
             var user = _mapper.Map<UserRequest,UserModel>(userRequest);
@@ -117,32 +121,40 @@ namespace LML.NPOManagement.Controllers
         // POST api/<UserController>       
 
         [HttpPost("login")]
-        public async Task<ActionResult<UserModel>> Login([FromBody] UserRequest userRequest)
+        public async Task<ActionResult<UserModel>> Login([FromBody] LoginRequest loginRequest)
         {
-            var userModel = _mapper.Map<UserRequest,UserModel>(userRequest);
+            var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
             return await _userService.Login(userModel, _configuration);
         }
 
 
-        [HttpPost("verifyRegistration")]
-        public async Task<ActionResult> VerifyRegistration([FromBody] UserRequest userRequest)
+        [HttpPost("registration")]
+        public async Task<ActionResult> Registration([FromBody] UserRequest userRequest)
         {
-            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
-            var result = await _userService.Registration(userModel, _configuration);
-            if (result == null)
+            if(userRequest.Password != userRequest.ConfirmPassword)
             {
-                return Ok(); 
+                return StatusCode(409);
+            }
+            var userModel = new UserModel { Email = userRequest.Email, Password = userRequest.Password };
+            var result = await _userService.Registration(userModel, _configuration);
+            
+            if (result != null)
+            {
+                return Ok(result); 
             }
             return StatusCode(409);
         }
 
 
 
-        [HttpPost("registration")]
-        public async Task<ActionResult<int>> Registration([FromBody] UserInformationRequest userInformationRequest)
-        {            
+        [HttpPost("userInfoRegistration")]
+        [Authorize]
+        public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
+        {
+            var user = HttpContext.Items["User"] as UserModel ;
+            userInformationRequest.UserId = user.Id;
             var userInformationModel = _mapper.Map<UserInformationRequest, UserInformationModel>(userInformationRequest);
-            return await _userService.UserInformationRegistration(userInformationModel);           
+            return await _userService.UserInformationRegistration(userInformationModel, _configuration);           
         }
     }
 }

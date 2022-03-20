@@ -13,7 +13,7 @@ namespace LML.NPOManagement.Bll.Services
         public static string GenerateJwtToken(UserModel user, IConfiguration configuration)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration.GetSection("Logging:SecretKey").Value);
+            var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
@@ -21,7 +21,7 @@ namespace LML.NPOManagement.Bll.Services
                    
                     
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16( configuration.GetSection("Logging:TokenExpiration").Value)),
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16( configuration.GetSection("AppSettings:TokenExpiration").Value)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -31,7 +31,7 @@ namespace LML.NPOManagement.Bll.Services
         public static UserModel ValidateJwtToken(string token, IConfiguration configuration)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration.GetSection("Logging:SecretKey").Value);
+            var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
