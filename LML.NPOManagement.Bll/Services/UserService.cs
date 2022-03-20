@@ -109,8 +109,6 @@ namespace LML.NPOManagement.Bll.Services
         {
             using (var dbContext = new NPOManagementContext())
             {
-                string encPass = BC.HashPassword(userModel.Password);
-
                 var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
                 if (user != null && BC.Verify(userModel.Password, user.Password))
                 {
@@ -145,20 +143,25 @@ namespace LML.NPOManagement.Bll.Services
             {              
                 var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
 
-                if (user == null || user.Status != Convert.ToString(StatusEnumModel.Closed))
-                {
-                    string encPass = BC.HashPassword(userModel.Password);
+                if (user == null )
+                {                    
+                    userModel.Password = BC.HashPassword(userModel.Password);
                     var addUser = _mapper.Map<UserModel, User>(userModel);
                     dbContext.Users.Add(addUser);
                     dbContext.SaveChanges();
-                    var newUser = _mapper.Map<User,UserModel>(addUser);
+                    var newUser = _mapper.Map<User, UserModel>(addUser);
+                    newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
                     newUser.Password = null;
-                    return newUser;
+                    return newUser;                    
+                }
+                else if(user.Status == Convert.ToString(StatusEnumModel.Closed))
+                {
+                    return null;//to do hendle this condition differently
                 }
                 return null;
             }           
         }
-        public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel)
+        public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel,IConfiguration configuration )
         {
             using(var dbContext = new NPOManagementContext())
             {

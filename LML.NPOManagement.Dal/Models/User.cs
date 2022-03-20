@@ -8,6 +8,7 @@ namespace LML.NPOManagement.Dal.Models
         public User()
         {
             InvestorInformations = new HashSet<InvestorInformation>();
+            UserInformations = new HashSet<UserInformation>();
             UserInventories = new HashSet<UserInventory>();
             Accounts = new HashSet<Account>();
             Notifications = new HashSet<Notification>();
@@ -16,13 +17,12 @@ namespace LML.NPOManagement.Dal.Models
         }
 
         public int Id { get; set; }
-        public int UserInformationId { get; set; }
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public string? Status { get; set; }
 
-        public virtual UserInformation UserInformation { get; set; } = null!;
         public virtual ICollection<InvestorInformation> InvestorInformations { get; set; }
+        public virtual ICollection<UserInformation> UserInformations { get; set; }
         public virtual ICollection<UserInventory> UserInventories { get; set; }
 
         public virtual ICollection<Account> Accounts { get; set; }

@@ -7,6 +7,7 @@ namespace LML.NPOManagement.Bll.Model
         public UserModel()
         {
             InvestorInformations = new HashSet<InvestorInformationModel>();
+            UserInformations = new HashSet<UserInformationModel>();
             UserInventories = new HashSet<UserInventoryModel>();
             Accounts = new HashSet<AccountModel>();
             Notifications = new HashSet<NotificationModel>();
@@ -15,14 +16,13 @@ namespace LML.NPOManagement.Bll.Model
         }
 
         public int Id { get; set; }
-        public int UserInformationId { get; set; }
-        public string Email { get; set; } = null!;
-        public string Password { get; set; } = null!;
-        public string Token { get; set; } = null!;
+        public string Email { get; set; } 
+        public string Password { get; set; }
+        public string Token { get; set; }
         public StatusEnumModel Status { get; set; }
 
-        public virtual UserInformationModel UserInformation { get; set; } = null!;
         public virtual ICollection<InvestorInformationModel> InvestorInformations { get; set; }
+        public virtual ICollection<UserInformationModel> UserInformations { get; set; }
         public virtual ICollection<UserInventoryModel> UserInventories { get; set; }
 
         public virtual ICollection<AccountModel> Accounts { get; set; }
