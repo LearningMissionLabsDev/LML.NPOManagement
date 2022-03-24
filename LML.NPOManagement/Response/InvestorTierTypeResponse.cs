@@ -2,5 +2,6 @@
 {
     public class InvestorTierTypeResponse
     {
+        public string InvestorTier { get; set; }
     }
 }

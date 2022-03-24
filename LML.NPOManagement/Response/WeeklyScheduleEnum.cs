@@ -1,7 +1,9 @@
-﻿
-namespace LML.NPOManagement.Response
+﻿namespace LML.NPOManagement.Response
 {
     public enum WeeklyScheduleEnum
     {
+      
     }
 }
+
+

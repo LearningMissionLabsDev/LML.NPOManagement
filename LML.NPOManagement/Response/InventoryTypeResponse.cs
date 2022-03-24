@@ -2,5 +2,6 @@
 {
     public class InventoryTypeResponse
     {
+        public string Description { get; set; }
     }
 }
