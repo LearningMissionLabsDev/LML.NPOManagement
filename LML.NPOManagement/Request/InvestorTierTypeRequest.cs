@@ -2,5 +2,6 @@
 {
     public class InvestorTierTypeRequest
     {
+        public string InvestorTier { get; set; }
     }
 }
