@@ -1,7 +1,11 @@
-﻿namespace LML.NPOManagement.Request
-{
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LML.NPOManagement.Request
+{    
     public class RoleRequest
     {
-        public string UserRole { get; set; } = null!;
+        [Required]
+        [StringLength(50)]
+        public string UserRole { get; set; } 
     }
 }
