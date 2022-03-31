@@ -3,6 +3,7 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
 using System.Net.Mail;
 using System.Text;
 
@@ -80,30 +81,35 @@ namespace LML.NPOManagement.Bll.Services
            
             foreach (var userModel in userModels)
             {
-                //userModel.Email = "lalazaryan91@inbox.ru";
-                //MailMessage message = new MailMessage(from, userModel.Email);
+                MailMessage EmailMsg = new MailMessage();
+                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
+                EmailMsg.Subject = notificationModel.Subject;
+                EmailMsg.Body = notificationModel.Body;
+                EmailMsg.IsBodyHtml = true;
+                EmailMsg.Priority = MailPriority.Normal;
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    //Port = 465,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
+                };
 
+                smtp.Send(EmailMsg);
+                   
+                
+            }
+           
+        }
+        public void SendNotification(List<UserModel> userModels, NotificationModel notificationModel)
+        {
 
-                //string mailbody = notificationModel.Body;
-                //message.Subject = notificationModel.Subject;
-                //message.Body = mailbody;
-                //message.BodyEncoding = Encoding.UTF8;
-                //message.IsBodyHtml = true;
-                //SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
-                //System.Net.NetworkCredential credential = new
-                //System.Net.NetworkCredential("garush.mkhitaryan@gmail.com", "sat25111988");
-                //client.EnableSsl = true;
-                //client.UseDefaultCredentials = false;
-                //client.Credentials = credential;
-                //try
-                //{
-                //    client.Send(message);
-                //}
-
-                //catch (Exception ex)
-                //{
-                //    throw ex;
-                //}
+            foreach (var userModel in userModels)
+            {
                 MailMessage mail = new MailMessage();
                 mail.From = new MailAddress("garush.mkhitaryan@gmail.com");
                 mail.Sender = new MailAddress("garush.mkhitaryan@gmail.com");
@@ -113,7 +119,7 @@ namespace LML.NPOManagement.Bll.Services
                 mail.Body = notificationModel.Body;
 
 
-               
+
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
                 smtp.UseDefaultCredentials = false;
 
@@ -132,8 +138,7 @@ namespace LML.NPOManagement.Bll.Services
                     throw ex;
                 }
             }
-           
+
         }
-      
     }
 }
