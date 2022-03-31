@@ -2,11 +2,9 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net.Mail;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -18,7 +16,7 @@ namespace LML.NPOManagement.Bll.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
-                cfg.CreateMap<Attachment, AttachmentModel>();
+                //cfg.CreateMap<Attachment, AttachmentModel>();
                 cfg.CreateMap<DailySchedule, DailyScheduleModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
@@ -34,7 +32,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Attachment>();
+                //cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DailyScheduleModel, DailySchedule>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
@@ -77,5 +75,65 @@ namespace LML.NPOManagement.Bll.Services
         {
             throw new NotImplementedException();
         }
+        public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
+        {
+           
+            foreach (var userModel in userModels)
+            {
+                //userModel.Email = "lalazaryan91@inbox.ru";
+                //MailMessage message = new MailMessage(from, userModel.Email);
+
+
+                //string mailbody = notificationModel.Body;
+                //message.Subject = notificationModel.Subject;
+                //message.Body = mailbody;
+                //message.BodyEncoding = Encoding.UTF8;
+                //message.IsBodyHtml = true;
+                //SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
+                //System.Net.NetworkCredential credential = new
+                //System.Net.NetworkCredential("garush.mkhitaryan@gmail.com", "sat25111988");
+                //client.EnableSsl = true;
+                //client.UseDefaultCredentials = false;
+                //client.Credentials = credential;
+                //try
+                //{
+                //    client.Send(message);
+                //}
+
+                //catch (Exception ex)
+                //{
+                //    throw ex;
+                //}
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress("garush.mkhitaryan@gmail.com");
+                mail.Sender = new MailAddress("garush.mkhitaryan@gmail.com");
+                mail.To.Add(userModel.Email);
+                mail.IsBodyHtml = true;
+                mail.Subject = notificationModel.Subject;
+                mail.Body = notificationModel.Body;
+
+
+               
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                smtp.UseDefaultCredentials = false;
+
+                smtp.Credentials = new System.Net.NetworkCredential("garush.mkhitaryan@gmail.com", "sat25111988");
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.EnableSsl = true;
+
+                smtp.Timeout = 30000;
+                try
+                {
+
+                    smtp.Send(mail);
+                }
+                catch (SmtpException ex)
+                {
+                    throw ex;
+                }
+            }
+           
+        }
+      
     }
 }

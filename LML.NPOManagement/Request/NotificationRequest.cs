@@ -11,7 +11,9 @@ namespace LML.NPOManagement.Request
         public string Subject { get; set; }  
         
         [StringLength (maximumLength:int.MaxValue)]
-        public string Metadate { get; set; } 
+        public NotificationContext NotificationContext { get; set; }
+
+        public string Body { get; set; } 
 
         [DataType (DataType.Time)]
         public string Reminder { get; set; }

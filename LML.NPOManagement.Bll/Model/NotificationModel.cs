@@ -2,7 +2,7 @@
 
 namespace LML.NPOManagement.Bll.Model
 {
-    public class NotificationModel
+    public class NotificationModel : UserModel
     {
         public NotificationModel()
         {

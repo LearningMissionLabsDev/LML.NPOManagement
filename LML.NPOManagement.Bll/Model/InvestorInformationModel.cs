@@ -10,7 +10,7 @@ namespace LML.NPOManagement.Bll.Model
         }
         public int Id { get; set; }
         public int UserId { get; set; }
-        public InvestorTierTypeModel InvestorTierId { get; set; }
+        public int InvestorTierId { get; set; }
 
         public virtual InvestorTierTypeModel InvestorTier { get; set; }
         public virtual UserModel User { get; set; }
