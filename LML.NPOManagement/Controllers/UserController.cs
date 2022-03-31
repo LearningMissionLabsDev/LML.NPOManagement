@@ -83,6 +83,7 @@ namespace LML.NPOManagement.Controllers
             var userTypes = _userService.GetAllUserTypes().ToList();
             return _mapper.Map<List<UserTypeModel>,List<UserTypeResponse>>(userTypes);
         }
+
         //GET api/<UserController>/5
         [HttpGet("{id}")]
         public UserResponse Get(int id)

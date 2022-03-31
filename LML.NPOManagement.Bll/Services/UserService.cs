@@ -2,7 +2,6 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
@@ -78,6 +77,7 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
+       
         public IEnumerable<UserTypeModel>  GetAllUserTypes()
         {
             using(var dbContext = new NPOManagementContext())
@@ -171,5 +171,72 @@ namespace LML.NPOManagement.Bll.Services
                 return userInfo.Id;
             }
         }
+
+
+
+
+        public async Task<List<UserModel>> GetUsersByRole(int id)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var userRole = await dbContext.Roles.Where(r => r.Id == id).FirstOrDefaultAsync();
+                var users = await dbContext.Users.Where(ro => ro.Roles.Contains(userRole)).ToListAsync();
+                if (users.Count > 0)
+                {
+                    var userModel = new List<UserModel>();
+                    foreach (var user in users)
+                    {
+                        var userByRole = _mapper.Map<User, UserModel>(user);                     
+                        userModel.Add(userByRole);
+                    }
+                    return userModel;
+                }
+                return null;
+            }
+
+        }
+
+        public async Task<List<UserModel>> GetUsersByAccount(int id)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var account = await dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
+                var users = await dbContext.Users.Where(acc => acc.Accounts.Contains(account)).ToListAsync();
+                if (users.Count > 0)
+                {
+                    var userModel = new List<UserModel>();
+                    foreach (var user in users)
+                    {
+                        var userByAccount = _mapper.Map<User, UserModel>(user);
+                        userModel.Add(userByAccount);
+                    }
+                    return userModel;
+                }
+                return null;
+            }
+        }
+
+        public async Task<List<UserModel>> GetUsersByInvestorTier(int id)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var investor = await dbContext.InvestorInformations.Where(inv => inv.InvestorTierId == id).FirstOrDefaultAsync();
+
+                var users = await dbContext.Users.Where(inv => inv.Id == investor.UserId).ToListAsync();
+
+                if (users.Count > 0)
+                {
+                    var userModel = new List<UserModel>();
+                    foreach (var user in users)
+                    {
+                        var userByAccount = _mapper.Map<User, UserModel>(user);
+                        userModel.Add(userByAccount);
+                    }
+                    return userModel;
+                }
+                return null;
+            }
+        }
+
     }
 }
