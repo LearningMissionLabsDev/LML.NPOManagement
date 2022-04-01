@@ -15,6 +15,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         public int ModifyNotification(NotificationModel notificationModel, int id);
         public void DeleteNotification(int id);
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel);
+        public void SendNotificationUser(UserModel userModel);
 
     }
 }

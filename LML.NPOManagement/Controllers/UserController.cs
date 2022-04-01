@@ -18,8 +18,9 @@ namespace LML.NPOManagement.Controllers
         private IMapper _mapper;
         private IUserService _userService;
         private IConfiguration _configuration;
+        private INotificationService _notificationService;
 
-        public UserController(IUserService userService, IConfiguration configuration)
+        public UserController(IUserService userService, IConfiguration configuration, INotificationService notificationService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -67,6 +68,7 @@ namespace LML.NPOManagement.Controllers
             _mapper = config.CreateMapper();
             _userService = userService;
             _configuration = configuration;
+            _notificationService = notificationService;
         }
         // GET: api/<UserController>
         [HttpGet]
@@ -155,7 +157,10 @@ namespace LML.NPOManagement.Controllers
             var user = HttpContext.Items["User"] as UserModel ;
             userInformationRequest.UserId = user.Id;
             var userInformationModel = _mapper.Map<UserInformationRequest, UserInformationModel>(userInformationRequest);
-            return await _userService.UserInformationRegistration(userInformationModel, _configuration);           
+            var newUser = _userService.GetUserById(userInformationModel.UserId);
+            var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            _notificationService.SendNotificationUser(newUser);
+            return userInfoId;          
         }
     }
 }
