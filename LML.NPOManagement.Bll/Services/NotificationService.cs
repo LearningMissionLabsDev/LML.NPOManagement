@@ -76,6 +76,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             throw new NotImplementedException();
         }
+
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
         {
            
@@ -105,39 +106,33 @@ namespace LML.NPOManagement.Bll.Services
             }
            
         }
-        public void SendNotification(List<UserModel> userModels, NotificationModel notificationModel)
+        public void SendNotificationUser(UserModel userModel)
         {
-
-            foreach (var userModel in userModels)
+            TemplateService templateService = new TemplateService();
+            using (var dbContext = new NPOManagementContext())
             {
-                MailMessage mail = new MailMessage();
-                mail.From = new MailAddress("garush.mkhitaryan@gmail.com");
-                mail.Sender = new MailAddress("garush.mkhitaryan@gmail.com");
-                mail.To.Add(userModel.Email);
-                mail.IsBodyHtml = true;
-                mail.Subject = notificationModel.Subject;
-                mail.Body = notificationModel.Body;
-
-
-
-                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-                smtp.UseDefaultCredentials = false;
-
-                smtp.Credentials = new System.Net.NetworkCredential("garush.mkhitaryan@gmail.com", "sat25111988");
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtp.EnableSsl = true;
-
-                smtp.Timeout = 30000;
-                try
+                var userInfo = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();          
+                MailMessage EmailMsg = new MailMessage();
+                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
+                EmailMsg.Subject = templateService.RegistrationUser(userInfo.FirstName, userInfo.CreateDate);
+                EmailMsg.Body = templateService.Body;
+                EmailMsg.IsBodyHtml = true;
+                EmailMsg.Priority = MailPriority.Normal;
+                var smtp = new SmtpClient
                 {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    //Port = 465,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
+                };
 
-                    smtp.Send(mail);
-                }
-                catch (SmtpException ex)
-                {
-                    throw ex;
-                }
+                smtp.Send(EmailMsg);
             }
+           
 
         }
     }
