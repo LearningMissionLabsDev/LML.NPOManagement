@@ -2,11 +2,10 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -18,7 +17,7 @@ namespace LML.NPOManagement.Bll.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
-                cfg.CreateMap<Attachment, AttachmentModel>();
+                //cfg.CreateMap<Attachment, AttachmentModel>();
                 cfg.CreateMap<DailySchedule, DailyScheduleModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
@@ -34,7 +33,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Attachment>();
+                //cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DailyScheduleModel, DailySchedule>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
@@ -76,6 +75,65 @@ namespace LML.NPOManagement.Bll.Services
         public int ModifyNotification(NotificationModel notificationModel, int id)
         {
             throw new NotImplementedException();
+        }
+
+        public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
+        {
+           
+            foreach (var userModel in userModels)
+            {
+                MailMessage EmailMsg = new MailMessage();
+                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
+                EmailMsg.Subject = notificationModel.Subject;
+                EmailMsg.Body = notificationModel.Body;
+                EmailMsg.IsBodyHtml = true;
+                EmailMsg.Priority = MailPriority.Normal;
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    //Port = 465,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
+                };
+
+                smtp.Send(EmailMsg);
+                   
+                
+            }
+           
+        }
+        public void SendNotificationUser(UserModel userModel)
+        {
+            TemplateService templateService = new TemplateService();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var userInfo = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();          
+                MailMessage EmailMsg = new MailMessage();
+                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
+                EmailMsg.Subject = templateService.RegistrationUser(userInfo.FirstName, userInfo.CreateDate);
+                EmailMsg.Body = templateService.Body;
+                EmailMsg.IsBodyHtml = true;
+                EmailMsg.Priority = MailPriority.Normal;
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    //Port = 465,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
+                };
+
+                smtp.Send(EmailMsg);
+            }
+           
+
         }
     }
 }

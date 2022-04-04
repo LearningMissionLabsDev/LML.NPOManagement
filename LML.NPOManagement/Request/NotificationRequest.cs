@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 {
     public class NotificationRequest
-    {
-        public int MeetingScheduleId { get; set; }
-        public string Subject { get; set; } 
+    {        
+        //[Required]
+        //[StringLength (100)]
+        public string Subject { get; set; }  
+        
+        //[StringLength (maximumLength:int.MaxValue)]
+        public NotificationContext NotificationContext { get; set; }
+
         public string Body { get; set; } 
-        public int AttachmentId { get; set; }
-        public string Metadate { get; set; } 
+
+        //[DataType (DataType.Time)]
         public string Reminder { get; set; }
 
     }

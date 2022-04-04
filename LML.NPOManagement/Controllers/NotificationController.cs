@@ -15,7 +15,9 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private INotificationService _notificationService;
-        public NotificationController(INotificationService notificationService)
+        private IUserService _userService;
+
+        public NotificationController(INotificationService notificationService, IUserService userService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -61,6 +63,7 @@ namespace LML.NPOManagement.Controllers
             });
             _mapper = config.CreateMapper();
             _notificationService = notificationService;
+            _userService = userService;
         }
         // GET: api/<NotificationController>
         [HttpGet]
@@ -78,9 +81,41 @@ namespace LML.NPOManagement.Controllers
 
         // POST api/<NotificationController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult> Post(int id, [FromBody] NotificationRequest notificationRequest)
         {
+            var notification =  _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
+
+            switch (notificationRequest.NotificationContext)
+            {
+                case NotificationContext.Users:
+
+                    var users =  _userService.GetAllUsers().ToList();
+                    _notificationService.SendNotifications(users, notification);
+                    return Ok();
+                    
+                case NotificationContext.Account:
+
+                    var userByAccounts = await  _userService.GetUsersByAccount(id);
+                    _notificationService.SendNotifications(userByAccounts, notification);
+                    return Ok();
+                    
+                case NotificationContext.Role:
+
+                    var userByRoles = await _userService.GetUsersByRole(id);
+                    _notificationService.SendNotifications(userByRoles, notification);
+                    return Ok();
+                   
+                case NotificationContext.InvestorTier:
+
+                    var userByInvestorTier = await _userService.GetUsersByInvestorTier(id);
+                    _notificationService.SendNotifications(userByInvestorTier, notification);
+                    return Ok();
+                   
+                default:
+                    return BadRequest();                    
+            }           
         }
+
 
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]
