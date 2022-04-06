@@ -9,5 +9,7 @@ namespace LML.NPOManagement.Bll.Interfaces
     public interface ITemplateService
     {
         public string RegistrationUser(string name, DateTime createDate);
+        public string Donor(string name, DateTime dateOfCharity);
+
     }
 }

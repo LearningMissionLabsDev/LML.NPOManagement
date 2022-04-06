@@ -77,9 +77,9 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
+        public void SendNotifications(List<UserModel> userModels, NotificationModel notificationModel)
         {
-           
+
             foreach (var userModel in userModels)
             {
                 MailMessage EmailMsg = new MailMessage();
@@ -101,20 +101,18 @@ namespace LML.NPOManagement.Bll.Services
                 };
 
                 smtp.Send(EmailMsg);
-                   
-                
+
             }
-           
         }
         public void SendNotificationUser(UserModel userModel)
         {
             TemplateService templateService = new TemplateService();
             using (var dbContext = new NPOManagementContext())
             {
-                var userInfo = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();          
+                var userInfo = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();
                 MailMessage EmailMsg = new MailMessage();
                 EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
-                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
+                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));               
                 EmailMsg.Subject = templateService.RegistrationUser(userInfo.FirstName, userInfo.CreateDate);
                 EmailMsg.Body = templateService.Body;
                 EmailMsg.IsBodyHtml = true;
@@ -132,8 +130,39 @@ namespace LML.NPOManagement.Bll.Services
 
                 smtp.Send(EmailMsg);
             }
-           
+        }
+        public void SendNotificationDonors(DonationModel donationModel)
+        {
+            TemplateService templateService= new TemplateService();
+            using (var dbContext = new NPOManagementContext())
+            {
+                var invvestor = dbContext.InvestorInformations.Where(i => i.Id == donationModel.InvestorId).FirstOrDefault();
+                var user= dbContext.Users.Where(us=>us.Id == invvestor.UserId).FirstOrDefault();   
+                var userInfo = dbContext.UserInformations.Where (usin => usin.UserId == user.Id).FirstOrDefault();
+                MailMessage EmailMsg = new MailMessage();
+                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                EmailMsg.To.Add(new MailAddress(user.Email, user.Email));
+                EmailMsg.Subject = templateService.Donor(userInfo.FirstName, userInfo.CreateDate);
+                EmailMsg.Body = templateService.Body;
+                EmailMsg.IsBodyHtml = true;
+                EmailMsg.Priority = MailPriority.Normal;
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    //Port = 465,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
 
+                };
+
+                smtp.Send(EmailMsg);
+            }
         }
     }
 }
+
+   
+

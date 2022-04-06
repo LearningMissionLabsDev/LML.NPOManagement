@@ -5,6 +5,8 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -162,5 +164,6 @@ namespace LML.NPOManagement.Controllers
             _notificationService.SendNotificationUser(newUser);
             return userInfoId;          
         }
+               
     }
 }
