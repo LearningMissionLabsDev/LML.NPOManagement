@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LML.NPOManagement.Bll.Model;
+
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface ITemplateService
     {
-        public string RegistrationUser(string name, DateTime createDate);
+        public string HtmlBodyNorification(UserModel userModel,NotificationModel notificationModel);
+        public string HtmlSubject();
     }
 }
