@@ -19,8 +19,10 @@ namespace LML.NPOManagement.Controllers
         private IUserService _userService;
         private IConfiguration _configuration;
         private INotificationService _notificationService;
+        private IWebHostEnvironment _webHostEnvironment;
 
-        public UserController(IUserService userService, IConfiguration configuration, INotificationService notificationService)
+        public UserController(IUserService userService, IConfiguration configuration,
+            INotificationService notificationService, IWebHostEnvironment webHostEnvironment)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -69,6 +71,8 @@ namespace LML.NPOManagement.Controllers
             _userService = userService;
             _configuration = configuration;
             _notificationService = notificationService;
+            _webHostEnvironment = webHostEnvironment;
+            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
         // GET: api/<UserController>
         [HttpGet]

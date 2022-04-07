@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Grpc.Core;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -12,6 +13,7 @@ namespace LML.NPOManagement.Bll.Services
     public class NotificationService : INotificationService
     {
         private IMapper _mapper;
+        public string AppRootPath { get; set; }
         public NotificationService()
         {
             var config = new MapperConfiguration(cfg =>
@@ -79,44 +81,55 @@ namespace LML.NPOManagement.Bll.Services
 
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
         {
-           
+            TemplateService templateService = new TemplateService(AppRootPath);
+
+            List<string> bodies = new List<string>() 
+            {
+
+            };
+            List<string> subjects = new List<string>()
+            {
+
+            };
+
+            string subject = templateService.HtmlSubject();
+
             foreach (var userModel in userModels)
             {
-                MailMessage EmailMsg = new MailMessage();
-                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
-                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
-                EmailMsg.Subject = notificationModel.Subject;
-                EmailMsg.Body = notificationModel.Body;
-                EmailMsg.IsBodyHtml = true;
-                EmailMsg.Priority = MailPriority.Normal;
-                var smtp = new SmtpClient
-                {
-                    Host = "smtp.gmail.com",
-                    Port = 587,
-                    //Port = 465,
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
-                };
-
-                smtp.Send(EmailMsg);
-                   
-                
-            }
-           
+                string body = templateService.HtmlBodyNorification(userModel ,notificationModel);
+                SendNotification(body, subject, userModel.Email);
+            }           
         }
         public void SendNotificationUser(UserModel userModel)
         {
-            TemplateService templateService = new TemplateService();
-            using (var dbContext = new NPOManagementContext())
+            TemplateService templateService = new TemplateService(AppRootPath);
+            string subject = templateService.HtmlSubject();
+            string body = templateService.HtmlBodyNorification(userModel,null);
+            SendNotification(body, subject, userModel.Email);
+        }
+        public void SendNotificationInvestor(DonationModel donationModel)
+        {
+            using(var dbContext = new NPOManagementContext())
             {
-                var userInfo = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();          
-                MailMessage EmailMsg = new MailMessage();
+                var investor = dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefault();
+                var user = dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
+                var userModel = _mapper.Map<User, UserModel>(user);
+
+                TemplateService templateService = new TemplateService(AppRootPath);
+                string subject = templateService.HtmlSubject();
+                string body = templateService.HtmlBodyNorification(userModel, null); 
+                SendNotification(body, subject, userModel.Email);
+            }
+
+        }
+        private void SendNotification(string body, string subject, string email)
+        {
+            using (MailMessage EmailMsg = new MailMessage())
+            {            
                 EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
-                EmailMsg.To.Add(new MailAddress(userModel.Email, userModel.Email));
-                EmailMsg.Subject = templateService.RegistrationUser(userInfo.FirstName, userInfo.CreateDate);
-                EmailMsg.Body = templateService.Body;
+                EmailMsg.To.Add(new MailAddress(email, email));
+                EmailMsg.Subject = subject;
+                EmailMsg.Body = body;
                 EmailMsg.IsBodyHtml = true;
                 EmailMsg.Priority = MailPriority.Normal;
                 var smtp = new SmtpClient
@@ -132,8 +145,6 @@ namespace LML.NPOManagement.Bll.Services
 
                 smtp.Send(EmailMsg);
             }
-           
-
         }
     }
 }

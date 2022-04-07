@@ -15,7 +15,10 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private IAccountService _accountService;
-        public AccountController(IAccountService accountService)
+        private IWebHostEnvironment _webHostEnvironment;
+        private INotificationService _notificationService;
+        public AccountController(IAccountService accountService, IWebHostEnvironment webHostEnvironment,
+                                INotificationService notificationService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -61,6 +64,9 @@ namespace LML.NPOManagement.Controllers
             });
             _mapper = config.CreateMapper();
             _accountService = accountService;
+            _webHostEnvironment = webHostEnvironment;
+            _notificationService = notificationService;
+            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
         // GET: api/<AccountController>
         [HttpGet]
