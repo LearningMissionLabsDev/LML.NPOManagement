@@ -16,7 +16,10 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private IInvestorService _investorInformationService;
-        public InvestorController(IInvestorService investorInformationService)
+        private INotificationService _notificationService;
+        private IWebHostEnvironment _webHostEnvironment;
+        public InvestorController(IInvestorService investorInformationService, INotificationService notificationService,
+                                  IWebHostEnvironment webHostEnvironment)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -62,6 +65,9 @@ namespace LML.NPOManagement.Controllers
             });
             _mapper = config.CreateMapper();
             _investorInformationService = investorInformationService;
+            _notificationService = notificationService;
+            _webHostEnvironment = webHostEnvironment;
+            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
         // GET: api/<InvestorInformationController>
         [HttpGet]

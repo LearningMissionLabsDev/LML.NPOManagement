@@ -9,6 +9,7 @@ namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface INotificationService
     {
+        public string AppRootPath { get; set; }
         public IEnumerable<NotificationModel> GetAllNotifications();
         public NotificationModel GetNotificationById(int id);
         public int AddNotification(NotificationModel notificationModel);
