@@ -7,11 +7,12 @@ namespace LML.NPOManagement.Dal.Models
     {
         public Notification()
         {
-            NotificationTypes = new HashSet<NotificationType>();
+            NotificationTransportTypes = new HashSet<NotificationTransportType>();
             Users = new HashSet<User>();
         }
 
         public int Id { get; set; }
+        public int NotificationTypeId { get; set; }
         public int MeetingScheduleId { get; set; }
         public string Subject { get; set; } = null!;
         public string Body { get; set; } = null!;
@@ -21,8 +22,9 @@ namespace LML.NPOManagement.Dal.Models
 
         public virtual Attachment Attachment { get; set; } = null!;
         public virtual MeetingSchedule MeetingSchedule { get; set; } = null!;
+        public virtual NotificationType NotificationType { get; set; } = null!;
 
-        public virtual ICollection<NotificationType> NotificationTypes { get; set; }
+        public virtual ICollection<NotificationTransportType> NotificationTransportTypes { get; set; }
         public virtual ICollection<User> Users { get; set; }
     }
 }
