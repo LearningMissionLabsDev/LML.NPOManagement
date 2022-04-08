@@ -4,7 +4,6 @@ using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,10 +17,9 @@ namespace LML.NPOManagement.Controllers
         private INotificationService _notificationService;
         private IUserService _userService;
         private  IWebHostEnvironment _webHostEnvironment;
-        private ITemplateService _templateService;
 
         public NotificationController(INotificationService notificationService, IUserService userService,
-            IWebHostEnvironment webHostEnvironment, ITemplateService templateService)
+                                      IWebHostEnvironment webHostEnvironment)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -69,7 +67,6 @@ namespace LML.NPOManagement.Controllers
             _notificationService = notificationService;            
             _userService = userService;
             _webHostEnvironment = webHostEnvironment;
-            _templateService = templateService;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }        
 
@@ -80,17 +77,7 @@ namespace LML.NPOManagement.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        [HttpGet("GetHtml")]
-        public IActionResult Index()
-        {
-             
-            //string html = _templateService.ReadHtmlFile("");
-            //_hostingEnvironment.WebRootPath = "";
-            //var path = Path.Combine(_hostingEnvironment.ContentRootPath, "./NotificationTemplates");
-            //var fileStream = System.IO.File.ReadAllBytes(path);
-            //var body = File(fileStream, "text/html");
-            return Ok();
-        }
+        
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]
         public string Get(int id)
