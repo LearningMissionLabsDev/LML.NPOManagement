@@ -27,6 +27,7 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<InvestorTierType> InvestorTierTypes { get; set; } = null!;
         public virtual DbSet<MeetingSchedule> MeetingSchedules { get; set; } = null!;
         public virtual DbSet<Notification> Notifications { get; set; } = null!;
+        public virtual DbSet<NotificationTransportType> NotificationTransportTypes { get; set; } = null!;
         public virtual DbSet<NotificationType> NotificationTypes { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<Template> Templates { get; set; } = null!;
@@ -199,15 +200,21 @@ namespace LML.NPOManagement.Dal.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Notification_MeetingSchedule");
 
-                entity.HasMany(d => d.NotificationTypes)
+                entity.HasOne(d => d.NotificationType)
+                    .WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.NotificationTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Notification_NotificationType");
+
+                entity.HasMany(d => d.NotificationTransportTypes)
                     .WithMany(p => p.Notifications)
                     .UsingEntity<Dictionary<string, object>>(
                         "NotificationBroadcast",
-                        l => l.HasOne<NotificationType>().WithMany().HasForeignKey("NotificationTypeId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_NotificationBroadcast_NotificationType"),
+                        l => l.HasOne<NotificationTransportType>().WithMany().HasForeignKey("NotificationTransportTypeId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_NotificationBroadcast_NotificationType"),
                         r => r.HasOne<Notification>().WithMany().HasForeignKey("NotificationId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_NotificationBroadcast_Notification"),
                         j =>
                         {
-                            j.HasKey("NotificationId", "NotificationTypeId");
+                            j.HasKey("NotificationId", "NotificationTransportTypeId");
 
                             j.ToTable("NotificationBroadcast");
                         });
@@ -224,6 +231,13 @@ namespace LML.NPOManagement.Dal.Models
 
                             j.ToTable("Notification2User");
                         });
+            });
+
+            modelBuilder.Entity<NotificationTransportType>(entity =>
+            {
+                entity.ToTable("NotificationTransportType");
+
+                entity.Property(e => e.Description).HasMaxLength(50);
             });
 
             modelBuilder.Entity<NotificationType>(entity =>

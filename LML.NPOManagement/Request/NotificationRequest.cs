@@ -8,8 +8,9 @@ namespace LML.NPOManagement.Request
     {        
         //[Required]
         //[StringLength (100)]
-        public string Subject { get; set; }  
-        
+        public string Subject { get; set; }
+        public NotificationTypeEnum NotificationTypeEnum { get; set; }
+
         //[StringLength (maximumLength:int.MaxValue)]
         public NotificationContext NotificationContext { get; set; }
 

@@ -163,7 +163,7 @@ namespace LML.NPOManagement.Controllers
             var userInformationModel = _mapper.Map<UserInformationRequest, UserInformationModel>(userInformationRequest);
             var newUser = _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
-            _notificationService.SendNotificationUser(newUser);
+            _notificationService.SendNotificationUser(newUser,new NotificationModel());
             return userInfoId;          
         }
     }
