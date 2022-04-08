@@ -79,35 +79,26 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
+        public IEnumerable<bool> SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
         {
             TemplateService templateService = new TemplateService(AppRootPath);
-
-            List<string> bodies = new List<string>() 
-            {
-
-            };
-            List<string> subjects = new List<string>()
-            {
-
-            };
-
             string subject = templateService.HtmlSubject();
 
             foreach (var userModel in userModels)
             {
-                string body = templateService.HtmlBodyNorification(userModel ,notificationModel);
-                SendNotification(body, subject, userModel.Email);
+                string body = templateService.HtmlBodyNotification(userModel ,notificationModel);
+                yield return SendNotification(body, subject, userModel.Email);
             }           
         }
-        public void SendNotificationUser(UserModel userModel)
+        public bool SendNotificationUser(UserModel userModel, NotificationModel notificationModel)
         {
             TemplateService templateService = new TemplateService(AppRootPath);
+            notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByRegistration;
             string subject = templateService.HtmlSubject();
-            string body = templateService.HtmlBodyNorification(userModel,null);
-            SendNotification(body, subject, userModel.Email);
+            string body = templateService.HtmlBodyNotification(userModel,notificationModel);
+            return SendNotification(body, subject, userModel.Email);
         }
-        public void SendNotificationInvestor(DonationModel donationModel)
+        public bool SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel)
         {
             using(var dbContext = new NPOManagementContext())
             {
@@ -116,14 +107,17 @@ namespace LML.NPOManagement.Bll.Services
                 var userModel = _mapper.Map<User, UserModel>(user);
 
                 TemplateService templateService = new TemplateService(AppRootPath);
+                notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
                 string subject = templateService.HtmlSubject();
-                string body = templateService.HtmlBodyNorification(userModel, null); 
-                SendNotification(body, subject, userModel.Email);
+                string body = templateService.HtmlBodyNotification(userModel, notificationModel);
+                return SendNotification(body, subject, userModel.Email);
+                 
             }
 
         }
-        private void SendNotification(string body, string subject, string email)
+        private bool SendNotification(string body, string subject, string email)
         {
+            var result = false;
             using (MailMessage EmailMsg = new MailMessage())
             {            
                 EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
@@ -144,7 +138,9 @@ namespace LML.NPOManagement.Bll.Services
                 };
 
                 smtp.Send(EmailMsg);
+                result = true;
             }
+            return result;
         }
     }
 }

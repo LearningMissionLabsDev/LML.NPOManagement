@@ -5,7 +5,7 @@ namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface ITemplateService
     {
-        public string HtmlBodyNorification(UserModel userModel,NotificationModel notificationModel);
+        public string HtmlBodyNotification(UserModel userModel,NotificationModel notificationModel);
         public string HtmlSubject();
     }
 }

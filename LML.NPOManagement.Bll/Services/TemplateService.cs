@@ -16,29 +16,38 @@ namespace LML.NPOManagement.Bll.Services
             _notificationTemplateRootPath = Path.Combine(appRootPath + "/NotificationTemplates");
         }
 
-        public string HtmlBodyNorification(UserModel userModel, NotificationModel notificationModel)
+        public string HtmlBodyNotification(UserModel userModel, NotificationModel notificationModel)
         {
             using (var dbContext = new NPOManagementContext())
             {
-                var html = "/RegistracionNotification.html";
-
-                if (notificationModel != null)
+                var html = string.Empty; 
+                switch (notificationModel.NotificationTypeEnum)
                 {
-                    var notificationType = dbContext.NotificationTypes.Where(nt => nt.Id == notificationModel.Id).FirstOrDefault();
-                    html = ReadHtmlFile(notificationType.Description);
-
-                   
-                }  
-                var investor = dbContext.InvestorInformations.Where(inv => inv.UserId == userModel.Id).FirstOrDefault();
-                if(investor != null)
-                {
-                    html = ".html";
+                    case NotificationTypeEnum.ByRoles:
+                        html = Path.Combine(_notificationTemplateRootPath);
+                        break;
+                    case NotificationTypeEnum.ByAccounts:
+                        html = Path.Combine(_notificationTemplateRootPath);
+                        break;
+                    case NotificationTypeEnum.ByInvestors:
+                        html = Path.Combine(_notificationTemplateRootPath);
+                        break;
+                    case NotificationTypeEnum.ByIndividuals:
+                        html = Path.Combine(_notificationTemplateRootPath);
+                        break;
+                    case NotificationTypeEnum.ByRegistration:
+                        html = Path.Combine(_notificationTemplateRootPath + "/RegistracionNotification.html");
+                        break;
+                    case NotificationTypeEnum.ByDonation:
+                        html = Path.Combine(_notificationTemplateRootPath);
+                        break;
+                    default:
+                        return null;
                 }
 
                 var user = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();               
-
-                string path = Path.Combine(_notificationTemplateRootPath + html);
-                var body = System.IO.File.ReadAllText(path);
+                                
+                var body = System.IO.File.ReadAllText(html);
                 body = body.Replace("@firstName", user.FirstName);
                 body = body.Replace("@lastName", user.LastName);
                 return body.ToString();
@@ -52,9 +61,5 @@ namespace LML.NPOManagement.Bll.Services
             return " Learning Mission ARMENIA ";
         }
 
-        private string ReadHtmlFile(string type)
-        {          
-            return type;
-        }
     }
 }
