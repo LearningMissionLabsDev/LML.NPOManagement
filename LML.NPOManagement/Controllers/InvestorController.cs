@@ -96,7 +96,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         // GET api/<InvestorInformationController>/5
-        [HttpGet("donationid")]
+        [HttpGet("getDonationByid")]
         public DonationResponse GetDonationById(int id)
         {
             var donation = _investorInformationService.GetDonationById(id);
