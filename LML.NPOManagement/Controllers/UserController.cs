@@ -5,9 +5,8 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+     // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace LML.NPOManagement.Controllers
 {
@@ -74,6 +73,7 @@ namespace LML.NPOManagement.Controllers
             _webHostEnvironment = webHostEnvironment;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
+
         // GET: api/<UserController>
         [HttpGet]
         public IEnumerable<UserResponse> Get()
@@ -123,10 +123,8 @@ namespace LML.NPOManagement.Controllers
             }
             return BadRequest();
         }
-        
 
         // POST api/<UserController>       
-
         [HttpPost("login")]
         public async Task<ActionResult<UserModel>> Login([FromBody] LoginRequest loginRequest)
         {

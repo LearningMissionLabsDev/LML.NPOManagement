@@ -76,7 +76,6 @@ namespace LML.NPOManagement.Controllers
         {
             return new string[] { "value1", "value2" };
         }
-
         
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]
