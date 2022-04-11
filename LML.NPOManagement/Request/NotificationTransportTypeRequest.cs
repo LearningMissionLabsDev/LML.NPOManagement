@@ -2,10 +2,10 @@
 
 namespace LML.NPOManagement.Request
 {
-    public class NotificationTypeRequest
+    public class NotificationTranportTypeRequest
     {
         [Required]
         [StringLength(100)]
-        public string Description { get; set; } = null!;
+        public string Description { get; set; } 
     }
 }

@@ -21,7 +21,6 @@ namespace LML.NPOManagement.Bll.Model
 
         public virtual AttachmentModel Attachment { get; set; }
         public virtual MeetingScheduleModel MeetingSchedule { get; set; }
-        public virtual NotificationTypeModel NotificationType { get; set; } 
 
         public virtual ICollection<NotificationTransportTypeModel> NotificationTransportTypes { get; set; }
         public virtual ICollection<UserModel> Users { get; set; }
