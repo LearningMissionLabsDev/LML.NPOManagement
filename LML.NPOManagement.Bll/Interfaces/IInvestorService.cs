@@ -13,7 +13,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         public IEnumerable<DonationModel> GetAllDonation();
         public InvestorInformationModel GetInvestorInformationById(int id);
         public DonationModel GetDonationById(int id);
-        public int AddInvestorInformation(InvestorInformationModel investorInformationModel);
+        public int AddDonation(DonationModel donationModel);
         public DonationModel ModifyDonation(DonationModel DonationModel, int id);
         public void DeleteDonation(int id);
     }

@@ -33,7 +33,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<TemplateRequest, TemplateModel>();
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
-                cfg.CreateMap<WeeklyScheduleRequest, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
@@ -44,7 +43,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
                 cfg.CreateMap<MeetingScheduleModel, MeetingScheduleResponse>();
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
-                cfg.CreateMap<NotificationTypeModel, NotificationTypeResponse>();
+                cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
                 cfg.CreateMap<TemplateModel, TemplateResponse>();
                 cfg.CreateMap<TemplateTypeModel, TemplateTypeResponse>();

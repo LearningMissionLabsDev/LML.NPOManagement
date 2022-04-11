@@ -24,7 +24,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<NotificationType, NotificationTypeModel>();
                 cfg.CreateMap<Template, TemplateModel>();
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
@@ -41,7 +40,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<NotificationTypeModel, NotificationType>();
                 cfg.CreateMap<TemplateModel, Template>();
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();

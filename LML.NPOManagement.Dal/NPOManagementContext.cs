@@ -147,11 +147,13 @@ namespace LML.NPOManagement.Dal.Models
                 entity.HasOne(d => d.InvestorTier)
                     .WithMany(p => p.InvestorInformations)
                     .HasForeignKey(d => d.InvestorTierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_InvestorInformation_InvestorTierType");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.InvestorInformations)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_InvestorInformation_User");
             });
 
