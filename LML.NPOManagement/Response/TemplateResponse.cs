@@ -6,6 +6,6 @@ namespace LML.NPOManagement.Response
     public class TemplateResponse
     {
         public int TemplateTypeId { get; set; }
-        public byte[] Uri { get; set; }
+        public byte[]? Uri { get; set; }
     }
 }

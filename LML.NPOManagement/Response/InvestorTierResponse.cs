@@ -2,6 +2,6 @@
 {
     public class InvestorTierResponse
     {
-        public string InvestorTier { get; set; }
+        public string? InvestorTier { get; set; }
     }
 }
