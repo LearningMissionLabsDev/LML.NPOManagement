@@ -21,13 +21,11 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<NotificationType, NotificationTypeModel>();
                 cfg.CreateMap<Template, TemplateModel>();
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType,UserTypeModel>();
-                cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DailyScheduleModel, DailySchedule>();
@@ -37,13 +35,11 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<NotificationTypeModel, NotificationType>();
                 cfg.CreateMap<TemplateModel, Template>();
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
-                cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
             });
             _mapper = config.CreateMapper();
         }

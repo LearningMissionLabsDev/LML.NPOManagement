@@ -6,7 +6,7 @@ namespace LML.NPOManagement.Bll.Model
     {
 
         public int Id { get; set; }
-        public  WeeklyScheduleEnum WeeklyScheduleId { get; set; }
+        public  WeeklyScheduleEnum WeeklyScheduleEnum { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
 

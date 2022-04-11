@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LML.NPOManagement.Request
+namespace LML.NPOManagement.Bll.Model
 {
-    public enum Gender
+    public enum InvestorTierEnum
     {
-        Undefined,
-        Male,
-        Femal,
+        Premium,
+        Gold,
     }
 }
+

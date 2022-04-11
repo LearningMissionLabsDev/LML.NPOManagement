@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LML.NPOManagement.Bll.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 {

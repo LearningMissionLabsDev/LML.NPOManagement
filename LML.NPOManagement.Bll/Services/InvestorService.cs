@@ -22,7 +22,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<NotificationType, NotificationTypeModel>();
                 cfg.CreateMap<Template, TemplateModel>();
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
@@ -38,7 +37,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<NotificationTypeModel, NotificationType>();
                 cfg.CreateMap<TemplateModel, Template>();
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
@@ -49,9 +47,15 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
         }
 
-        public int AddInvestorInformation(InvestorInformationModel investorInformationModel)
+        public int AddDonation(DonationModel donationModel)
         {
-            throw new NotImplementedException();
+            using(var dbContext = new NPOManagementContext())
+            {
+                var donation = _mapper.Map<DonationModel,Donation>(donationModel);
+                dbContext.Donations.Add(donation);
+                dbContext.SaveChanges();
+                return donation.Id;
+            }
         }
 
         public void DeleteDonation(int id)

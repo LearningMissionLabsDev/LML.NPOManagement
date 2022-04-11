@@ -10,7 +10,7 @@ namespace LML.NPOManagement.Bll.Model
         }
 
         public int Id { get; set; }
-        public int WeeklyScheduleId { get; set; }
+        public WeeklyScheduleEnum WeeklyScheduleEnum { get; set; }
         public int DayOfMonth { get; set; }
         public DateTime DateInYear { get; set; }
         public int NumberOfMeeting { get; set; }

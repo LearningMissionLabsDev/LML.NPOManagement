@@ -11,7 +11,7 @@ namespace LML.NPOManagement.Bll.Model
         }
 
         public int Id { get; set; }
-        public string DayofWeek { get; set; } 
+        public WeeklyScheduleEnum WeeklyScheduleEnum { get; set; } 
 
         public virtual ICollection<DailyScheduleModel> DailySchedules { get; set; }
         public virtual ICollection<MeetingScheduleModel> MeetingSchedules { get; set; }

@@ -39,7 +39,7 @@ namespace LML.NPOManagement.Bll.Services
                         html = Path.Combine(_notificationTemplateRootPath + "/RegistracionNotification.html");
                         break;
                     case NotificationTypeEnum.ByDonation:
-                        html = Path.Combine(_notificationTemplateRootPath);
+                        html = Path.Combine(_notificationTemplateRootPath + "/DonationNotification.html");
                         break;
                     default:
                         return null;

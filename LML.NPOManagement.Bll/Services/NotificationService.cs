@@ -27,7 +27,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<NotificationType, NotificationTypeModel>();
                 cfg.CreateMap<Template, TemplateModel>();
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
@@ -43,13 +42,13 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<NotificationTypeModel, NotificationType>();
                 cfg.CreateMap<TemplateModel, Template>();
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
+                cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
         }
@@ -109,7 +108,9 @@ namespace LML.NPOManagement.Bll.Services
                 TemplateService templateService = new TemplateService(AppRootPath);
                 notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
                 string subject = templateService.HtmlSubject();
-                string body = templateService.HtmlBodyNotification(userModel, notificationModel); 
+                string body = templateService.HtmlBodyNotification(userModel, notificationModel);
+                body = body.Replace("@amount", Convert.ToString(donationModel.Amount));
+                body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
                 SendNotification(body, subject, userModel.Email);
             }
 
