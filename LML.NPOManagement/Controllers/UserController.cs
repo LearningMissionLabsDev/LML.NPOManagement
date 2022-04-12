@@ -41,7 +41,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
-                cfg.CreateMap<UserTypeRequest, UserTypeModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
@@ -139,7 +138,7 @@ namespace LML.NPOManagement.Controllers
             {
                 return StatusCode(409);
             }
-            var userModel = new UserModel { Email = userRequest.Email, Password = userRequest.Password };
+            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var result = await _userService.Registration(userModel, _configuration);
             
             if (result != null)
@@ -160,6 +159,26 @@ namespace LML.NPOManagement.Controllers
             var userInformationModel = _mapper.Map<UserInformationRequest, UserInformationModel>(userInformationRequest);
             var newUser = _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            switch (userInformationRequest.UserTypeEnum)
+            {
+                case UserTypeEnum.Undefined:
+                   
+                    break;
+                case UserTypeEnum.Admin:
+                    _userService.AddUserType(userInformationModel);
+                    break;
+                case UserTypeEnum.AccountManager:
+                    _userService.AddUserType(userInformationModel);
+                    break;
+                case UserTypeEnum.Beneficiary:
+                    _userService.AddUserType(userInformationModel);
+                    break;
+                case UserTypeEnum.Investor:
+                    _userService.AddUserType(userInformationModel);
+                    break;
+                default:
+                    break;
+            }
             _notificationService.SendNotificationUser(newUser,new NotificationModel());
             return userInfoId;          
         }
