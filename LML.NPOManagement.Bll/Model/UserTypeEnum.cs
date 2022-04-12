@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Bll.Model
 {
-    public enum InvestorTierEnum
+    public enum UserTypeEnum
     {
         Undefined,
-        Basic,
-        Premium,
-        Gold,
+        Admin,
+        AccountManager,
+        Beneficiary,        
+        Investor,
     }
 }
-

@@ -7,10 +7,10 @@ namespace LML.NPOManagement.Request
     public class UserInventoryRequest
     {
         [Required]
-        [Range(int.MinValue, int.MaxValue)]
+        [Range(1, int.MaxValue)]
         public int InventoryTypeId { get; set; }
 
-        [Range(int.MinValue, int.MaxValue)]
+        [Range(1, int.MaxValue)]
         public int UserId { get; set; }
 
         [Required]

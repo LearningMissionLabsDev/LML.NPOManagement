@@ -140,7 +140,7 @@ namespace LML.NPOManagement.Bll.Services
             using (var dbContext = new NPOManagementContext())
             {              
                 var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
-
+       
                 if (user == null )
                 {                    
                     userModel.Password = BC.HashPassword(userModel.Password);
@@ -166,6 +166,17 @@ namespace LML.NPOManagement.Bll.Services
                 var userInfo = _mapper.Map<UserInformationModel, UserInformation>(userInformationModel);
                 dbContext.UserInformations.Add(userInfo);
                 dbContext.SaveChanges();
+                if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
+                {
+                    dbContext.InvestorInformations.Add(new InvestorInformation()
+                    {
+                        UserId = userInformationModel.UserId,
+                        InvestorTierId = Convert.ToInt16(InvestorTierEnum.Basic),
+                    });
+                    dbContext.SaveChanges();
+
+                }
+                
                 return userInfo.Id;
             }
         }
@@ -236,5 +247,24 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
+        public void AddUserType(UserInformationModel userInformationModel)
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var userTypes = dbContext.UserTypes.ToList();
+                var user = dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefault();
+                foreach (var userType in userTypes)
+                {
+                    if( userType.Description == Convert.ToString( userInformationModel.UserTypeEnum ))
+                    {
+                        user.UserTypes.Add(userType);
+                        dbContext.SaveChanges();
+
+                    }
+                    
+                }
+                
+            }
+        }
     }
 }

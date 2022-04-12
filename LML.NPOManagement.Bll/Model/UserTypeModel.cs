@@ -9,7 +9,7 @@ namespace LML.NPOManagement.Bll.Model
             Users = new HashSet<UserModel>();
         }
         public int Id { get; set; }
-        public string Description { get; set; } 
+        public UserTypeEnum UserTypeEnum { get; set; } 
 
         public virtual ICollection<UserModel> Users { get; set; }
     }

@@ -38,7 +38,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
-                cfg.CreateMap<UserTypeRequest, UserTypeModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
@@ -108,12 +107,17 @@ namespace LML.NPOManagement.Controllers
 
         // POST api/<InvestorInformationController>
         [HttpPost]
-        public int Post([FromBody] DonationRequest donationRequest)
+        public ActionResult<int> Post([FromBody] DonationRequest donationRequest)
         {
+            var investor = _investorInformationService.GetInvestorInformationById(donationRequest.InvestorId);
+            if(investor == null)
+            {
+                return StatusCode(409);
+            }
             var donationModel = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
             var result = _investorInformationService.AddDonation(donationModel);
             _notificationService.SendNotificationInvestor(donationModel, new NotificationModel());
-            return result;
+            return Ok(result);
         }
 
         // PUT api/<InvestorInformationController>/5
