@@ -2,9 +2,11 @@
 {
     public class UserRegistrationResponse
     {
-        public UserTypeResponse UserTypeResponse { get; set; }
-        public UserResponse UserResponse { get; set; }
-        public UserInformationResponse UserInformation { get; set; }
-        public RoleResponse RoleResponse { get; set; }
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }
