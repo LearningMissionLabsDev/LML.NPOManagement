@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
+﻿
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -17,7 +17,6 @@ namespace LML.NPOManagement.Bll.Model
         public string PhoneNumber { get; set; } 
         public Gender Gender { get; set; }
         public string Metadata { get; set; }
-
         public virtual UserModel User { get; set; } 
     }
 }

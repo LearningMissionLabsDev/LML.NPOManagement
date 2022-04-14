@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
-using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +64,7 @@ namespace LML.NPOManagement.Controllers
             _webHostEnvironment = webHostEnvironment;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
+
         // GET: api/<InvestorInformationController>
         [HttpGet]
         public IEnumerable<InvestorInformationResponse> GetAllInvestorInformations()
@@ -98,6 +98,7 @@ namespace LML.NPOManagement.Controllers
             var donation = _investorInformationService.GetDonationById(id);
             return _mapper.Map<DonationModel,DonationResponse>(donation);
         }
+
         // GET api/<InvestorInformationController>/5
         [HttpGet("year")]
         public string GetDonationByYear(DateTime dateTime)
@@ -142,7 +143,6 @@ namespace LML.NPOManagement.Controllers
             {
                 _investorInformationService.DeleteDonation(id);
             }
-
             return BadRequest();
         }
     }

@@ -18,7 +18,7 @@ namespace LML.NPOManagement.Controllers
         private IWebHostEnvironment _webHostEnvironment;
         private INotificationService _notificationService;
         public UserInventoryController(IUserInventoryService userInventoryService, IWebHostEnvironment webHostEnvironment,
-                                INotificationService notificationService)
+                                       INotificationService notificationService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -52,8 +52,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
-
-
             });
             _mapper = config.CreateMapper();
             _userInventoryService = userInventoryService;
@@ -61,6 +59,7 @@ namespace LML.NPOManagement.Controllers
             _webHostEnvironment = webHostEnvironment;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
+
         // GET: api/<UserInventoryController>
         [HttpGet]
         public IEnumerable<string> Get()

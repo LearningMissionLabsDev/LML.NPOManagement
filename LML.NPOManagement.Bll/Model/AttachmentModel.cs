@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
+﻿
 
 namespace LML.NPOManagement.Bll.Model
 {

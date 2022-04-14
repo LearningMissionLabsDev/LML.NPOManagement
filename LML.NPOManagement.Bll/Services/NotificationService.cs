@@ -89,6 +89,7 @@ namespace LML.NPOManagement.Bll.Services
                 SendNotification(body, subject, userModel.Email);
             }           
         }
+
         public void SendNotificationUser(UserModel userModel, NotificationModel notificationModel)
         {
             TemplateService templateService = new TemplateService(AppRootPath);
@@ -97,6 +98,7 @@ namespace LML.NPOManagement.Bll.Services
             string body = templateService.HtmlBodyNotification(userModel,notificationModel);
             SendNotification(body, subject, userModel.Email);
         }
+
         public void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel)
         {
             using(var dbContext = new NPOManagementContext())
@@ -113,13 +115,13 @@ namespace LML.NPOManagement.Bll.Services
                 body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
                 SendNotification(body, subject, userModel.Email);
             }
-
         }
+        
         private void SendNotification(string body, string subject, string email)
         {
             using (MailMessage EmailMsg = new MailMessage())
             {            
-                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                EmailMsg.From = new MailAddress("martuni3vahe@gmail.com", "Learning Mission");
                 EmailMsg.To.Add(new MailAddress(email, email));
                 EmailMsg.Subject = subject;
                 EmailMsg.Body = body;
@@ -133,9 +135,8 @@ namespace LML.NPOManagement.Bll.Services
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
+                    Credentials = new NetworkCredential("martuni3vahe@gmail.com", "vahe1995h")
                 };
-
                 smtp.Send(EmailMsg);
             }
         }

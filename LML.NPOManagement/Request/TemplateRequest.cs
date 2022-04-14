@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 {
     public class TemplateRequest
     {
         [Required]
-        [Range(int.MinValue, int.MaxValue)]
+        [Range(1, int.MaxValue)]
         public int TemplateTypeId { get; set; }
         public byte[] Uri { get; set; } 
-
     }
 }

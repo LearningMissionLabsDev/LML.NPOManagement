@@ -75,7 +75,6 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
-       
         public IEnumerable<UserTypeModel>  GetAllUserTypes()
         {
             using(var dbContext = new NPOManagementContext())
@@ -174,15 +173,10 @@ namespace LML.NPOManagement.Bll.Services
                         InvestorTierId = Convert.ToInt16(InvestorTierEnum.Basic),
                     });
                     dbContext.SaveChanges();
-
                 }
-                
                 return userInfo.Id;
             }
         }
-
-
-
 
         public async Task<List<UserModel>> GetUsersByRole(int id)
         {
@@ -202,7 +196,6 @@ namespace LML.NPOManagement.Bll.Services
                 }
                 return null;
             }
-
         }
 
         public async Task<List<UserModel>> GetUsersByAccount(int id)
@@ -259,11 +252,8 @@ namespace LML.NPOManagement.Bll.Services
                     {
                         user.UserTypes.Add(userType);
                         dbContext.SaveChanges();
-
                     }
-                    
                 }
-                
             }
         }
     }

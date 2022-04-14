@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
+﻿
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -8,9 +8,9 @@ namespace LML.NPOManagement.Bll.Model
         {
             InvestorInformations = new HashSet<InvestorInformationModel>();
         }
+
         public int Id { get; set; }
         public InvestorTierEnum InvestorTierEnum { get; set; } 
-
         public virtual ICollection<InvestorInformationModel> InvestorInformations { get; set; }
     }
 }

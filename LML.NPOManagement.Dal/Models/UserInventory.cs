@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 
 namespace LML.NPOManagement.Dal.Models
 {
@@ -11,7 +10,6 @@ namespace LML.NPOManagement.Dal.Models
         public DateTime Date { get; set; }
         public string Metadata { get; set; } = null!;
         public string? Description { get; set; }
-
         public virtual InventoryType InventoryType { get; set; } = null!;
         public virtual User? User { get; set; }
     }

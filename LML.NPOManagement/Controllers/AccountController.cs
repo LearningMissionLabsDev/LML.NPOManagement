@@ -64,6 +64,7 @@ namespace LML.NPOManagement.Controllers
             _notificationService = notificationService;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
+
         // GET: api/<AccountController>
         [HttpGet]
         public IEnumerable<AccountResponse> Get()

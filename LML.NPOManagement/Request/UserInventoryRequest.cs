@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 { 
@@ -23,6 +21,5 @@ namespace LML.NPOManagement.Request
         
         [StringLength(int.MaxValue)]
         public string Description { get; set; }
-
     }
 }

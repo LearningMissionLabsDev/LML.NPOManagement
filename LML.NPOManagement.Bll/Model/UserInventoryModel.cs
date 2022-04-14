@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
+﻿
 
 namespace LML.NPOManagement.Bll.Model
 {
@@ -10,7 +10,6 @@ namespace LML.NPOManagement.Bll.Model
         public DateTime Date { get; set; }
         public string Metadata { get; set; } = null!;
         public string? Description { get; set; }
-
         public virtual InventoryTypeModel InventoryType { get; set; } = null!;
         public virtual UserModel? User { get; set; }
     }

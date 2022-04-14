@@ -10,7 +10,6 @@ namespace LML.NPOManagement.Bll.Model
         }
         public int Id { get; set; }
         public UserTypeEnum UserTypeEnum { get; set; } 
-
         public virtual ICollection<UserModel> Users { get; set; }
     }
 }

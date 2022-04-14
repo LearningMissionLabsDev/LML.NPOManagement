@@ -1,4 +1,5 @@
 ﻿
+
 namespace LML.NPOManagement.Bll.Model
 {
     public partial class AccountModel
@@ -13,9 +14,7 @@ namespace LML.NPOManagement.Bll.Model
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Status { get; set; }
-
         public virtual ICollection<AccountProgressModel> AccountProgresses { get; set; }
-
         public virtual ICollection<UserModel> Users { get; set; }
     }
 }
