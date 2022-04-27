@@ -166,7 +166,7 @@ namespace LML.NPOManagement.Bll.Services
                 var userInfo = _mapper.Map<UserInformationModel, UserInformation>(userInformationModel);
                 dbContext.UserInformations.Add(userInfo);
                 dbContext.SaveChanges();
-                if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
+                if (userInformationModel.UserTypeEnum == Model.UserTypeEnum.Investor)
                 {
                     dbContext.InvestorInformations.Add(new InvestorInformation()
                     {
