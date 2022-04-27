@@ -7,6 +7,5 @@ namespace LML.NPOManagement.Response
     {
         public int TemplateTypeId { get; set; }
         public byte[] Uri { get; set; } 
-
     }
 }
