@@ -72,6 +72,7 @@ namespace LML.NPOManagement.Controllers
         }
         // GET: api/<UserController>
         [HttpGet]
+        [Authorize(UserTypeEnum.Investor)]
         public IEnumerable<UserResponse> Get()
         {
             var userModel = _userService.GetAllUsers().ToList();
