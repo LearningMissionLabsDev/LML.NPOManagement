@@ -15,7 +15,7 @@
         public string Body { get; set; } 
         public int AttachmentId { get; set; }
         public string Metadate { get; set; }
-        public string? Reminder { get; set; }
+        public string Reminder { get; set; }
         public virtual AttachmentModel Attachment { get; set; }
         public virtual MeetingScheduleModel MeetingSchedule { get; set; }
         public virtual ICollection<NotificationTransportTypeModel> NotificationTransportTypes { get; set; }
