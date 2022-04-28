@@ -1,4 +1,5 @@
 ﻿using LML.NPOManagement.Bll.Model;
+
 namespace LML.NPOManagement.Response
 {
     public class UserInformationResponse

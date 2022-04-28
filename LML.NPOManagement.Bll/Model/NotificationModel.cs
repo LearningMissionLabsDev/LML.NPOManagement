@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
-namespace LML.NPOManagement.Bll.Model
+﻿namespace LML.NPOManagement.Bll.Model
 {
     public class NotificationModel 
     {
@@ -17,11 +15,9 @@ namespace LML.NPOManagement.Bll.Model
         public string Body { get; set; } 
         public int AttachmentId { get; set; }
         public string Metadate { get; set; }
-        public string? Reminder { get; set; }
-
+        public string Reminder { get; set; }
         public virtual AttachmentModel Attachment { get; set; }
         public virtual MeetingScheduleModel MeetingSchedule { get; set; }
-
         public virtual ICollection<NotificationTransportTypeModel> NotificationTransportTypes { get; set; }
         public virtual ICollection<UserModel> Users { get; set; }
     }

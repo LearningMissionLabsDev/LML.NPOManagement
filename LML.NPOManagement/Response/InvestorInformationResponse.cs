@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LML.NPOManagement.Response
+﻿namespace LML.NPOManagement.Response
 { 
     public class InvestorInformationResponse
     {

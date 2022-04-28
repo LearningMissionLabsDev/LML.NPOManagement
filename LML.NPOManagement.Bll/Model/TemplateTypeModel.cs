@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
-namespace LML.NPOManagement.Bll.Model 
+﻿namespace LML.NPOManagement.Bll.Model 
 { 
     public class TemplateTypeModel
     {
@@ -11,7 +9,6 @@ namespace LML.NPOManagement.Bll.Model
 
         public int Id { get; set; }
         public string Description { get; set; } 
-
         public virtual ICollection<TemplateModel> Templates { get; set; }
     }
 }

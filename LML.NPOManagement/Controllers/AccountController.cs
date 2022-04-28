@@ -56,7 +56,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
-
+                cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();
             _accountService = accountService;
@@ -64,6 +64,7 @@ namespace LML.NPOManagement.Controllers
             _notificationService = notificationService;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
+
         // GET: api/<AccountController>
         [HttpGet]
         public IEnumerable<AccountResponse> Get()

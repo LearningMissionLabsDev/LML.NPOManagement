@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LML.NPOManagement.Bll.Model
+﻿namespace LML.NPOManagement.Bll.Model
 {
     public class NotificationTransportTypeModel
     {
@@ -15,7 +9,6 @@ namespace LML.NPOManagement.Bll.Model
 
         public int Id { get; set; }
         public string Description { get; set; } 
-
         public virtual ICollection<NotificationModel> Notifications { get; set; }
     }
 }

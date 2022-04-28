@@ -17,22 +17,28 @@ namespace LML.NPOManagement.Controllers
         private IUserInventoryService _userInventoryService;
         private IWebHostEnvironment _webHostEnvironment;
         private INotificationService _notificationService;
+
         public UserInventoryController(IUserInventoryService userInventoryService, IWebHostEnvironment webHostEnvironment,
-                                INotificationService notificationService)
+                                       INotificationService notificationService)
         {
             var config = new MapperConfiguration(cfg =>
             {
+
                 cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AttachmentRequest, AttachmentModel>();
                 cfg.CreateMap<DailyScheduleRequest, DailyScheduleModel>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
+                cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
                 cfg.CreateMap<MeetingScheduleRequest, MeetingScheduleModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
+                cfg.CreateMap<RoleRequest, RoleModel>();
                 cfg.CreateMap<TemplateRequest, TemplateModel>();
+                cfg.CreateMap<TemplateTypeRequest, TemplateTypeModel>();
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
+                cfg.CreateMap<UserRequest, UserModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
@@ -52,8 +58,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
-
-
+                cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();
             _userInventoryService = userInventoryService;
@@ -61,6 +66,7 @@ namespace LML.NPOManagement.Controllers
             _webHostEnvironment = webHostEnvironment;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
         }
+
         // GET: api/<UserInventoryController>
         [HttpGet]
         public IEnumerable<string> Get()

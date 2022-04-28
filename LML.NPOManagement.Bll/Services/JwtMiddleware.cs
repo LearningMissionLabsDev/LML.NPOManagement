@@ -10,6 +10,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             _next = next;
         }
+
         public async Task Invoke(HttpContext context, IConfiguration configuration)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
@@ -19,11 +20,11 @@ namespace LML.NPOManagement.Bll.Services
             }
             await _next(context);
         }
+
         private async Task AttachAccountToContext(HttpContext context, string token, IConfiguration configuration)
         {
             try
             {
-
                 var user = TokenCreationHelper.ValidateJwtToken(token, configuration);
                 // on successful jwt validation attach UserId to context
                 context.Items["User"] = user;

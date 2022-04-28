@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
-namespace LML.NPOManagement.Bll.Model
+﻿namespace LML.NPOManagement.Bll.Model
 {
     public class UserModel
     {
@@ -20,11 +18,9 @@ namespace LML.NPOManagement.Bll.Model
         public string Password { get; set; }
         public string Token { get; set; }
         public StatusEnumModel Status { get; set; }
-
         public virtual ICollection<InvestorInformationModel> InvestorInformations { get; set; }
         public virtual ICollection<UserInformationModel> UserInformations { get; set; }
         public virtual ICollection<UserInventoryModel> UserInventories { get; set; }
-
         public virtual ICollection<AccountModel> Accounts { get; set; }
         public virtual ICollection<NotificationModel> Notifications { get; set; }
         public virtual ICollection<RoleModel> Roles { get; set; }

@@ -25,7 +25,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<UserType,UserTypeModel>();
+                cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DailyScheduleModel, DailySchedule>();
@@ -51,7 +51,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteAccount(int id)
         {
-            using(var dbContext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
                 var delatAccount = dbContext.Accounts.Where(da => da.Id == id).FirstOrDefault();
                 if (delatAccount != null)
@@ -63,12 +63,12 @@ namespace LML.NPOManagement.Bll.Services
 
         public AccountModel GetAccountById(int id)
         {
-            using(var dbContext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
                 var account = dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefault();
                 if (account != null)
                 {
-                    var accountModel = _mapper.Map<Account,AccountModel>(account);
+                    var accountModel = _mapper.Map<Account, AccountModel>(account);
                     return accountModel;
                 }
                 return null;
@@ -80,7 +80,7 @@ namespace LML.NPOManagement.Bll.Services
             using (var dbContex = new NPOManagementContext())
             {
                 var accounts = dbContex.Accounts.ToList();
-                
+
                 foreach (var account in accounts)
                 {
                     var accountModel = _mapper.Map<Account, AccountModel>(account);
@@ -93,7 +93,5 @@ namespace LML.NPOManagement.Bll.Services
         {
             throw new NotImplementedException();
         }
-
-      
     }
 }

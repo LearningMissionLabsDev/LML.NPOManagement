@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LML.NPOManagement.Dal.Models
+﻿namespace LML.NPOManagement.Dal.Models
 {
     public partial class DailySchedule
     {
@@ -9,7 +6,6 @@ namespace LML.NPOManagement.Dal.Models
         public int WeeklyScheduleId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-
         public virtual WeeklySchedule WeeklySchedule { get; set; } = null!;
     }
 }

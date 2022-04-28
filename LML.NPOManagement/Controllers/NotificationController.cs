@@ -56,7 +56,8 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
-
+                cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
+                cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();
             _notificationService = notificationService;            
@@ -71,7 +72,6 @@ namespace LML.NPOManagement.Controllers
         {
             return new string[] { "value1", "value2" };
         }
-
         
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]
@@ -116,7 +116,6 @@ namespace LML.NPOManagement.Controllers
                     return BadRequest();                    
             }           
         }
-
 
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]

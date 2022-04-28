@@ -11,6 +11,7 @@ namespace LML.NPOManagement.Bll.Services
         {
 
         }
+
         public TemplateService(string appRootPath )
         {
             _notificationTemplateRootPath = Path.Combine(appRootPath + "/NotificationTemplates");
@@ -47,19 +48,16 @@ namespace LML.NPOManagement.Bll.Services
 
                 var user = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();               
                                 
-                var body = System.IO.File.ReadAllText(html);
+                var body = File.ReadAllText(html);
                 body = body.Replace("@firstName", user.FirstName);
                 body = body.Replace("@lastName", user.LastName);
                 return body.ToString();
-
             }
-            
         }
 
         public string HtmlSubject()
         {
             return " Learning Mission ARMENIA ";
         }
-
     }
 }

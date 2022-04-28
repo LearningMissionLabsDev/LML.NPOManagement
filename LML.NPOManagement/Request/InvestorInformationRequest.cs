@@ -1,16 +1,15 @@
 ﻿using LML.NPOManagement.Bll.Model;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 { 
     public class InvestorInformationRequest
     {
-        //[Required]
-        //[Range(1,int.MaxValue)]
+        [Required]
+        [Range(1, int.MaxValue)]
         public int UserId { get; set; }
-        public InvestorTierEnum? InvestorTierEnum { get; set; }
 
+        [Range(1,3)]
+        public InvestorTierEnum InvestorTierEnum { get; set; }
     }
 }

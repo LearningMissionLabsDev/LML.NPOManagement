@@ -29,8 +29,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<User, UserModel>();
-                cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DailyScheduleModel, DailySchedule>();
@@ -45,12 +43,9 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
-                cfg.CreateMap<UserModel, User>();
-                cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
             });
             _mapper = config.CreateMapper();
         }
-
 
         public void DeleteUser(int id)
         {
@@ -75,7 +70,6 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
-       
         public IEnumerable<UserTypeModel>  GetAllUserTypes()
         {
             using(var dbContext = new NPOManagementContext())
@@ -159,6 +153,7 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }           
         }
+
         public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel,IConfiguration configuration )
         {
             using(var dbContext = new NPOManagementContext())
@@ -166,7 +161,7 @@ namespace LML.NPOManagement.Bll.Services
                 var userInfo = _mapper.Map<UserInformationModel, UserInformation>(userInformationModel);
                 dbContext.UserInformations.Add(userInfo);
                 dbContext.SaveChanges();
-                if (userInformationModel.UserTypeEnum == Model.UserTypeEnum.Investor)
+                if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
                 {
                     dbContext.InvestorInformations.Add(new InvestorInformation()
                     {
@@ -174,15 +169,10 @@ namespace LML.NPOManagement.Bll.Services
                         InvestorTierId = Convert.ToInt16(InvestorTierEnum.Basic),
                     });
                     dbContext.SaveChanges();
-
                 }
-                
                 return userInfo.Id;
             }
         }
-
-
-
 
         public async Task<List<UserModel>> GetUsersByRole(int id)
         {
@@ -202,7 +192,6 @@ namespace LML.NPOManagement.Bll.Services
                 }
                 return null;
             }
-
         }
 
         public async Task<List<UserModel>> GetUsersByAccount(int id)
@@ -259,11 +248,8 @@ namespace LML.NPOManagement.Bll.Services
                     {
                         user.UserTypes.Add(userType);
                         dbContext.SaveChanges();
-
                     }
-                    
                 }
-                
             }
         }
     }

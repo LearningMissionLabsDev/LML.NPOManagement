@@ -9,7 +9,6 @@ namespace LML.NPOManagement.Bll.Services
 {
     public static class TokenCreationHelper
     {       
-      
         public static string GenerateJwtToken(UserModel user, IConfiguration configuration)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -18,8 +17,6 @@ namespace LML.NPOManagement.Bll.Services
             {
                 Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
-                   
-                    
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16( configuration.GetSection("AppSettings:TokenExpiration").Value)),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -32,6 +29,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
+
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
@@ -44,14 +42,13 @@ namespace LML.NPOManagement.Bll.Services
                 }, out SecurityToken validatedToken);
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 UserModel userModel = new UserModel();
-
                 userModel.Id = Convert.ToInt16(jwtToken.Claims.First(x => x.Type == "Id").Value);
                 
-
                 // if validation is successful then return UserId from JWT token 
+                  
                 return userModel;
             }
-            catch (System.Exception exp)
+            catch (Exception exp)
             {
                 // if validation fails then return null
                 return null;
