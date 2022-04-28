@@ -13,45 +13,24 @@ namespace LML.NPOManagement.Bll.Services
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<AccountProgress, AccountProgressModel>();
-                cfg.CreateMap<Attachment, AttachmentModel>();
-                cfg.CreateMap<DailySchedule, DailyScheduleModel>();
                 cfg.CreateMap<Donation, DonationModel>();
-                cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
-                cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
-                cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<Template, TemplateModel>();
-                cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
-                cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<WeeklySchedule, WeeklyScheduleModel>();
-                cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Attachment>();
-                cfg.CreateMap<DailyScheduleModel, DailySchedule>();
                 cfg.CreateMap<DonationModel, Donation>();
-                cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
-                cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
-                cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<TemplateModel, Template>();
-                cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
-                cfg.CreateMap<WeeklyScheduleModel, WeeklySchedule>();
             });
             _mapper = config.CreateMapper();
         }
 
         public int AddDonation(DonationModel donationModel)
         {
-            using(var dbContext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
-                var donation = _mapper.Map<DonationModel,Donation>(donationModel);
+                var donation = _mapper.Map<DonationModel, Donation>(donationModel);
                 dbContext.Donations.Add(donation);
                 dbContext.SaveChanges();
                 return donation.Id;
@@ -96,7 +75,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public IEnumerable<DonationModel> GetAllDonation()
         {
-            using(var dbContext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
                 var donations = dbContext.Donations.ToList();
                 foreach (var donation in donations)
@@ -109,10 +88,10 @@ namespace LML.NPOManagement.Bll.Services
 
         public DonationModel GetDonationById(int id)
         {
-            using(var dbContext = new NPOManagementContext())
+            using (var dbContext = new NPOManagementContext())
             {
                 var donation = dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
-                if(donation != null)
+                if (donation != null)
                 {
                     return _mapper.Map<Donation, DonationModel>(donation);
                 }

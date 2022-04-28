@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LML.NPOManagement.Dal.Models
+﻿namespace LML.NPOManagement.Dal.Models
 {
     public partial class UserInformation
     {
@@ -16,7 +13,6 @@ namespace LML.NPOManagement.Dal.Models
         public string PhoneNumber { get; set; } = null!;
         public int Gender { get; set; }
         public string? Metadata { get; set; }
-
         public virtual User User { get; set; } = null!;
     }
 }

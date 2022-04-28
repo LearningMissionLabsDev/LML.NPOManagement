@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LML.NPOManagement.Dal.Models
+﻿namespace LML.NPOManagement.Dal.Models
 {
     public partial class Notification
     {
@@ -19,11 +16,9 @@ namespace LML.NPOManagement.Dal.Models
         public int AttachmentId { get; set; }
         public string Metadate { get; set; } = null!;
         public string? Reminder { get; set; }
-
         public virtual Attachment Attachment { get; set; } = null!;
         public virtual MeetingSchedule MeetingSchedule { get; set; } = null!;
         public virtual NotificationType NotificationType { get; set; } = null!;
-
         public virtual ICollection<NotificationTransportType> NotificationTransportTypes { get; set; }
         public virtual ICollection<User> Users { get; set; }
     }

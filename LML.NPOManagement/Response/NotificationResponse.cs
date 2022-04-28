@@ -1,6 +1,4 @@
-﻿using System;
-using LML.NPOManagement.Bll.Model;
-using System.Collections.Generic;
+﻿using LML.NPOManagement.Bll.Model;
 
 namespace LML.NPOManagement.Response
 {

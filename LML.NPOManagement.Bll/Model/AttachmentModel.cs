@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
-namespace LML.NPOManagement.Bll.Model
+﻿namespace LML.NPOManagement.Bll.Model
 {
     public class AttachmentModel
     {
@@ -12,7 +10,6 @@ namespace LML.NPOManagement.Bll.Model
         public int Id { get; set; }
         public int NotificationId { get; set; }
         public byte[] AttachmentData { get; set; } 
-
         public virtual ICollection<NotificationModel> Notifications { get; set; }
     }
 }

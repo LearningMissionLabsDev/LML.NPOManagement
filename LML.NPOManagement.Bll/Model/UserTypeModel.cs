@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
-namespace LML.NPOManagement.Bll.Model
+﻿namespace LML.NPOManagement.Bll.Model
 {
     public class UserTypeModel
     {
@@ -10,7 +8,6 @@ namespace LML.NPOManagement.Bll.Model
         }
         public int Id { get; set; }
         public UserTypeEnum UserTypeEnum { get; set; } 
-
         public virtual ICollection<UserModel> Users { get; set; }
     }
 }

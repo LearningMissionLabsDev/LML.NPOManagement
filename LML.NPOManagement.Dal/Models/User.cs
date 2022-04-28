@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LML.NPOManagement.Dal.Models
+﻿namespace LML.NPOManagement.Dal.Models
 {
     public partial class User
     {
@@ -20,11 +17,9 @@ namespace LML.NPOManagement.Dal.Models
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public string? Status { get; set; }
-
         public virtual ICollection<InvestorInformation> InvestorInformations { get; set; }
         public virtual ICollection<UserInformation> UserInformations { get; set; }
         public virtual ICollection<UserInventory> UserInventories { get; set; }
-
         public virtual ICollection<Account> Accounts { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Role> Roles { get; set; }
