@@ -16,6 +16,7 @@ namespace LML.NPOManagement.Bll.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
+                cfg.CreateMap<User, UserModel>();
                 cfg.CreateMap<Attachment, AttachmentModel>();
                 cfg.CreateMap<DailySchedule, DailyScheduleModel>();
                 cfg.CreateMap<Donation, DonationModel>();
@@ -43,6 +44,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
+                cfg.CreateMap<UserModel, User>();
             });
             _mapper = config.CreateMapper();
         }
@@ -136,7 +138,7 @@ namespace LML.NPOManagement.Bll.Services
                 var user = await dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
        
                 if (user == null )
-                {                    
+                {             
                     userModel.Password = BC.HashPassword(userModel.Password);
                     var addUser = _mapper.Map<UserModel, User>(userModel);
                     dbContext.Users.Add(addUser);
@@ -158,7 +160,19 @@ namespace LML.NPOManagement.Bll.Services
         {
             using(var dbContext = new NPOManagementContext())
             {
-                var userInfo = _mapper.Map<UserInformationModel, UserInformation>(userInformationModel);
+                var userInfo = new UserInformation()
+                {
+                    FirstName = userInformationModel.FirstName,
+                    LastName = userInformationModel.LastName,
+                    DateOfBirth = userInformationModel.DateOfBirth,
+                    CreateDate = DateTime.UtcNow,
+                    UpdateDate = DateTime.UtcNow,
+                    UserId = userInformationModel.UserId,
+                    Gender = (int)userInformationModel.Gender,
+                    MiddleName = userInformationModel.MiddleName,
+                    Metadata = userInformationModel.Metadata,
+                    PhoneNumber = userInformationModel.PhoneNumber,
+                };
                 dbContext.UserInformations.Add(userInfo);
                 dbContext.SaveChanges();
                 if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
@@ -170,6 +184,7 @@ namespace LML.NPOManagement.Bll.Services
                     });
                     dbContext.SaveChanges();
                 }
+               
                 return userInfo.Id;
             }
         }
@@ -251,6 +266,20 @@ namespace LML.NPOManagement.Bll.Services
                     }
                 }
             }
+        }
+
+        public async Task<UserModel> ActivationUser(string token,IConfiguration configuration)
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
+                var user = await dbContext.Users.Where(us => us.Id == newUser.Id).FirstOrDefaultAsync();
+                user.Status = StatusEnumModel.Activ.ToString();
+                dbContext.SaveChanges();
+                var userModel = _mapper.Map<User,UserModel>(user);
+                return userModel;
+            }
+
         }
     }
 }

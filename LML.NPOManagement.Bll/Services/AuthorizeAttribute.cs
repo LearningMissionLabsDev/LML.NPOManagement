@@ -9,11 +9,6 @@ namespace LML.NPOManagement.Bll.Services
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
-        private IList<UserTypeEnum> _allowedUserTypes;
-        public AuthorizeAttribute(params UserTypeEnum[] userType)
-        {
-            _allowedUserTypes = userType ?? new UserTypeEnum[] { };
-        }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var user = context.HttpContext.Items["User"];

@@ -2,7 +2,6 @@
 {
     public enum UserTypeEnum
     {
-        Undefined,
         Admin,
         AccountManager,
         Beneficiary,        
