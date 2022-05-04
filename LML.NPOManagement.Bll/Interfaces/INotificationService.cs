@@ -1,4 +1,5 @@
 ﻿using LML.NPOManagement.Bll.Model;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace LML.NPOManagement.Bll.Interfaces
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel);
         public void SendNotificationUser(UserModel userModel, NotificationModel notificationModel);
         public void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel);
+        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration);
     }
 }

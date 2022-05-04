@@ -3,10 +3,9 @@ using Grpc.Core;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -121,7 +120,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             using (MailMessage EmailMsg = new MailMessage())
             {            
-                EmailMsg.From = new MailAddress("martuni3vahe@gmail.com", "Learning Mission");
+                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
                 EmailMsg.To.Add(new MailAddress(email, email));
                 EmailMsg.Subject = subject;
                 EmailMsg.Body = body;
@@ -135,10 +134,18 @@ namespace LML.NPOManagement.Bll.Services
                     EnableSsl = true,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential("martuni3vahe@gmail.com", "vahe1995h")
+                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
                 };
                 smtp.Send(EmailMsg);
             }
+        }
+
+        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
+        {
+            TemplateService templateService = new TemplateService(AppRootPath);
+            string subject = templateService.HtmlSubject();
+            string body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration);
+            SendNotification(body, subject, userModel.Email);
         }
     }
 }

@@ -5,6 +5,9 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -71,7 +74,6 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserController>
         [HttpGet]
-        [Authorize(UserTypeEnum.Investor)]
         public IEnumerable<UserResponse> Get()
         {
             var userModel = _userService.GetAllUsers().ToList();
@@ -125,7 +127,20 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserModel>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
-            return await _userService.Login(userModel, _configuration);
+            var user = await _userService.Login(userModel, _configuration);
+            if(user != null)
+            {
+                return Ok(user);
+            }
+            return Redirect("http://localhost:3000/login");
+        }
+
+        [HttpGet("verifyEmail")]
+        public async Task<ActionResult> VerifyEmail([FromQuery] string token)
+        {
+            var user = await _userService.ActivationUser(token, _configuration);            
+            _notificationService.SendNotificationUser(user, new NotificationModel());
+            return  Redirect("http://localhost:3000/login");
         }
 
         // POST api/<UserController> 
@@ -136,14 +151,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return StatusCode(409);
             }
-            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
+            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);            
             var result = await _userService.Registration(userModel, _configuration);
-            
-            if (result != null)
+            if(result != null)
             {
-                return Ok(result); 
+                return Ok(result);
             }
-            return StatusCode(409);
+            return BadRequest();
+            
         }
 
         // POST api/<UserController> 
@@ -158,9 +173,7 @@ namespace LML.NPOManagement.Controllers
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
             switch (userInformationRequest.UserTypeEnum)
             {
-                case UserTypeEnum.Undefined:
-                   
-                    break;
+               
                 case UserTypeEnum.Admin:
                     _userService.AddUserType(userInformationModel);
                     break;
@@ -176,8 +189,10 @@ namespace LML.NPOManagement.Controllers
                 default:
                     break;
             }
-            _notificationService.SendNotificationUser(newUser,new NotificationModel());
-            return userInfoId;          
+            
+            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration);
+            return Ok(userInfoId);         
         }
+        
     }
 }

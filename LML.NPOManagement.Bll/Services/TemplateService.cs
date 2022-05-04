@@ -1,6 +1,7 @@
 ﻿using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -53,6 +54,15 @@ namespace LML.NPOManagement.Bll.Services
                 body = body.Replace("@lastName", user.LastName);
                 return body.ToString();
             }
+        }
+        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
+        {     
+            var html = Path.Combine(_notificationTemplateRootPath + "/CheckingEmail.html");           
+            var body = File.ReadAllText(html);
+            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);           
+            var uri =  $"https://localhost:7049/api/User/verifyEmail?token={token}";
+            body = body.Replace("@verifiyCod", uri);
+            return body.ToString();  
         }
 
         public string HtmlSubject()
