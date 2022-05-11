@@ -140,11 +140,11 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
-        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
+        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration,string host)
         {
             TemplateService templateService = new TemplateService(AppRootPath);
             string subject = templateService.HtmlSubject();
-            string body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration);
+            string body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration, host);
             SendNotification(body, subject, userModel.Email);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using LML.NPOManagement.Bll.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 {
@@ -30,7 +31,7 @@ namespace LML.NPOManagement.Request
         public string PhoneNumber { get; set; }
 
         //[Required]
-        //[Range(1,3)]
+        //[Range(1, 3)]
         public Gender Gender { get; set; }
 
         //[StringLength(int.MaxValue)]

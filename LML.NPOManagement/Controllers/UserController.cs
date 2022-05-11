@@ -132,7 +132,7 @@ namespace LML.NPOManagement.Controllers
             {
                 return Ok(user);
             }
-            return Redirect("http://localhost:3000/login");
+            return Unauthorized();
         }
 
         [HttpGet("verifyEmail")]
@@ -140,7 +140,7 @@ namespace LML.NPOManagement.Controllers
         {
             var user = await _userService.ActivationUser(token, _configuration);            
             _notificationService.SendNotificationUser(user, new NotificationModel());
-            return  Redirect("http://localhost:3000/login");
+            return  Ok();
         }
 
         // POST api/<UserController> 
@@ -189,8 +189,9 @@ namespace LML.NPOManagement.Controllers
                 default:
                     break;
             }
-            
-            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration);
+            var host = this.Request.Host.Value;
+
+            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration,host);
             return Ok(userInfoId);         
         }
         
