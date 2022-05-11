@@ -55,13 +55,14 @@ namespace LML.NPOManagement.Bll.Services
                 return body.ToString();
             }
         }
-        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
+        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string host)
         {     
             var html = Path.Combine(_notificationTemplateRootPath + "/CheckingEmail.html");           
             var body = File.ReadAllText(html);
-            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);           
-            var uri =  $"https://localhost:7049/api/User/verifyEmail?token={token}";
-            body = body.Replace("@verifiyCod", uri);
+            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);
+            string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
+            var uri =  $"{clientVerificationURL}?token={token}";
+            body = body.Replace("@verifiyCode", uri);
             return body.ToString();  
         }
 
