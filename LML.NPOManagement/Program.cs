@@ -1,6 +1,7 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Dal.Models;
+using LML.NPOManagement.Middeware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,13 @@ app.UseCors(x => x
 
 app.UseAuthorization();
 
+Middlewares(app, app.Environment);
+
 app.MapControllers();
 
 app.Run();
+
+void Middlewares(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    app.ConfigureExceptionHandler(env);
+}

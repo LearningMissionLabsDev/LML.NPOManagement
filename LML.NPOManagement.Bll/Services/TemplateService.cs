@@ -15,7 +15,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public TemplateService(string appRootPath )
         {
-            _notificationTemplateRootPath = Path.Combine(appRootPath + "/NotificationTemplates");
+            _notificationTemplateRootPath = Path.Combine(appRootPath + "NotificationTemplates");
         }
 
         public string HtmlBodyNotification(UserModel userModel, NotificationModel notificationModel)
@@ -55,10 +55,9 @@ namespace LML.NPOManagement.Bll.Services
                 return body.ToString();
             }
         }
-        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string host)
-        {     
-            var html = Path.Combine(_notificationTemplateRootPath + "/CheckingEmail.html");           
-            var body = File.ReadAllText(html);
+        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration,string body)
+        {  
+
             string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);
             string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
             var uri =  $"{clientVerificationURL}?token={token}";

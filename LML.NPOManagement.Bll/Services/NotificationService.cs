@@ -3,6 +3,7 @@ using Grpc.Core;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
@@ -119,32 +120,67 @@ namespace LML.NPOManagement.Bll.Services
         private void SendNotification(string body, string subject, string email)
         {
             using (MailMessage EmailMsg = new MailMessage())
-            {            
-                EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
-                EmailMsg.To.Add(new MailAddress(email, email));
-                EmailMsg.Subject = subject;
-                EmailMsg.Body = body;
-                EmailMsg.IsBodyHtml = true;
-                EmailMsg.Priority = MailPriority.Normal;
-                var smtp = new SmtpClient
+            {
+                //EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
+                //EmailMsg.To.Add(new MailAddress(email, email));
+                //EmailMsg.Subject = subject;
+                //EmailMsg.Body = body;
+                //EmailMsg.IsBodyHtml = true;
+                //EmailMsg.Priority = MailPriority.Normal;
+                //var smtp = new SmtpClient
+                //{
+                //    Host = "smtp.gmail.com",
+                //    Port = 587,
+                //    //Port = 465,
+                //    EnableSsl = true,
+                //    DeliveryMethod = SmtpDeliveryMethod.Network,
+                //    UseDefaultCredentials = false,
+                //    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
+                //};
+                //smtp.Send(EmailMsg);
+                String FROM = "learningmissionarmenia@gmail.com";
+                String FROMNAME = "Learning Mission";                
+                String TO = email;               
+                String SMTP_USERNAME = "AKIAWNCW772FWBE4MWVF";
+                String SMTP_PASSWORD = "BPWcA52AiFww/WLlyKnsDdurWtAYfOA1WA0POVqFj1Bs";       
+                //String CONFIGSET = "ConfigSet";
+                String HOST = "email-smtp.eu-west-1.amazonaws.com";                
+                int PORT = 587;            
+                String SUBJECT = subject;       
+                String BODY = body;
+                MailMessage message = new MailMessage();
+                message.IsBodyHtml = true;
+                message.From = new MailAddress(FROM, FROMNAME);
+                message.To.Add(new MailAddress(TO));
+                message.Subject = SUBJECT;
+                message.Body = BODY;
+                //message.Headers.Add("X-SES-CONFIGURATION-SET", CONFIGSET);
+
+                using (var client = new SmtpClient(HOST, PORT))
                 {
-                    Host = "smtp.gmail.com",
-                    Port = 587,
-                    //Port = 465,
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
-                };
-                smtp.Send(EmailMsg);
+      
+                    client.Credentials = new NetworkCredential(SMTP_USERNAME, SMTP_PASSWORD);                
+                    client.EnableSsl = true;
+                    try
+                    {
+                        Console.WriteLine("Attempting to send email...");
+                        client.Send(message);
+                        Console.WriteLine("Email sent!");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("The email was not sent.");
+                        Console.WriteLine("Error message: " + ex.Message);
+                    }
+                }
             }
         }
 
-        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration,string host)
+        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration,string body)
         {
             TemplateService templateService = new TemplateService(AppRootPath);
             string subject = templateService.HtmlSubject();
-            string body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration, host);
+            body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration,body);
             SendNotification(body, subject, userModel.Email);
         }
     }

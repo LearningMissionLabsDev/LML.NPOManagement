@@ -8,7 +8,19 @@ using System.Text;
 namespace LML.NPOManagement.Bll.Services
 {
     public static class TokenCreationHelper
-    {       
+    {
+        private static SymmetricSecurityKey _signingKey = null;
+
+        private static SymmetricSecurityKey GetSigningKey(IConfiguration configuration)
+        {
+            if (_signingKey == null)
+            {
+                var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
+                _signingKey = new SymmetricSecurityKey(key);
+            }
+
+            return _signingKey;
+        }
         public static string GenerateJwtToken(UserModel user, IConfiguration configuration)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -18,8 +30,8 @@ namespace LML.NPOManagement.Bll.Services
                 Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16( configuration.GetSection("AppSettings:TokenExpiration").Value)),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
@@ -34,8 +46,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
+                    /* rg: added */
+                    RequireAudience = false,
+                    RequireExpirationTime = false,
+                    ValidateLifetime = false,
+                    /*<<<*/
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = GetSigningKey(configuration),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero
@@ -43,9 +60,9 @@ namespace LML.NPOManagement.Bll.Services
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 UserModel userModel = new UserModel();
                 userModel.Id = Convert.ToInt16(jwtToken.Claims.First(x => x.Type == "Id").Value);
-                
+
                 // if validation is successful then return UserId from JWT token 
-                  
+
                 return userModel;
             }
             catch (Exception exp)
