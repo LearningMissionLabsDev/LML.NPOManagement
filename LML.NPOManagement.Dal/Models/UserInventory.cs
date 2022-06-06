@@ -1,4 +1,7 @@
-﻿namespace LML.NPOManagement.Dal.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace LML.NPOManagement.Dal.Models
 {
     public partial class UserInventory
     {
@@ -8,6 +11,7 @@
         public DateTime Date { get; set; }
         public string Metadata { get; set; } = null!;
         public string? Description { get; set; }
+
         public virtual InventoryType InventoryType { get; set; } = null!;
         public virtual User? User { get; set; }
     }

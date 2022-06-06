@@ -33,6 +33,7 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<Template> Templates { get; set; } = null!;
         public virtual DbSet<TemplateType> TemplateTypes { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<UserIdea> UserIdeas { get; set; } = null!;
         public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
         public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
         public virtual DbSet<UserType> UserTypes { get; set; } = null!;
@@ -302,6 +303,19 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.Password).HasMaxLength(250);
 
                 entity.Property(e => e.Status).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<UserIdea>(entity =>
+            {
+                entity.ToTable("UserIdea");
+
+                entity.Property(e => e.IdeaCategory).HasMaxLength(256);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserIdeas)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserIdea_User");
             });
 
             modelBuilder.Entity<UserInformation>(entity =>

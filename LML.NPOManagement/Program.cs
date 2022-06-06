@@ -1,3 +1,4 @@
+using Amazon.S3;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Dal.Models;
@@ -14,6 +15,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

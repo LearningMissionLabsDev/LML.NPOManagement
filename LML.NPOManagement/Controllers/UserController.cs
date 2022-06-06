@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Amazon.S3;
+using Amazon.S3.Model;
+using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Bll.Services;
@@ -21,9 +23,10 @@ namespace LML.NPOManagement.Controllers
         private IConfiguration _configuration;
         private INotificationService _notificationService;
         private IWebHostEnvironment _webHostEnvironment;
+        private IAmazonS3 _s3Client;
 
         public UserController(IUserService userService, IConfiguration configuration, INotificationService notificationService,
-                              IWebHostEnvironment webHostEnvironment)
+                              IWebHostEnvironment webHostEnvironment, IAmazonS3 s3Client)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -69,6 +72,7 @@ namespace LML.NPOManagement.Controllers
             _notificationService = notificationService;
             _webHostEnvironment = webHostEnvironment;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
+            _s3Client = s3Client;
         }
 
         // GET: api/<UserController>
@@ -94,7 +98,7 @@ namespace LML.NPOManagement.Controllers
             var user = _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }
-
+          
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
         [Authorize]
@@ -131,13 +135,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return Ok(user);
             }
-            return Unauthorized();
+            return Unauthorized(401);
         }
 
         [HttpGet("verifyEmail")]
         public async Task<ActionResult> VerifyEmail([FromQuery] string token)
         {
-            var user = await _userService.ActivationUser(token, _configuration);
+            var user = await _userService.ActivationUser(token, _configuration);          
+           
             _notificationService.SendNotificationUser(user, new NotificationModel());
             return Ok();
         }
@@ -200,11 +205,9 @@ namespace LML.NPOManagement.Controllers
                 default:
                     break;
             }
-            var html = string.Empty;
-            //var html = Path.Combine(_webHostEnvironment.ContentRootPath+"NotificationTemplates/CheckingEmail.html");
-            var body = System.IO.File.ReadAllText( "../../../../NotificationTemplates/CheckingEmail.html");
-            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration,body);
+            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration);
             return Ok(userInfoId);                  
-        }   
+        }
+       
     }
 }

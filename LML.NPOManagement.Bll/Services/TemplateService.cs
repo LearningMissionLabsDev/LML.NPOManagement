@@ -55,9 +55,10 @@ namespace LML.NPOManagement.Bll.Services
                 return body.ToString();
             }
         }
-        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration,string body)
-        {  
-
+        public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
+        {
+            var html = Path.Combine(_notificationTemplateRootPath + "/CheckingEmail.html");
+            var body = File.ReadAllText(html);
             string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);
             string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
             var uri =  $"{clientVerificationURL}?token={token}";

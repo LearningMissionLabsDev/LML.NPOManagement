@@ -1,4 +1,7 @@
-﻿namespace LML.NPOManagement.Dal.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace LML.NPOManagement.Dal.Models
 {
     public partial class MeetingSchedule
     {
@@ -12,6 +15,7 @@
         public int? DayOfMonth { get; set; }
         public DateTime? DateInYear { get; set; }
         public int NumberOfMeeting { get; set; }
+
         public virtual WeeklySchedule? WeeklySchedule { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
     }

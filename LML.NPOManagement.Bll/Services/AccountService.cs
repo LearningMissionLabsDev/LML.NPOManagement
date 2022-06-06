@@ -40,6 +40,8 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
+                cfg.CreateMap<UserIdeaModel, UserIdea>();
+                cfg.CreateMap<UserIdea, UserIdeaModel>();
             });
             _mapper = config.CreateMapper();
         }
@@ -47,6 +49,35 @@ namespace LML.NPOManagement.Bll.Services
         public int AddAccount(AccountModel accountModel)
         {
             throw new NotImplementedException();
+        }
+
+        public UserIdeaModel AddUserIdea(UserIdeaModel userIdeaModel)
+        {
+            using(var dbContext = new NPOManagementContext())
+            {
+                var idea =_mapper.Map<UserIdeaModel,UserIdea>(userIdeaModel);
+                dbContext.UserIdeas.Add(idea);
+                dbContext.SaveChanges();
+                return userIdeaModel;
+            }
+        }
+        public List<UserIdeaModel> GetAllIdea()
+        {
+            using (var dbContext = new NPOManagementContext())
+            {
+                var ideas = dbContext.UserIdeas.ToList();
+                if(ideas.Count == 0)
+                {
+                    return null;
+                }
+                List<UserIdeaModel> userIdeaModels = new List<UserIdeaModel>();
+                foreach (var idea in ideas)
+                {
+                    var ideaModel = _mapper.Map<UserIdea, UserIdeaModel>(idea);
+                    userIdeaModels.Add(ideaModel);
+                }
+                return userIdeaModels;
+            }
         }
 
         public void DeleteAccount(int id)
