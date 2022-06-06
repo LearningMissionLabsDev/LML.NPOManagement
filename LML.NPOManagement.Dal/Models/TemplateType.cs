@@ -1,4 +1,7 @@
-﻿namespace LML.NPOManagement.Dal.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace LML.NPOManagement.Dal.Models
 {
     public partial class TemplateType
     {
@@ -9,6 +12,7 @@
 
         public int Id { get; set; }
         public string Description { get; set; } = null!;
+
         public virtual ICollection<Template> Templates { get; set; }
     }
 }

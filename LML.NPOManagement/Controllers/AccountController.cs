@@ -17,8 +17,9 @@ namespace LML.NPOManagement.Controllers
         private IAccountService _accountService;
         private IWebHostEnvironment _webHostEnvironment;
         private INotificationService _notificationService;
+        private IUserService _userService;
         public AccountController(IAccountService accountService, IWebHostEnvironment webHostEnvironment,
-                                INotificationService notificationService)
+                                INotificationService notificationService, IUserService userService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -57,12 +58,15 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
                 cfg.CreateMap<LoginRequest, UserModel>();
+                cfg.CreateMap<UserIdeaRequest, UserIdeaModel>();
+                cfg.CreateMap<UserIdeaModel, UserIdeaResponse>();
             });
             _mapper = config.CreateMapper();
             _accountService = accountService;
             _webHostEnvironment = webHostEnvironment;
             _notificationService = notificationService;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
+            _userService = userService;
         }
 
         // GET: api/<AccountController>
@@ -81,10 +85,39 @@ namespace LML.NPOManagement.Controllers
             return _mapper.Map<AccountModel,AccountResponse>(account);
         }
 
+        // GET: api/<AccountController>
+        [HttpGet("idea")]
+        public IEnumerable<ActionResult<UserIdeaResponse>> GetIdea()
+        {
+            var ideas = _accountService.GetAllIdea();
+            if (ideas.Count > 0)
+            {
+                foreach (var idea in ideas)
+                {
+                    var ideaResponse = _mapper.Map<UserIdeaModel, UserIdeaResponse>(idea);
+                    yield return ideaResponse;
+                }
+            }
+        }
+
         // POST api/<AccountController>
         [HttpPost]
         public void Post([FromBody] string value)
         {
+        }
+
+        // POST api/<AccountController>
+        [HttpPost("submitComments")]
+        public ActionResult SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
+        {
+            var user = _userService.GetUserById(userIdeaRequest.UserId);
+            if(user == null)
+            {
+                return BadRequest();
+            }
+            var ideaModel = _mapper.Map<UserIdeaRequest, UserIdeaModel>(userIdeaRequest);
+            var idea = _accountService.AddUserIdea(ideaModel);
+            return Ok();
         }
 
         // PUT api/<AccountController>/5

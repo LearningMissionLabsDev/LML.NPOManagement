@@ -1,4 +1,7 @@
-﻿namespace LML.NPOManagement.Dal.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace LML.NPOManagement.Dal.Models
 {
     public partial class Account
     {
@@ -12,7 +15,9 @@
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Status { get; set; }
+
         public virtual ICollection<AccountProgress> AccountProgresses { get; set; }
+
         public virtual ICollection<User> Users { get; set; }
     }
 }
