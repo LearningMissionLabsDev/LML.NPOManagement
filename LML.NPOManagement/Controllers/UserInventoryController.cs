@@ -58,7 +58,10 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
+<<<<<<< HEAD
                 cfg.CreateMap<LoginRequest, UserModel>();
+=======
+>>>>>>> 602de833836cd76818c179edc83fbe911dbd9653
             });
             _mapper = config.CreateMapper();
             _userInventoryService = userInventoryService;

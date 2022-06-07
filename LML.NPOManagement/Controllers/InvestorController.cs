@@ -72,7 +72,6 @@ namespace LML.NPOManagement.Controllers
         {
             var investor = _investorInformationService.GetAllInvestorInformations().ToList();
             return _mapper.Map<List<InvestorInformationModel>, List<InvestorInformationResponse>>(investor);
-           
         }
 
         // GET api/<InvestorInformationController>/5
@@ -81,7 +80,6 @@ namespace LML.NPOManagement.Controllers
         {
             var investor = _investorInformationService.GetInvestorInformationById(id);
             return _mapper.Map<InvestorInformationModel, InvestorInformationResponse>(investor);
-          
         }
 
         // GET: api/<InvestorInformationController>

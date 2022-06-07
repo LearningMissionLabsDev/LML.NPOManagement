@@ -7,10 +7,13 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using System.Net;
 
+=======
+>>>>>>> 602de833836cd76818c179edc83fbe911dbd9653
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+     // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace LML.NPOManagement.Controllers
 {
