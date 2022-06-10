@@ -2,6 +2,7 @@
 {
     public enum NotificationContext
     {
+        Undefined,
         Users,
         Account,
         Role,

@@ -3,7 +3,7 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -11,11 +11,7 @@ namespace LML.NPOManagement.Bll.Services
     {
         private IMapper _mapper;
         private readonly INPOManagementContext _dbContext;
-        public InvestorService (INPOManagementContext context)
-        {
-            _dbContext = context;
-        }
-        public InvestorService()
+        public InvestorService(INPOManagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -49,13 +45,14 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
+            _dbContext = context;
         }
 
-        public int AddDonation(DonationModel donationModel)
+        public async Task<int> AddDonation(DonationModel donationModel)
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var donation = _mapper.Map<DonationModel, Donation>(donationModel);
+                var donation =  _mapper.Map<DonationModel, Donation>(donationModel);
                 _dbContext.Donations.Add(donation);
                 _dbContext.SaveChanges();
                 return donation.Id;
@@ -72,24 +69,27 @@ namespace LML.NPOManagement.Bll.Services
             //}
         }
 
-        public IEnumerable<InvestorInformationModel> GetAllInvestorInformations()
+        public async Task<List<InvestorInformationModel>> GetAllInvestorInformations()
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var investors = _dbContext.InvestorInformations.ToList();
+                List<InvestorInformationModel> investorInformationModels = new List<InvestorInformationModel>();
+                var investors = await _dbContext.InvestorInformations.ToListAsync();
                 foreach (var investor in investors)
                 {
                     var InvestorModel = _mapper.Map<InvestorInformation, InvestorInformationModel>(investor);
-                    yield return InvestorModel;
+                    investorInformationModels.Add(InvestorModel);
+
                 }
+                return investorInformationModels;
             //}
         }
 
-        public InvestorInformationModel GetInvestorInformationById(int id)
+        public async Task<InvestorInformationModel> GetInvestorInformationById(int id)
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var investor = _dbContext.InvestorInformations.Where(d => d.Id == id).FirstOrDefault();
+                var investor = await _dbContext.InvestorInformations.Where(d => d.Id == id).FirstOrDefaultAsync();
                 if (investor != null)
                 {
                     return _mapper.Map<InvestorInformation, InvestorInformationModel>(investor);
@@ -98,24 +98,26 @@ namespace LML.NPOManagement.Bll.Services
             //}
         }
 
-        public IEnumerable<DonationModel> GetAllDonation()
+        public async Task<List<DonationModel>> GetAllDonation()
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var donations = _dbContext.Donations.ToList();
-                foreach (var donation in donations)
-                {
-                    var donationModel = _mapper.Map<Donation, DonationModel>(donation);
-                    yield return donationModel;
-                }
+            List<DonationModel> donationModels = new List<DonationModel>();
+            var donations = await _dbContext.Donations.ToListAsync();
+            foreach (var donation in donations)
+            {
+                var donationModel = _mapper.Map<Donation, DonationModel>(donation);
+                donationModels.Add(donationModel);
+            }
+            return donationModels;
             //}
         }
 
-        public DonationModel GetDonationById(int id)
+        public async Task<DonationModel> GetDonationById(int id)
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var donation = _dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
+                var donation = await _dbContext.Donations.Where(d => d.Id == id).FirstOrDefaultAsync();
                 if (donation != null)
                 {
                     return _mapper.Map<Donation, DonationModel>(donation);
@@ -123,11 +125,11 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             //}
         }
-        public DonationModel ModifyDonation(DonationModel donationModel, int id)
+        public async Task<DonationModel> ModifyDonation(DonationModel donationModel, int id)
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var donation = _dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
+                var donation = await _dbContext.Donations.Where(d => d.Id == id).FirstOrDefaultAsync();
                 if (donation != null)
                 {
                     var modifyDonation = _mapper.Map<DonationModel, Donation>(donationModel);

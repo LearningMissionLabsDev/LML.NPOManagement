@@ -68,14 +68,14 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<NotificationController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" };
         }
         
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<string> Get(int id)
         {
             return "value";
         }
@@ -90,7 +90,7 @@ namespace LML.NPOManagement.Controllers
             {
                 case NotificationContext.Users:
 
-                    var users =  _userService.GetAllUsers().ToList();
+                    var users = await  _userService.GetAllUsers();
                     _notificationService.SendNotifications(users, notification);
                     return Ok();
                     
@@ -109,7 +109,7 @@ namespace LML.NPOManagement.Controllers
                 case NotificationContext.InvestorTier:
 
                     var userByInvestorTier = await _userService.GetUsersByInvestorTier(id);
-                    _notificationService.SendNotifications(userByInvestorTier, notification);
+                     _notificationService.SendNotifications(userByInvestorTier, notification);
                     return Ok();
                    
                 default:

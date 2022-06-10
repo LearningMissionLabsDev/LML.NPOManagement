@@ -9,12 +9,12 @@ namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IInvestorService
     {
-        public IEnumerable<InvestorInformationModel> GetAllInvestorInformations();
-        public IEnumerable<DonationModel> GetAllDonation();
-        public InvestorInformationModel GetInvestorInformationById(int id);
-        public DonationModel GetDonationById(int id);
-        public int AddDonation(DonationModel donationModel);
-        public DonationModel ModifyDonation(DonationModel DonationModel, int id);
+        Task<List<InvestorInformationModel>> GetAllInvestorInformations();
+        Task<List<DonationModel>> GetAllDonation();
+        Task<InvestorInformationModel> GetInvestorInformationById(int id);
+        Task<DonationModel> GetDonationById(int id);
+        Task<int> AddDonation(DonationModel donationModel);
+        Task<DonationModel> ModifyDonation(DonationModel DonationModel, int id);
         public void DeleteDonation(int id);
     }
 }

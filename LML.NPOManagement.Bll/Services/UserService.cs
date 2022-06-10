@@ -62,29 +62,33 @@ namespace LML.NPOManagement.Bll.Services
             //}
         }
 
-        public IEnumerable<UserModel> GetAllUsers()
+        public async Task<List<UserModel>> GetAllUsers()
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var users = _dbContext.Users.ToList();
-                foreach (var user in users)
-                {
-                    var userModels = _mapper.Map<User, UserModel>(user);
-                    yield return userModels;
-                }
+            List<UserModel> userModels = new List<UserModel>();
+            var users = await _dbContext.Users.ToListAsync();
+            foreach (var user in users)
+            {
+                var userModel = _mapper.Map<User, UserModel>(user);
+                userModels.Add(userModel);
+            }
+            return userModels;
             //}
         }
 
-        public IEnumerable<UserTypeModel>  GetAllUserTypes()
+        public async Task<List<UserTypeModel>>  GetAllUserTypes()
         {
             //using(var dbContext = new NPOManagementContext())
             //{
-                var types = _dbContext.UserTypes.ToList();
-                foreach (var type in types)
-                {
-                    var userType = _mapper.Map<UserType, UserTypeModel>(type);
-                    yield return userType;
-                }
+            List<UserTypeModel> userTypeModels = new List<UserTypeModel>();
+            var types = await _dbContext.UserTypes.ToListAsync();
+            foreach (var type in types)
+            {
+                var userType = _mapper.Map<UserType, UserTypeModel>(type);
+                userTypeModels.Add(userType);
+            }
+            return userTypeModels;
             //}
         }
 

@@ -68,66 +68,66 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<InvestorInformationController>
         [HttpGet]
-        public IEnumerable<InvestorInformationResponse> GetAllInvestorInformations()
+        public async Task<IEnumerable<InvestorInformationResponse>> GetAllInvestorInformations()
         {
-            var investor = _investorInformationService.GetAllInvestorInformations().ToList();
-            return _mapper.Map<List<InvestorInformationModel>, List<InvestorInformationResponse>>(investor);
+            var investor = await _investorInformationService.GetAllInvestorInformations();
+            return  _mapper.Map<List<InvestorInformationModel>, List<InvestorInformationResponse>>(investor);
            
         }
 
         // GET api/<InvestorInformationController>/5
         [HttpGet("{id}")]
-        public InvestorInformationResponse GetInvestorInformationById(int id)
+        public async Task<InvestorInformationResponse> GetInvestorInformationById(int id)
         {
-            var investor = _investorInformationService.GetInvestorInformationById(id);
+            var investor = await _investorInformationService.GetInvestorInformationById(id);
             return _mapper.Map<InvestorInformationModel, InvestorInformationResponse>(investor);
           
         }
 
         // GET: api/<InvestorInformationController>
         [HttpGet("donation")]
-        public IEnumerable<DonationResponse> GetAllDonation()
+        public async Task<IEnumerable<DonationResponse>> GetAllDonation()
         {
-            var donation = _investorInformationService.GetAllDonation().ToList();
+            var donation = await _investorInformationService.GetAllDonation();
             return _mapper.Map<List<DonationModel>,List<DonationResponse>>(donation);
         }
 
         // GET api/<InvestorInformationController>/5
         [HttpGet("getDonationByid")]
-        public DonationResponse GetDonationById(int id)
+        public async Task<DonationResponse> GetDonationById(int id)
         {
-            var donation = _investorInformationService.GetDonationById(id);
+            var donation = await _investorInformationService.GetDonationById(id);
             return _mapper.Map<DonationModel,DonationResponse>(donation);
         }
 
         // GET api/<InvestorInformationController>/5
         [HttpGet("year")]
-        public string GetDonationByYear(DateTime dateTime)
+        public async Task<string> GetDonationByYear(DateTime dateTime)
         {
             return "value";
         }
 
         // POST api/<InvestorInformationController>
         [HttpPost]
-        public ActionResult<int> Post([FromBody] DonationRequest donationRequest)
+        public async Task<ActionResult<int>> Post([FromBody] DonationRequest donationRequest)
         {
-            var investor = _investorInformationService.GetInvestorInformationById(donationRequest.InvestorId);
+            var investor = await _investorInformationService.GetInvestorInformationById(donationRequest.InvestorId);
             if(investor == null)
             {
                 return StatusCode(409);
             }
             var donationModel = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
-            var result = _investorInformationService.AddDonation(donationModel);
+            var result = await _investorInformationService.AddDonation(donationModel);
             _notificationService.SendNotificationInvestor(donationModel, new NotificationModel());
             return Ok(result);
         }
 
         // PUT api/<InvestorInformationController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] DonationRequest donationRequest)
+        public async Task<ActionResult> Put(int id, [FromBody] DonationRequest donationRequest)
         {
-            var donation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
-            var modifyDonation = _investorInformationService.ModifyDonation(donation, id);
+            var donation =  _mapper.Map<DonationRequest, DonationModel>(donationRequest);
+            var modifyDonation = await _investorInformationService.ModifyDonation(donation, id);
             if (modifyDonation != null)
             {
                 return Ok();
@@ -137,9 +137,9 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<InvestorInformationController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var donation = _investorInformationService.GetDonationById(id);
+            var donation = await _investorInformationService.GetDonationById(id);
             if (donation != null)
             {
                 _investorInformationService.DeleteDonation(id);
