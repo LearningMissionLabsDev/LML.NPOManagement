@@ -91,21 +91,21 @@ namespace LML.NPOManagement.Controllers
             return _mapper.Map<List<UserTypeModel>, List<UserTypeResponse>>(userTypes);
         }
 
-        //GET api/<UserController>/5
+        //GET: api/<UserController>/5
         [HttpGet("{id}")]
-        public UserResponse Get(int id)
+        public async Task<UserResponse> Get(int id)
         {
-            var user = _userService.GetUserById(id);
+            var user = await  _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }
           
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
         [Authorize]
-        public async Task <ActionResult> Put(int id, [FromBody] UserRequest userRequest)
+        public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
             var user = _mapper.Map<UserRequest, UserModel>(userRequest);
-            var modifyUser =await _userService.ModifyUser(user, id);
+            var modifyUser = await _userService.ModifyUser(user, id);
             if (modifyUser)
             {
                 return Ok();
@@ -115,9 +115,9 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var user = _userService.GetUserById(id);
+            var user = await _userService.GetUserById(id);
             if (user != null)
             {
                 _userService.DeleteUser(id);
@@ -125,10 +125,9 @@ namespace LML.NPOManagement.Controllers
             return BadRequest();
         }
 
-
         // Get api/<UserController>       
         [HttpGet("logout")]
-        public ActionResult LogOut()
+        public async Task<ActionResult> LogOut()
         {
             var user = HttpContext.Items["User"] as UserModel;
             if(user != null)
@@ -156,11 +155,11 @@ namespace LML.NPOManagement.Controllers
             return Unauthorized(401);
         }
 
+        // GET: api/<UserController>
         [HttpGet("verifyEmail")]
         public async Task<ActionResult> VerifyEmail([FromQuery] string token)
         {
             var user = await _userService.ActivationUser(token, _configuration);          
-           
             _notificationService.SendNotificationUser(user, new NotificationModel());
             return Ok();
         }
@@ -180,7 +179,6 @@ namespace LML.NPOManagement.Controllers
                 return Ok(result);
             }
             return BadRequest();
-
         }
 
         // POST api/<UserController> 
@@ -204,21 +202,21 @@ namespace LML.NPOManagement.Controllers
                 PhoneNumber = userInformationRequest.PhoneNumber,
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
-            var newUser = _userService.GetUserById(userInformationModel.UserId);
+            var newUser = await _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
             switch (userInformationRequest.UserTypeEnum)
             {
                 case UserTypeEnum.Admin:
-                    _userService.AddUserType(userInformationModel);
+                    var userType = await _userService.AddUserType(userInformationModel);
                     break;
                 case UserTypeEnum.AccountManager:
-                    _userService.AddUserType(userInformationModel);
+                    userType =  await _userService.AddUserType(userInformationModel);
                     break;
                 case UserTypeEnum.Beneficiary:
-                    _userService.AddUserType(userInformationModel);
+                    userType =  await _userService.AddUserType(userInformationModel);
                     break;
                 case UserTypeEnum.Investor:
-                    _userService.AddUserType(userInformationModel);
+                    userType = await _userService.AddUserType(userInformationModel);
                     break;
                 default:
                     break;
@@ -226,6 +224,5 @@ namespace LML.NPOManagement.Controllers
             _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration);
             return Ok(userInfoId);                  
         }
-       
     }
 }
