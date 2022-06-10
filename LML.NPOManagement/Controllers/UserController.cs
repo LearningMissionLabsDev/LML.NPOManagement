@@ -125,6 +125,20 @@ namespace LML.NPOManagement.Controllers
             return BadRequest();
         }
 
+
+        // Get api/<UserController>       
+        [HttpGet("logout")]
+        public ActionResult LogOut()
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+            if(user != null)
+            {
+                user.Token = null;
+                return Ok();
+            }
+            return BadRequest("Not User");
+        }
+
         // POST api/<UserController>       
         [HttpPost("login")]
         public async Task<ActionResult<UserModel>> Login([FromBody] LoginRequest loginRequest)
@@ -133,7 +147,11 @@ namespace LML.NPOManagement.Controllers
             var user = await _userService.Login(userModel, _configuration);
             if (user != null)
             {
-                return Ok(user);
+                if(user.Status == StatusEnumModel.Activ)
+                {
+                    return Ok(user);
+                }
+                return BadRequest("Please check your email");
             }
             return Unauthorized(401);
         }
