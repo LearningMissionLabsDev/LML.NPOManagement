@@ -1,6 +1,7 @@
 using Amazon.S3;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
+using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Middeware;
 
@@ -23,7 +24,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
-builder.Services.AddDbContext<NPOManagementContext>();
+builder.Services.AddScoped<INPOManagementContext, NPOManagementContext>();
+
 
 var app = builder.Build();
 

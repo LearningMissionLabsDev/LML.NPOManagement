@@ -2,6 +2,7 @@
 using Grpc.Core;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.Extensions.Configuration;
 using System.Net;
@@ -12,6 +13,11 @@ namespace LML.NPOManagement.Bll.Services
     public class NotificationService : INotificationService
     {
         private IMapper _mapper;
+        private readonly INPOManagementContext _dbContext;
+        public NotificationService (INPOManagementContext context)
+        {
+            _dbContext = context;
+        }
         public string AppRootPath { get; set; }
         public NotificationService()
         {
@@ -100,10 +106,10 @@ namespace LML.NPOManagement.Bll.Services
 
         public void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel)
         {
-            using(var dbContext = new NPOManagementContext())
-            {
-                var investor = dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefault();
-                var user = dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
+            //using(var dbContext = new NPOManagementContext())
+            //{
+                var investor = _dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefault();
+                var user = _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
                 var userModel = _mapper.Map<User, UserModel>(user);
 
                 TemplateService templateService = new TemplateService(AppRootPath);
@@ -113,7 +119,7 @@ namespace LML.NPOManagement.Bll.Services
                 body = body.Replace("@amount", Convert.ToString(donationModel.Amount));
                 body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
                 SendNotification(body, subject, userModel.Email);
-            }
+            //}
         }
         
         private void SendNotification(string body, string subject, string email)

@@ -1,15 +1,20 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
 {
     public class AccountService : IAccountService
     {
         private IMapper _mapper;
-        public AccountService()
+        private readonly INPOManagementContext _dbContext;
+       
+        public AccountService(INPOManagementContext context)
         {
+
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
@@ -44,6 +49,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserIdea, UserIdeaModel>();
             });
             _mapper = config.CreateMapper();
+            _dbContext = context;
         }
 
         public int AddAccount(AccountModel accountModel)
@@ -53,19 +59,19 @@ namespace LML.NPOManagement.Bll.Services
 
         public UserIdeaModel AddUserIdea(UserIdeaModel userIdeaModel)
         {
-            using(var dbContext = new NPOManagementContext())
-            {
+            //using(var dbContext = new NPOManagementContext())
+            //{
                 var idea =_mapper.Map<UserIdeaModel,UserIdea>(userIdeaModel);
-                dbContext.UserIdeas.Add(idea);
-                dbContext.SaveChanges();
+                _dbContext.UserIdeas.Add(idea);
+                _dbContext.SaveChanges();
                 return userIdeaModel;
-            }
+            //}
         }
         public List<UserIdeaModel> GetAllIdea()
         {
-            using (var dbContext = new NPOManagementContext())
-            {
-                var ideas = dbContext.UserIdeas.ToList();
+            //using (var dbContext = new NPOManagementContext())
+            //{
+                var ideas = _dbContext.UserIdeas.ToList();
                 if(ideas.Count == 0)
                 {
                     return null;
@@ -77,47 +83,47 @@ namespace LML.NPOManagement.Bll.Services
                     userIdeaModels.Add(ideaModel);
                 }
                 return userIdeaModels;
-            }
+            //}
         }
 
         public void DeleteAccount(int id)
         {
-            using (var dbContext = new NPOManagementContext())
-            {
-                var delatAccount = dbContext.Accounts.Where(da => da.Id == id).FirstOrDefault();
+            //using (var dbContext = new NPOManagementContext())
+            //{
+                var delatAccount = _dbContext.Accounts.Where(da => da.Id == id).FirstOrDefault();
                 if (delatAccount != null)
                 {
-                    dbContext.SaveChanges();
+                    _dbContext.SaveChanges();
                 }
-            }
+            //}
         }
 
         public AccountModel GetAccountById(int id)
         {
-            using (var dbContext = new NPOManagementContext())
-            {
-                var account = dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefault();
+           // using (var dbContext = new NPOManagementContext())
+           // {
+                var account = _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefault();
                 if (account != null)
                 {
                     var accountModel = _mapper.Map<Account, AccountModel>(account);
                     return accountModel;
                 }
                 return null;
-            }
+           // }
         }
 
         public IEnumerable<AccountModel> GetAllAccounts()
         {
-            using (var dbContex = new NPOManagementContext())
-            {
-                var accounts = dbContex.Accounts.ToList();
+            //using (var dbContex = new NPOManagementContext())
+            //{
+                var accounts = _dbContext.Accounts.ToList();
 
                 foreach (var account in accounts)
                 {
                     var accountModel = _mapper.Map<Account, AccountModel>(account);
                     yield return accountModel;
                 }
-            }
+            //}
         }
 
         public int ModifyAccount(AccountModel accountModel, int id)

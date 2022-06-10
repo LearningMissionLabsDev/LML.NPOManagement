@@ -1,5 +1,6 @@
 ﻿using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.Extensions.Configuration;
 
@@ -8,6 +9,11 @@ namespace LML.NPOManagement.Bll.Services
     public class TemplateService : ITemplateService
     {
         private string _notificationTemplateRootPath;
+        private readonly INPOManagementContext _dbContext;
+        public TemplateService(INPOManagementContext context)
+        {
+            _dbContext = context;
+        }
         public TemplateService()
         {
 
@@ -20,8 +26,8 @@ namespace LML.NPOManagement.Bll.Services
 
         public string HtmlBodyNotification(UserModel userModel, NotificationModel notificationModel)
         {
-            using (var dbContext = new NPOManagementContext())
-            {
+            //using (var dbContext = new NPOManagementContext())
+            //{
                 var html = string.Empty; 
                 switch (notificationModel.NotificationTypeEnum)
                 {
@@ -47,13 +53,13 @@ namespace LML.NPOManagement.Bll.Services
                         return null;
                 }
 
-                var user = dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();               
+            var user = _dbContext.UserInformations.Where(us => us.UserId == userModel.Id).FirstOrDefault();               
                                 
                 var body = File.ReadAllText(html);
                 body = body.Replace("@firstName", user.FirstName);
                 body = body.Replace("@lastName", user.LastName);
                 return body.ToString();
-            }
+            //}
         }
         public string HtmlBodyNotificationVerify(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
         {

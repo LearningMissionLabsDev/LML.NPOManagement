@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Bll.Services
@@ -8,6 +9,11 @@ namespace LML.NPOManagement.Bll.Services
     public class UserInventoryService : IUserInventoryService
     {
         private IMapper _mapper;
+        private readonly INPOManagementContext _dbContext;
+        public UserInventoryService (INPOManagementContext context)
+        {
+            _dbContext = context;
+        }
         public UserInventoryService()
         {
             var config = new MapperConfiguration(cfg =>
