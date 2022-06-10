@@ -11,7 +11,7 @@ namespace LML.NPOManagement.Bll.Services
     {
         private IMapper _mapper;
         private readonly INPOManagementContext _dbContext;
-       
+      
         public AccountService(INPOManagementContext context)
         {
 
@@ -57,21 +57,21 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public UserIdeaModel AddUserIdea(UserIdeaModel userIdeaModel)
+        public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
         {
             //using(var dbContext = new NPOManagementContext())
             //{
                 var idea =_mapper.Map<UserIdeaModel,UserIdea>(userIdeaModel);
-                _dbContext.UserIdeas.Add(idea);
-                _dbContext.SaveChanges();
+                await _dbContext.UserIdeas.AddAsync(idea);
+                await _dbContext.SaveChangesAsync();
                 return userIdeaModel;
             //}
         }
-        public List<UserIdeaModel> GetAllIdea()
+        public async Task<List<UserIdeaModel>> GetAllIdea()
         {
             //using (var dbContext = new NPOManagementContext())
             //{
-                var ideas = _dbContext.UserIdeas.ToList();
+                var ideas = await _dbContext.UserIdeas.ToListAsync();
                 if(ideas.Count == 0)
                 {
                     return null;
@@ -98,37 +98,37 @@ namespace LML.NPOManagement.Bll.Services
             //}
         }
 
-        public AccountModel GetAccountById(int id)
+        public async Task<AccountModel> GetAccountById(int id)
         {
            // using (var dbContext = new NPOManagementContext())
            // {
-                var account = _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefault();
+                var account = await _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
                 if (account != null)
                 {
                     var accountModel = _mapper.Map<Account, AccountModel>(account);
                     return accountModel;
                 }
                 return null;
-           // }
+          
         }
 
-        public IEnumerable<AccountModel> GetAllAccounts()
+        public async Task<List<AccountModel>> GetAllAccounts()
         {
-            //using (var dbContex = new NPOManagementContext())
-            //{
-                var accounts = _dbContext.Accounts.ToList();
-
-                foreach (var account in accounts)
-                {
-                    var accountModel = _mapper.Map<Account, AccountModel>(account);
-                    yield return accountModel;
-                }
-            //}
+            List<AccountModel> accountModels = new List<AccountModel>();
+            var accounts = await _dbContext.Accounts.ToListAsync();
+            foreach (var account in accounts)
+            {
+                var accountModel = _mapper.Map<Account, AccountModel>(account);
+                accountModels.Add(accountModel);
+            }
+            return accountModels;
         }
 
         public int ModifyAccount(AccountModel accountModel, int id)
         {
             throw new NotImplementedException();
         }
+
+       
     }
 }

@@ -71,33 +71,36 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<AccountController>
         [HttpGet]
-        public IEnumerable<AccountResponse> Get()
+        public async Task<List<AccountResponse>> Get()
         {
-            var accounts = _accountService.GetAllAccounts().ToList();
+            var accounts = await _accountService.GetAllAccounts();
             return _mapper.Map<List<AccountModel>,List<AccountResponse>>(accounts);
         }
 
         // GET api/<AccountController>/5
         [HttpGet("{id}")]
-        public AccountResponse Get(int id)
+        public async Task<AccountResponse> Get(int id)
         {
-            var account = _accountService.GetAccountById(id);
+            var account = await _accountService.GetAccountById(id);
             return _mapper.Map<AccountModel,AccountResponse>(account);
         }
 
         // GET: api/<AccountController>
         [HttpGet("idea")]
-        public IEnumerable<ActionResult<UserIdeaResponse>> GetIdea()
+        public async Task<List<UserIdeaResponse>> GetIdea()
         {
-            var ideas = _accountService.GetAllIdea();
+            List<UserIdeaResponse> ideaModels = new List<UserIdeaResponse>();
+            var ideas = await _accountService.GetAllIdea();
             if (ideas.Count > 0)
             {
                 foreach (var idea in ideas)
                 {
                     var ideaResponse = _mapper.Map<UserIdeaModel, UserIdeaResponse>(idea);
-                    yield return ideaResponse;
+                    ideaModels.Add(ideaResponse);
                 }
+                return ideaModels;
             }
+            return null;
         }
 
         // POST api/<AccountController>
@@ -108,7 +111,7 @@ namespace LML.NPOManagement.Controllers
 
         // POST api/<AccountController>
         [HttpPost("submitComments")]
-        public ActionResult SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
+        public async Task<ActionResult> SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
         {
             var user = _userService.GetUserById(userIdeaRequest.UserId);
             if(user == null)
@@ -116,7 +119,7 @@ namespace LML.NPOManagement.Controllers
                 return BadRequest();
             }
             var ideaModel = _mapper.Map<UserIdeaRequest, UserIdeaModel>(userIdeaRequest);
-            var idea = _accountService.AddUserIdea(ideaModel);
+            var idea = await _accountService.AddUserIdea(ideaModel);
             return Ok();
         }
 
