@@ -10,11 +10,7 @@ namespace LML.NPOManagement.Bll.Services
     {
         private IMapper _mapper;
         private readonly INPOManagementContext _dbContext;
-        public UserInventoryService (INPOManagementContext context)
-        {
-            _dbContext = context;
-        }
-        public UserInventoryService()
+        public UserInventoryService(INPOManagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -48,6 +44,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
+            _dbContext = context;
         }
 
         public int AddUserInventory(UserInventoryModel userInventoryModel)

@@ -14,12 +14,8 @@ namespace LML.NPOManagement.Bll.Services
     {
         private IMapper _mapper;
         private readonly INPOManagementContext _dbContext;
-        public NotificationService (INPOManagementContext context)
-        {
-            _dbContext = context;
-        }
         public string AppRootPath { get; set; }
-        public NotificationService()
+        public NotificationService(INPOManagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -56,6 +52,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
+            _dbContext = context;
         }
 
         public int AddNotification(NotificationModel notificationModel)
@@ -85,7 +82,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
         {
-            TemplateService templateService = new TemplateService(AppRootPath);
+            TemplateService templateService = new TemplateService(AppRootPath,_dbContext);
             string subject = templateService.HtmlSubject();
 
             foreach (var userModel in userModels)
@@ -97,7 +94,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public void SendNotificationUser(UserModel userModel, NotificationModel notificationModel)
         {
-            TemplateService templateService = new TemplateService(AppRootPath);
+            TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
             notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByRegistration;
             string subject = templateService.HtmlSubject();
             var body = templateService.HtmlBodyNotification(userModel,notificationModel);
@@ -112,7 +109,7 @@ namespace LML.NPOManagement.Bll.Services
                 var user = _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
                 var userModel = _mapper.Map<User, UserModel>(user);
 
-                TemplateService templateService = new TemplateService(AppRootPath);
+                TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
                 notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
                 string subject = templateService.HtmlSubject();
                 var body = templateService.HtmlBodyNotification(userModel, notificationModel);
@@ -176,7 +173,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
         {
-            TemplateService templateService = new TemplateService(AppRootPath);
+            TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
             string subject = templateService.HtmlSubject();
             var body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration);
             SendNotification(body, subject, userModel.Email);

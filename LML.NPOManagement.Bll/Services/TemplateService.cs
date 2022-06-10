@@ -10,18 +10,15 @@ namespace LML.NPOManagement.Bll.Services
     {
         private string _notificationTemplateRootPath;
         private readonly INPOManagementContext _dbContext;
-        public TemplateService(INPOManagementContext context)
-        {
-            _dbContext = context;
-        }
         public TemplateService()
         {
 
         }
 
-        public TemplateService(string appRootPath )
+        public TemplateService(string appRootPath , INPOManagementContext context)
         {
             _notificationTemplateRootPath = Path.Combine(appRootPath + "NotificationTemplates");
+            _dbContext = context;
         }
 
         public string HtmlBodyNotification(UserModel userModel, NotificationModel notificationModel)

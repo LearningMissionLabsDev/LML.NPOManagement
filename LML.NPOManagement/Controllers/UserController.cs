@@ -77,17 +77,17 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserController>
         [HttpGet]
-        public IEnumerable<UserResponse> Get()
+        public async Task<IEnumerable<UserResponse>> Get()
         {
-            var userModel = _userService.GetAllUsers().ToList();
+            var userModel = await _userService.GetAllUsers();
             return _mapper.Map<List<UserModel>, List<UserResponse>>(userModel);
         }
 
         // GET: api/<UserController>
         [HttpGet("userTypes")]
-        public IEnumerable<UserTypeResponse> GetUserTypes()//return user type table id,description 
+        public async Task<IEnumerable<UserTypeResponse>> GetUserTypes()//return user type table id,description 
         {
-            var userTypes = _userService.GetAllUserTypes().ToList();
+            var userTypes = await _userService.GetAllUserTypes();
             return _mapper.Map<List<UserTypeModel>, List<UserTypeResponse>>(userTypes);
         }
 
