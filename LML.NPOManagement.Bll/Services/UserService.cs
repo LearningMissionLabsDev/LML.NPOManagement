@@ -52,13 +52,13 @@ namespace LML.NPOManagement.Bll.Services
             _dbContext = context;
         }
 
-        public void DeleteUser(int id)
+        public  void DeleteUser(int id)
         {
             //using(var dbContext = new NPOManagementContext())
             //{
                 var user = _dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
                 user.Status = Convert.ToString(StatusEnumModel.Closed);
-                _dbContext.SaveChangesAsync();
+                _dbContext.SaveChanges();
             //}
         }
 
@@ -92,11 +92,11 @@ namespace LML.NPOManagement.Bll.Services
             //}
         }
 
-        public UserModel GetUserById(int id)
+        public async Task <UserModel> GetUserById(int id)
         {
             //using(var dbContext = new NPOManagementContext())
             //{
-                var user = _dbContext.Users.Where(x => x.Id == id).FirstOrDefault();
+                var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (user != null)
                 {
                     var userModel = _mapper.Map<User,UserModel>(user);
@@ -131,7 +131,7 @@ namespace LML.NPOManagement.Bll.Services
                 if (verifyUser)
                 {
                     var modifyUser = _mapper.Map<UserModel, User>(userModel);
-                   await _dbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync();
                     return true;
                 }
                 return false;
@@ -148,7 +148,7 @@ namespace LML.NPOManagement.Bll.Services
                 {             
                     userModel.Password = BC.HashPassword(userModel.Password);
                     var addUser = _mapper.Map<UserModel, User>(userModel);
-                    _dbContext.Users.Add(addUser);
+                    await _dbContext.Users.AddAsync(addUser);
                     await _dbContext.SaveChangesAsync();
                     var newUser = _mapper.Map<User, UserModel>(addUser);
                     newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
@@ -180,8 +180,8 @@ namespace LML.NPOManagement.Bll.Services
                     Metadata = userInformationModel.Metadata,
                     PhoneNumber = userInformationModel.PhoneNumber,
                 };
-                _dbContext.UserInformations.Add(userInfo);
-                _dbContext.SaveChanges();
+                await _dbContext.UserInformations.AddAsync(userInfo);
+                await _dbContext.SaveChangesAsync();
                 if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
                 {
                     _dbContext.InvestorInformations.Add(new InvestorInformation()
@@ -263,13 +263,13 @@ namespace LML.NPOManagement.Bll.Services
             //using(var dbContext = new NPOManagementContext())
             //{
                 var userTypes = _dbContext.UserTypes.ToList();
-                var user = _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefault();
+                var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
                 foreach (var userType in userTypes)
                 {
                     if( userType.Description == Convert.ToString( userInformationModel.UserTypeEnum ))
                     {
                         user.UserTypes.Add(userType);
-                       await _dbContext.SaveChangesAsync();
+                        await _dbContext.SaveChangesAsync();
                     }
                 }
             //}
