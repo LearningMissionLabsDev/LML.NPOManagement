@@ -105,7 +105,7 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
             var user = _mapper.Map<UserRequest, UserModel>(userRequest);
-            var modifyUser =await _userService.ModifyUser(user, id);
+            var modifyUser = await _userService.ModifyUser(user, id);
             if (modifyUser)
             {
                 return Ok();
@@ -115,9 +115,9 @@ namespace LML.NPOManagement.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var user = _userService.GetUserById(id);
+            var user = await _userService.GetUserById(id);
             if (user != null)
             {
                 _userService.DeleteUser(id);
@@ -127,7 +127,7 @@ namespace LML.NPOManagement.Controllers
 
         // Get api/<UserController>       
         [HttpGet("logout")]
-        public ActionResult LogOut()
+        public async Task<ActionResult> LogOut()
         {
             var user = HttpContext.Items["User"] as UserModel;
             if(user != null)
@@ -160,7 +160,6 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult> VerifyEmail([FromQuery] string token)
         {
             var user = await _userService.ActivationUser(token, _configuration);          
-           
             _notificationService.SendNotificationUser(user, new NotificationModel());
             return Ok();
         }
@@ -208,16 +207,16 @@ namespace LML.NPOManagement.Controllers
             switch (userInformationRequest.UserTypeEnum)
             {
                 case UserTypeEnum.Admin:
-                    _userService.AddUserType(userInformationModel);
+                    var userType = await _userService.AddUserType(userInformationModel);
                     break;
                 case UserTypeEnum.AccountManager:
-                    _userService.AddUserType(userInformationModel);
+                    userType =  await _userService.AddUserType(userInformationModel);
                     break;
                 case UserTypeEnum.Beneficiary:
-                    _userService.AddUserType(userInformationModel);
+                    userType =  await _userService.AddUserType(userInformationModel);
                     break;
                 case UserTypeEnum.Investor:
-                    _userService.AddUserType(userInformationModel);
+                    userType = await _userService.AddUserType(userInformationModel);
                     break;
                 default:
                     break;

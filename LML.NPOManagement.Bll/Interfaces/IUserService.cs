@@ -17,7 +17,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<UserModel> Login(UserModel userModel, IConfiguration configuration);
         Task<UserModel> Registration(UserModel userModel, IConfiguration configuration);
         Task<int> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
-        public void AddUserType(UserInformationModel userInformationModel);
+        Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel);
         Task<UserModel> ActivationUser(string token, IConfiguration configuration);
     }
 }
