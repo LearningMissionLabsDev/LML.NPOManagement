@@ -69,14 +69,32 @@ namespace LML.NPOManagement.Bll.Services
             _dbContext.SaveChanges();
         }
 
-        public IEnumerable<NotificationModel> GetAllNotifications()
+        public async Task<List<NotificationModel>> GetAllNotifications()
         {
-            throw new NotImplementedException();
+            List<NotificationModel> notificationModels = new List<NotificationModel>();
+            var notifications = await _dbContext.Notifications.ToListAsync();
+            if (notifications != null)
+            {
+                foreach (var notification in notifications)
+                {
+                    var notificationModel = _mapper.Map<Notification, NotificationModel>(notification);
+                    notificationModels.Add(notificationModel);
+                }
+                return notificationModels;
+            }
+            return null;
         }
+
 
         public async Task<NotificationModel> GetNotificationById(int id)
         {
-            throw new NotImplementedException();
+            var notification = await _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
+            if (notification != null)
+            {
+                var notificationModel = _mapper.Map<Notification, NotificationModel>(notification);
+                return notificationModel;
+            }
+            return null;
         }
 
         public async Task<bool> ModifyNotification(NotificationModel notificationModel, int id)
