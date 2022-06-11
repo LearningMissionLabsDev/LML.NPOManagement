@@ -83,6 +83,7 @@ namespace LML.NPOManagement.Bll.Services
             return userTypeModels;
         }
 
+
         public async Task <UserModel> GetUserById(int id)
         {
                 var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
@@ -107,7 +108,7 @@ namespace LML.NPOManagement.Bll.Services
             return null;
         }
 
-        public async Task  <bool> ModifyUser(UserModel userModel, int id)
+        public async Task<bool> ModifyUser(UserModel userModel, int id)
         {
                 var user =await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
                 var verifyUser = BC.Verify(userModel.Password,user.Password);

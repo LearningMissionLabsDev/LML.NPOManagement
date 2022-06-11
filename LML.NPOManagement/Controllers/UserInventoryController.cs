@@ -17,9 +17,10 @@ namespace LML.NPOManagement.Controllers
         private IUserInventoryService _userInventoryService;
         private IWebHostEnvironment _webHostEnvironment;
         private INotificationService _notificationService;
+        private IUserService _userService;
 
         public UserInventoryController(IUserInventoryService userInventoryService, IWebHostEnvironment webHostEnvironment,
-                                       INotificationService notificationService)
+                                       INotificationService notificationService, IUserService userService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -65,38 +66,81 @@ namespace LML.NPOManagement.Controllers
             _notificationService = notificationService;
             _webHostEnvironment = webHostEnvironment;
             _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
+            _userService = userService;
         }
 
         // GET: api/<UserInventoryController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<UserInventoryResponse>> Get()
         {
-            return new string[] { "value1", "value2" };
+            var inventories = await _userInventoryService.GetAllUserInventories();
+            return _mapper.Map<List<UserInventoryModel>,List<UserInventoryResponse>>(inventories);
         }
 
         // GET api/<UserInventoryController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult< UserInventoryResponse>> Get(int id)
         {
-            return "value";
+            var inventory = await _userInventoryService.GetUserInventoryById(id);
+            if(inventory == null)
+            {
+                return BadRequest();
+            }
+            return Ok(inventory);
         }
 
         // POST api/<UserInventoryController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<UserInventoryResponse>> Post([FromBody] UserInventoryRequest userInventoryRequest)
         {
+            var user = await _userService.GetUserById(userInventoryRequest.UserId);
+            if(user == null)
+            {
+                return BadRequest();
+            }
+            var inventoryType = await _userInventoryService.GetUserInventoryTypeById(userInventoryRequest.InventoryTypeId);
+            if(inventoryType == null)
+            {
+                return BadRequest();
+            }
+            var inventoryModel = _mapper.Map<UserInventoryRequest,UserInventoryModel>(userInventoryRequest);
+            var inventory = await _userInventoryService.AddUserInventory(inventoryModel);
+            var inventoryResponse = _mapper.Map<UserInventoryModel,UserInventoryResponse>(inventory);
+            return Ok(inventoryResponse);
+        }
+
+        // POST api/<UserInventoryController>
+        [HttpPost("inventoryType")]
+        public async Task<ActionResult<InventoryTypeResponse>> PostInventoryType([FromBody] InventoryTypeRequest inventoryTypeRequest)
+        {
+            var inventoryType = _mapper.Map<InventoryTypeRequest,InventoryTypeModel>(inventoryTypeRequest);
+            var newInventory = await _userInventoryService.AddInventoryType(inventoryType);
+            return Ok(_mapper.Map<InventoryTypeModel,InventoryTypeResponse>(newInventory));
         }
 
         // PUT api/<UserInventoryController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult<UserInventoryResponse>> Put(int id, [FromBody] UserInventoryRequest userInventoryRequest)
         {
+            var inventory = _userInventoryService.GetUserInventoryById(id);
+            if( inventory == null)
+            {
+                return BadRequest();
+            }
+            var user = await _userService.GetUserById(userInventoryRequest.UserId);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var inventoryType = await _userInventoryService.GetUserInventoryTypeById(userInventoryRequest.InventoryTypeId);
+            if (inventoryType == null)
+            {
+                return BadRequest();
+            }
+            var inventoryModel = _mapper.Map<UserInventoryRequest, UserInventoryModel>(userInventoryRequest);
+            var newInventory = await _userInventoryService.ModifyUserInventory(inventoryModel, id);
+            return Ok(newInventory);
         }
 
-        // DELETE api/<UserInventoryController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

@@ -8,6 +8,7 @@ namespace LML.NPOManagement.Request
         [Range(1, int.MaxValue)]
         public int InventoryTypeId { get; set; }
 
+        [Required]
         [Range(1, int.MaxValue)]
         public int UserId { get; set; }
 

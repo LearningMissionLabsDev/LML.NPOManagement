@@ -95,6 +95,7 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("{id}")]
         public async Task<UserResponse> Get(int id)
         {
+
             var user = await  _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }

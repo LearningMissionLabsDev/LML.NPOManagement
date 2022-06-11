@@ -9,10 +9,11 @@ namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IUserInventoryService
     {
-        public IEnumerable<UserInventoryModel> GetAllUserInventories();
-        public UserInventoryModel GetUserInventoryById(int id);
-        public int AddUserInventory(UserInventoryModel userInventoryModel);
-        public int ModifyUserInventory(UserInventoryModel userInventoryModel, int id);
-        public void DeleteUserInventory(int id);
+        Task<List<UserInventoryModel>> GetAllUserInventories();
+        Task<UserInventoryModel> GetUserInventoryById(int id);
+        Task<UserInventoryModel> AddUserInventory(UserInventoryModel userInventoryModel);
+        Task<UserInventoryModel> ModifyUserInventory(UserInventoryModel userInventoryModel, int id);
+        Task<InventoryTypeModel> GetUserInventoryTypeById(int id);
+        Task<InventoryTypeModel> AddInventoryType(InventoryTypeModel inventoryTypeModel);
     }
 }
