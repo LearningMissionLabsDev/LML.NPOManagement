@@ -114,6 +114,34 @@ namespace LML.NPOManagement.Controllers
             return BadRequest();
         }
 
+        // PUT api/<UserController>/5
+        [HttpPut("userInfo")]
+        public async Task<ActionResult> PutUserInfo(int id,[FromBody] UserInformationRequest userInformationRequest)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var userInfoModel = new UserInformationModel()
+            {
+                UserTypeEnum = userInformationRequest.UserTypeEnum,
+                UserId = id,
+                Gender = userInformationRequest.Gender,
+                FirstName = userInformationRequest.FirstName,
+                LastName = userInformationRequest.LastName,
+                Metadata = userInformationRequest.UserMetadata,
+                PhoneNumber = userInformationRequest.PhoneNumber,
+                DateOfBirth = userInformationRequest.DateOfBirth,
+            };
+            var modifyUser = await _userService.ModifyUserInfo(userInfoModel, id);
+            if (modifyUser)
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

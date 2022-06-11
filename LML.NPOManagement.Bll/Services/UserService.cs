@@ -54,9 +54,9 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteUser(int id)
         {
-                var user = _dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
-                user.Status = Convert.ToString(StatusEnumModel.Closed);
-                _dbContext.SaveChanges();
+            var user = _dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
+            user.Status = Convert.ToString(StatusEnumModel.Closed);
+            _dbContext.SaveChanges();
         }
 
         public async Task<List<UserModel>> GetAllUsers()
@@ -86,61 +86,62 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task <UserModel> GetUserById(int id)
         {
-                var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
-                if (user != null)
-                {
-                    var userModel = _mapper.Map<User,UserModel>(user);
-                    return userModel;
-                }
-                return null;
+            var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (user != null)
+            {
+                var userModel = _mapper.Map<User,UserModel>(user);
+                return userModel;
+            }
+            return null;
         }
 
         public async Task<UserModel> Login(UserModel userModel, IConfiguration configuration)
         {
-                var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
-                if (user != null && BC.Verify(userModel.Password, user.Password))
-                {
-                    var userModelMapper = _mapper.Map<User, UserModel>(user);
-                    userModelMapper.Password = null;
-                    userModelMapper.Token = TokenCreationHelper.GenerateJwtToken(userModelMapper, configuration);
-                    return userModelMapper;
-                }
+            var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
+            if (user != null && BC.Verify(userModel.Password, user.Password))
+            {
+                var userModelMapper = _mapper.Map<User, UserModel>(user);
+                userModelMapper.Password = null;
+                userModelMapper.Token = TokenCreationHelper.GenerateJwtToken(userModelMapper, configuration);
+                return userModelMapper;
+            }
             return null;
         }
 
         public async Task<bool> ModifyUser(UserModel userModel, int id)
         {
-                var user =await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
-                var verifyUser = BC.Verify(userModel.Password,user.Password);
-                if (verifyUser)
-                {
-                    var modifyUser = _mapper.Map<UserModel, User>(userModel);
-                    await _dbContext.SaveChangesAsync();
-                    return true;
-                }
-                return false;
+            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
+            var verifyUser = BC.Verify(userModel.Password,user.Password);
+            if (verifyUser)
+            {
+                user.Email = userModel.Email;
+                user.Password = BC.HashPassword(userModel.Password);                
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public async Task<UserModel> Registration(UserModel userModel, IConfiguration configuration)
         {
-                var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
        
-                if (user == null )
-                {             
-                    userModel.Password = BC.HashPassword(userModel.Password);
-                    var addUser = _mapper.Map<UserModel, User>(userModel);
-                    await _dbContext.Users.AddAsync(addUser);
-                    await _dbContext.SaveChangesAsync();
-                    var newUser = _mapper.Map<User, UserModel>(addUser);
-                    newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
-                    newUser.Password = null;
-                    return newUser;                    
-                }
-                else if(user.Status == Convert.ToString(StatusEnumModel.Closed))
-                {
-                    return null;//to do handle this condition differently
-                }
-                return null;
+            if (user == null )
+            {             
+                userModel.Password = BC.HashPassword(userModel.Password);
+                var addUser = _mapper.Map<UserModel, User>(userModel);
+                await _dbContext.Users.AddAsync(addUser);
+                await _dbContext.SaveChangesAsync();
+                var newUser = _mapper.Map<User, UserModel>(addUser);
+                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
+                newUser.Password = null;
+                return newUser;                    
+            }
+            else if(user.Status == Convert.ToString(StatusEnumModel.Closed))
+            {
+                return null;//to do handle this condition differently
+            }
+            return null;
         }
 
         public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel,IConfiguration configuration )
@@ -228,7 +229,6 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel)
         {
-
             var userTypes = await _dbContext.UserTypes.ToListAsync();
             var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
             foreach (var userType in userTypes)
@@ -246,12 +246,49 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<UserModel> ActivationUser(string token,IConfiguration configuration)
         {
-                var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
-                var user = await _dbContext.Users.Where(us => us.Id == newUser.Id).FirstOrDefaultAsync();
-                user.Status = StatusEnumModel.Activ.ToString();
-                await _dbContext.SaveChangesAsync();
-                var userModel = _mapper.Map<User,UserModel>(user);
-                return userModel;
+            var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
+            var user = await _dbContext.Users.Where(us => us.Id == newUser.Id).FirstOrDefaultAsync();
+            user.Status = StatusEnumModel.Activ.ToString();
+            await _dbContext.SaveChangesAsync();
+            var userModel = _mapper.Map<User,UserModel>(user);
+            return userModel;
+        }
+
+        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int id)
+        {
+            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == id).FirstOrDefaultAsync();            
+
+            if (userInfo == null)
+            {
+                return false;
+            }
+
+            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
+
+            userInfo.UserId = id;
+            userInfo.FirstName= userInformationModel.FirstName;
+            userInfo.LastName= userInformationModel.LastName;
+            userInfo.PhoneNumber= userInformationModel.PhoneNumber;
+            userInfo.UpdateDate = DateTime.UtcNow;
+            userInfo.MiddleName = userInformationModel.MiddleName;
+            userInfo.CreateDate = DateTime.UtcNow;
+            userInfo.Metadata = userInformationModel.Metadata;
+            userInfo.DateOfBirth = userInformationModel.DateOfBirth;
+            userInfo.Gender = (int) userInformationModel.Gender;
+           
+            var userTypes = await _dbContext.UserTypes.ToListAsync();
+
+            foreach (var userType in userTypes)
+            {
+                if ( userType.Description == Convert.ToString(userInformationModel.UserTypeEnum) &&
+                     user.UserTypes.Where(us => us.Description == Convert.ToString(userInformationModel.UserTypeEnum)) == null)
+                {
+                    user.UserTypes.Add(userType);            
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+            return true;
         }
     }
 }
