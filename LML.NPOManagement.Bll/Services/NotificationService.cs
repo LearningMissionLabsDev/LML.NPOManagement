@@ -102,42 +102,23 @@ namespace LML.NPOManagement.Bll.Services
         }
 
         public void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel)
-        {
-            //using(var dbContext = new NPOManagementContext())
-            //{
-                var investor = _dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefault();
-                var user = _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
-                var userModel = _mapper.Map<User, UserModel>(user);
+        {      
+            var investor = _dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefault();
+            var user = _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
+            var userModel = _mapper.Map<User, UserModel>(user);
 
-                TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
-                notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
-                string subject = templateService.HtmlSubject();
-                var body = templateService.HtmlBodyNotification(userModel, notificationModel);
-                body = body.Replace("@amount", Convert.ToString(donationModel.Amount));
-                body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
-                SendNotification(body, subject, userModel.Email);
-            //}
+            TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
+            notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
+            string subject = templateService.HtmlSubject();
+            var body = templateService.HtmlBodyNotification(userModel, notificationModel);
+            body = body.Replace("@amount", Convert.ToString(donationModel.Amount));
+            body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
+            SendNotification(body, subject, userModel.Email);
+ 
         }
         
         private void SendNotification(string body, string subject, string email)
-        {            
-            //EmailMsg.From = new MailAddress("learningmissionarmenia@gmail.com", "Learning Mission");
-            //EmailMsg.To.Add(new MailAddress(email, email));
-            //EmailMsg.Subject = subject;
-            //EmailMsg.Body = body;
-            //EmailMsg.IsBodyHtml = true;
-            //EmailMsg.Priority = MailPriority.Normal;
-            //var smtp = new SmtpClient
-            //{
-            //    Host = "smtp.gmail.com",
-            //    Port = 587,
-            //    //Port = 465,
-            //    EnableSsl = true,
-            //    DeliveryMethod = SmtpDeliveryMethod.Network,
-            //    UseDefaultCredentials = false,
-            //    Credentials = new NetworkCredential("learningmissionarmenia@gmail.com", "H@ghteluEnk21!")
-            //};
-            //smtp.Send(EmailMsg);
+        {           
             String FROM = "learningmissionarmenia@gmail.com";
             String FROMNAME = "Learning Mission";                
             String TO = email;               
