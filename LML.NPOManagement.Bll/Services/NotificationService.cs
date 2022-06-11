@@ -4,6 +4,7 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
@@ -65,14 +66,27 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<NotificationModel> GetAllNotifications()
+        public async Task<List<NotificationModel>> GetAllNotifications()
         {
-            throw new NotImplementedException();
+            List<NotificationModel> notificationModels = new List<NotificationModel>();
+            var notifications = await _dbContext.Notifications.ToListAsync();
+            foreach (var notification in notifications)
+            {
+                var notificationModel = _mapper.Map<Notification, NotificationModel>(notification);
+                notificationModels.Add(notificationModel);
+            }
+            return notificationModels;
         }
 
-        public NotificationModel GetNotificationById(int id)
+        public async Task<NotificationModel> GetNotificationById(int id)
         {
-            throw new NotImplementedException();
+            var notification = await _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
+            if (notification != null)
+            {
+                var notificationModel = _mapper.Map<Notification, NotificationModel>(notification);
+                return notificationModel;
+            }
+            return null;
         }
 
         public int ModifyNotification(NotificationModel notificationModel, int id)

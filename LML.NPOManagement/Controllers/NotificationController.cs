@@ -68,16 +68,18 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<NotificationController>
         [HttpGet]
-        public async Task<IEnumerable<string>> Get()
+        public async Task<List<NotificationResponse>> Get()
         {
-            return new string[] { "value1", "value2" };
+            var notification = await _notificationService.GetAllNotifications();
+            return _mapper.Map<List<NotificationModel>, List<NotificationResponse>>(notification);
         }
         
         // GET api/<NotificationController>/5
         [HttpGet("{id}")]
-        public async Task<string> Get(int id)
+        public async Task<NotificationResponse> GetNotificationById(int id)
         {
-            return "value";
+            var notification = await _notificationService.GetNotificationById(id);
+            return _mapper.Map<NotificationModel,NotificationResponse>(notification);
         }
 
         // POST api/<NotificationController>
