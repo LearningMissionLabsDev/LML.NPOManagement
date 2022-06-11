@@ -261,12 +261,11 @@ namespace LML.NPOManagement.Bll.Services
             var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
 
             userInfo.UserId = id;
-            userInfo.FirstName= userInformationModel.FirstName;
-            userInfo.LastName= userInformationModel.LastName;
-            userInfo.PhoneNumber= userInformationModel.PhoneNumber;
+            userInfo.FirstName = userInformationModel.FirstName;
+            userInfo.LastName = userInformationModel.LastName;
+            userInfo.PhoneNumber = userInformationModel.PhoneNumber;
             userInfo.UpdateDate = DateTime.UtcNow;
             userInfo.MiddleName = userInformationModel.MiddleName;
-            userInfo.CreateDate = DateTime.UtcNow;
             userInfo.Metadata = userInformationModel.Metadata;
             userInfo.DateOfBirth = userInformationModel.DateOfBirth;
             userInfo.Gender = (int) userInformationModel.Gender;
@@ -281,7 +280,6 @@ namespace LML.NPOManagement.Bll.Services
                     user.UserTypes.Add(userType);            
                 }
             }
-
             await _dbContext.SaveChangesAsync();
             return true;
         }

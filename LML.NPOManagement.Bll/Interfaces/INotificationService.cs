@@ -7,9 +7,9 @@ namespace LML.NPOManagement.Bll.Interfaces
     {
         public string AppRootPath { get; set; }
         public IEnumerable<NotificationModel> GetAllNotifications();
-        public NotificationModel GetNotificationById(int id);
+        Task<NotificationModel> GetNotificationById(int id);
         public int AddNotification(NotificationModel notificationModel);
-        public int ModifyNotification(NotificationModel notificationModel, int id);
+        Task<bool> ModifyNotification(NotificationModel notificationModel, int id);
         public void DeleteNotification(int id);
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel);
         public void SendNotificationUser(UserModel userModel, NotificationModel notificationModel);
