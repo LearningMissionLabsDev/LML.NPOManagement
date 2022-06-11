@@ -102,10 +102,14 @@ namespace LML.NPOManagement.Controllers
           
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        [Authorize]
         public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
-            var user = _mapper.Map<UserRequest, UserModel>(userRequest);
+            var user = await _userService.GetUserById(id);
+            if(user == null)
+            {
+                return BadRequest();
+            }
+            var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var modifyUser = await _userService.ModifyUser(user, id);
             if (modifyUser)
             {

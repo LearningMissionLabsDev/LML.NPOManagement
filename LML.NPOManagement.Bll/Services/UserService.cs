@@ -110,16 +110,11 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<bool> ModifyUser(UserModel userModel, int id)
         {
-            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
-            var verifyUser = BC.Verify(userModel.Password,user.Password);
-            if (verifyUser)
-            {
-                user.Email = userModel.Email;
-                user.Password = BC.HashPassword(userModel.Password);                
-                await _dbContext.SaveChangesAsync();
-                return true;
-            }
-            return false;
+            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();            
+            user.Email = userModel.Email;
+            user.Password = BC.HashPassword(userModel.Password);                
+            await _dbContext.SaveChangesAsync();          
+            return true;
         }
 
         public async Task<UserModel> Registration(UserModel userModel, IConfiguration configuration)
