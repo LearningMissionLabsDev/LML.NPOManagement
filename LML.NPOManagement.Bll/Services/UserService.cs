@@ -92,11 +92,11 @@ namespace LML.NPOManagement.Bll.Services
             //}
         }
 
-        public UserModel GetUserById(int id)
+        public async Task<UserModel> GetUserById(int id)
         {
             //using(var dbContext = new NPOManagementContext())
             //{
-                var user = _dbContext.Users.Where(x => x.Id == id).FirstOrDefault();
+                var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (user != null)
                 {
                     var userModel = _mapper.Map<User,UserModel>(user);
@@ -122,7 +122,7 @@ namespace LML.NPOManagement.Bll.Services
             return null;
         }
 
-        public async Task  <bool> ModifyUser(UserModel userModel, int id)
+        public async Task<bool> ModifyUser(UserModel userModel, int id)
         {
             //using(var dbContext = new NPOManagementContext())
             //{
@@ -131,7 +131,7 @@ namespace LML.NPOManagement.Bll.Services
                 if (verifyUser)
                 {
                     var modifyUser = _mapper.Map<UserModel, User>(userModel);
-                   await _dbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync();
                     return true;
                 }
                 return false;

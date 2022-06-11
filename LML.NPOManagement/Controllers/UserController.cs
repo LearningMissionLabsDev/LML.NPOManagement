@@ -93,9 +93,9 @@ namespace LML.NPOManagement.Controllers
 
         //GET api/<UserController>/5
         [HttpGet("{id}")]
-        public UserResponse Get(int id)
+        public async Task<UserResponse> Get(int id)
         {
-            var user = _userService.GetUserById(id);
+            var user = await _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }
           
@@ -204,7 +204,7 @@ namespace LML.NPOManagement.Controllers
                 PhoneNumber = userInformationRequest.PhoneNumber,
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
-            var newUser = _userService.GetUserById(userInformationModel.UserId);
+            var newUser = await _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
             switch (userInformationRequest.UserTypeEnum)
             {

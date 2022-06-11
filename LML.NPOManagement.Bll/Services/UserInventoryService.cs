@@ -3,6 +3,7 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -47,29 +48,75 @@ namespace LML.NPOManagement.Bll.Services
             _dbContext = context;
         }
 
-        public int AddUserInventory(UserInventoryModel userInventoryModel)
+        public async Task<UserInventoryModel> AddUserInventory(UserInventoryModel userInventoryModel)
         {
-            throw new NotImplementedException();
+            var inventory = _mapper.Map<UserInventoryModel,UserInventory>(userInventoryModel);
+            await _dbContext.UserInventories.AddAsync(inventory);
+            await _dbContext.SaveChangesAsync();
+            var newInventory = await _dbContext.UserInventories.Where(inv => inv.Date == userInventoryModel.Date).FirstOrDefaultAsync();
+            if (newInventory == null)
+            {
+                return null;
+            }
+            var inventoryModel = _mapper.Map<UserInventory,UserInventoryModel>(newInventory);
+            return inventoryModel;
         }
 
-        public void DeleteUserInventory(int id)
+        public async Task<List<UserInventoryModel>> GetAllUserInventories()
         {
-            throw new NotImplementedException();
+            var inventories = await _dbContext.UserInventories.ToListAsync();
+            if(inventories.Count == 0)
+            {
+                return null;
+            }
+            return _mapper.Map<List<UserInventory>, List<UserInventoryModel>>(inventories);
         }
 
-        public IEnumerable<UserInventoryModel> GetAllUserInventories()
+        public async Task<UserInventoryModel> GetUserInventoryById(int id)
         {
-            throw new NotImplementedException();
+            var inventory = await _dbContext.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
+            if(inventory == null)
+            {
+                return null;
+            }
+            return _mapper.Map<UserInventory, UserInventoryModel>(inventory);
         }
 
-        public UserInventoryModel GetUserInventoryById(int id)
+        public async Task<UserInventoryModel> ModifyUserInventory(UserInventoryModel userInventoryModel, int id)
         {
-            throw new NotImplementedException();
+            var inventory = await _dbContext.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
+            if( inventory == null)
+            {
+                return null;
+            }
+            inventory.Description = userInventoryModel.Description;
+            inventory.InventoryTypeId = userInventoryModel.InventoryTypeId;
+            inventory.Metadata = userInventoryModel.Metadata;
+            inventory.Date = userInventoryModel.Date;
+            inventory.UserId = userInventoryModel.UserId;
+            await _dbContext.UserInventories.AddAsync(inventory);
+            await _dbContext.SaveChangesAsync();
+            var inventoryModel = _mapper.Map<UserInventory,UserInventoryModel>(inventory);
+            return inventoryModel;
+
         }
 
-        public int ModifyUserInventory(UserInventoryModel userInventoryModel, int id)
+        public async Task<InventoryTypeModel> GetUserInventoryTypeById(int id)
         {
-            throw new NotImplementedException();
+            var inventoryType = await _dbContext.InventoryTypes.Where(type => type.Id == id).FirstOrDefaultAsync();
+            if(inventoryType == null)
+            {
+                return null;
+            }
+            return _mapper.Map<InventoryType, InventoryTypeModel>(inventoryType);
+        }
+
+        public async Task<InventoryTypeModel> AddInventoryType(InventoryTypeModel inventoryTypeModel)
+        {
+            var inventory = _mapper.Map<InventoryTypeModel, InventoryType>(inventoryTypeModel);
+            await _dbContext.InventoryTypes.AddAsync(inventory);
+            await _dbContext.SaveChangesAsync();
+            return inventoryTypeModel;
         }
     }
 }
