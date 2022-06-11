@@ -24,7 +24,6 @@ namespace LML.NPOManagement.Controllers
         {
             var config = new MapperConfiguration(cfg =>
             {
-
                 cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AttachmentRequest, AttachmentModel>();
@@ -77,6 +76,14 @@ namespace LML.NPOManagement.Controllers
             return _mapper.Map<List<UserInventoryModel>,List<UserInventoryResponse>>(inventories);
         }
 
+        // GET: api/<UserInventoryController>
+        [HttpGet("inventoryType")]
+        public async Task<IEnumerable<InventoryTypeResponse>> GetInventoryType()
+        {
+            var inventoryTypes = await _userInventoryService.GetAllInventoryTypes();
+            return _mapper.Map<List<InventoryTypeModel>, List<InventoryTypeResponse>>(inventoryTypes);
+        }
+
         // GET api/<UserInventoryController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult< UserInventoryResponse>> Get(int id)
@@ -87,6 +94,23 @@ namespace LML.NPOManagement.Controllers
                 return BadRequest();
             }
             return Ok(inventory);
+        }
+
+        // GET api/<UserInventoryController>/5
+        [HttpGet("userId")]
+        public async Task<ActionResult<UserInventoryResponse>> GetInventoryByUserId(int id)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var userInventories = await _userInventoryService.GetInventoryByUser(id);
+            if(userInventories == null)
+            {
+                return BadRequest();
+            }
+            return Ok(userInventories);
         }
 
         // POST api/<UserInventoryController>

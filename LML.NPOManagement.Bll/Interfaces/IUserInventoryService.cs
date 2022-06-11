@@ -15,5 +15,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<UserInventoryModel> ModifyUserInventory(UserInventoryModel userInventoryModel, int id);
         Task<InventoryTypeModel> GetUserInventoryTypeById(int id);
         Task<InventoryTypeModel> AddInventoryType(InventoryTypeModel inventoryTypeModel);
+        Task<List<InventoryTypeModel>> GetAllInventoryTypes();
+        Task<List<UserInventoryModel>> GetInventoryByUser(int id);
     }
 }

@@ -118,5 +118,31 @@ namespace LML.NPOManagement.Bll.Services
             await _dbContext.SaveChangesAsync();
             return inventoryTypeModel;
         }
+
+        public async Task<List<InventoryTypeModel>> GetAllInventoryTypes()
+        {
+            var inventoryTypes = await _dbContext.InventoryTypes.ToListAsync();
+            if(inventoryTypes.Count == 0)
+            {
+                return null;
+            }
+            return _mapper.Map<List<InventoryType>, List<InventoryTypeModel>>(inventoryTypes);
+        }
+
+        public async Task<List<UserInventoryModel>> GetInventoryByUser(int id)
+        {
+            var userInventories = await _dbContext.UserInventories.Where(inv => inv.UserId == id).ToListAsync();
+            if(userInventories.Count == 0)
+            {
+                return null;
+            }
+            List<UserInventoryModel> inventoryModels = new List<UserInventoryModel>();
+            foreach(var userInventory in userInventories)
+            {
+                var newInventoryModel = _mapper.Map<UserInventory,UserInventoryModel>(userInventory);
+                inventoryModels.Add(newInventoryModel);
+            }
+            return inventoryModels;
+        }
     }
 }
