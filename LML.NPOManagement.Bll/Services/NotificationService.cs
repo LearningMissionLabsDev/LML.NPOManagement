@@ -4,7 +4,9 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 
@@ -62,7 +64,9 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteNotification(int id)
         {
-            throw new NotImplementedException();
+            var notification = _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefault();
+            _dbContext.Notifications.Remove(notification);
+            _dbContext.SaveChanges();
         }
 
         public IEnumerable<NotificationModel> GetAllNotifications()
@@ -70,14 +74,28 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public NotificationModel GetNotificationById(int id)
+        public async Task<NotificationModel> GetNotificationById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public int ModifyNotification(NotificationModel notificationModel, int id)
+        public async Task<bool> ModifyNotification(NotificationModel notificationModel, int id)
         {
-            throw new NotImplementedException();
+            var notification = await _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
+            if (notification != null)
+            {
+                notification.Id = id;
+                notification.Subject = notificationModel.Subject;
+                notification.AttachmentId = notificationModel.AttachmentId;
+                notification.Body = notificationModel.Body;
+                notification.Reminder = notificationModel.Reminder;
+                notification.Metadate = notificationModel.Metadate;
+                notification.MeetingScheduleId = notificationModel.MeetingScheduleId;
+                notification.NotificationType.Description = notificationModel.NotificationTypeEnum.ToString();
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
