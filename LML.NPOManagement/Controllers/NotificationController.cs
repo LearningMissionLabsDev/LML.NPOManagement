@@ -119,14 +119,28 @@ namespace LML.NPOManagement.Controllers
 
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult> Put(int id, [FromBody] NotificationRequest notificationRequest)
         {
+            var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
+            var modifyNotification = _notificationService.ModifyNotification(notification, id);
+            if (modifyNotification != null)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         // DELETE api/<NotificationController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var notification = _notificationService.GetNotificationById(id);
+            if (notification != null)
+            {
+                _notificationService.DeleteNotification(id);
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }

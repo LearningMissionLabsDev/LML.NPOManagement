@@ -62,7 +62,9 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteNotification(int id)
         {
-            throw new NotImplementedException();
+            var notification = _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefault();
+            _dbContext.Notifications.Remove(notification);
+            _dbContext.SaveChanges();
         }
 
         public IEnumerable<NotificationModel> GetAllNotifications()
@@ -75,9 +77,16 @@ namespace LML.NPOManagement.Bll.Services
             throw new NotImplementedException();
         }
 
-        public int ModifyNotification(NotificationModel notificationModel, int id)
+        public async Task<bool> ModifyNotification(NotificationModel notificationModel, int id)
         {
-            throw new NotImplementedException();
+            var notification = _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefault();
+            if (notification != null)
+            {
+                var modifyNotification = _mapper.Map<NotificationModel, Notification>(notificationModel);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
