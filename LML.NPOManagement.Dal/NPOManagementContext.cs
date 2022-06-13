@@ -20,13 +20,12 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<Account> Accounts { get; set; } = null!;
         public virtual DbSet<AccountProgress> AccountProgresses { get; set; } = null!;
         public virtual DbSet<Attachment> Attachments { get; set; } = null!;
-        public virtual DbSet<DailySchedule> DailySchedules { get; set; } = null!;
         public virtual DbSet<Donation> Donations { get; set; } = null!;
         public virtual DbSet<InventoryType> InventoryTypes { get; set; } = null!;
         public virtual DbSet<InvestorInformation> InvestorInformations { get; set; } = null!;
         public virtual DbSet<InvestorTierType> InvestorTierTypes { get; set; } = null!;
-        public virtual DbSet<MeetingSchedule> MeetingSchedules { get; set; } = null!;
         public virtual DbSet<Notification> Notifications { get; set; } = null!;
+        public virtual DbSet<NotificationArchive> NotificationArchives { get; set; } = null!;
         public virtual DbSet<NotificationTransportType> NotificationTransportTypes { get; set; } = null!;
         public virtual DbSet<NotificationType> NotificationTypes { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
@@ -37,7 +36,6 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
         public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
         public virtual DbSet<UserType> UserTypes { get; set; } = null!;
-        public virtual DbSet<WeeklySchedule> WeeklySchedules { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -102,21 +100,6 @@ namespace LML.NPOManagement.Dal.Models
                 entity.ToTable("Attachment");
             });
 
-            modelBuilder.Entity<DailySchedule>(entity =>
-            {
-                entity.ToTable("DailySchedule");
-
-                entity.Property(e => e.EndTime).HasColumnType("datetime");
-
-                entity.Property(e => e.StartTime).HasColumnType("datetime");
-
-                entity.HasOne(d => d.WeeklySchedule)
-                    .WithMany(p => p.DailySchedules)
-                    .HasForeignKey(d => d.WeeklyScheduleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_DailySchedule_WeeklySchedule");
-            });
-
             modelBuilder.Entity<Donation>(entity =>
             {
                 entity.ToTable("Donation");
@@ -165,25 +148,13 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.InvestorTier).HasMaxLength(50);
             });
 
-            modelBuilder.Entity<MeetingSchedule>(entity =>
-            {
-                entity.ToTable("MeetingSchedule");
-
-                entity.Property(e => e.DateInYear).HasColumnType("datetime");
-
-                entity.HasOne(d => d.WeeklySchedule)
-                    .WithMany(p => p.MeetingSchedules)
-                    .HasForeignKey(d => d.WeeklyScheduleId)
-                    .HasConstraintName("FK_MeetingSchedule_WeeklySchedule1");
-            });
-
             modelBuilder.Entity<Notification>(entity =>
             {
                 entity.ToTable("Notification");
 
                 entity.Property(e => e.Body).HasColumnType("ntext");
 
-                entity.Property(e => e.Metadate).HasColumnType("ntext");
+                entity.Property(e => e.Metadata).HasColumnType("ntext");
 
                 entity.Property(e => e.Reminder).HasMaxLength(50);
 
@@ -196,12 +167,6 @@ namespace LML.NPOManagement.Dal.Models
                     .HasForeignKey(d => d.AttachmentId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Notification_Attachment");
-
-                entity.HasOne(d => d.MeetingSchedule)
-                    .WithMany(p => p.Notifications)
-                    .HasForeignKey(d => d.MeetingScheduleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Notification_MeetingSchedule");
 
                 entity.HasOne(d => d.NotificationType)
                     .WithMany(p => p.Notifications)
@@ -234,6 +199,23 @@ namespace LML.NPOManagement.Dal.Models
 
                             j.ToTable("Notification2User");
                         });
+            });
+
+            modelBuilder.Entity<NotificationArchive>(entity =>
+            {
+                entity.ToTable("NotificationArchive");
+
+                entity.Property(e => e.NotificationDate).HasColumnType("datetime");
+
+                entity.Property(e => e.NotificationMessage).HasColumnType("text");
+
+                entity.Property(e => e.NotificationRecipients).IsUnicode(false);
+
+                entity.HasOne(d => d.Notification)
+                    .WithMany(p => p.NotificationArchives)
+                    .HasForeignKey(d => d.NotificationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_NotificationArchive_Notification");
             });
 
             modelBuilder.Entity<NotificationTransportType>(entity =>
@@ -349,9 +331,13 @@ namespace LML.NPOManagement.Dal.Models
             {
                 entity.ToTable("UserInventory");
 
+                entity.Property(e => e.Amount).HasColumnType("numeric(10, 2)");
+
                 entity.Property(e => e.Date).HasColumnType("datetime");
 
                 entity.Property(e => e.Description).HasColumnType("ntext");
+
+                entity.Property(e => e.MeasurmentUnit).HasMaxLength(50);
 
                 entity.HasOne(d => d.InventoryType)
                     .WithMany(p => p.UserInventories)
@@ -385,25 +371,19 @@ namespace LML.NPOManagement.Dal.Models
                         });
             });
 
-            modelBuilder.Entity<WeeklySchedule>(entity =>
-            {
-                entity.ToTable("WeeklySchedule");
-
-                entity.Property(e => e.DayOfWeek).HasMaxLength(50);
-            });
-
             OnModelCreatingPartial(modelBuilder);
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
+        public async Task<int> SaveChangesAsync()
+        {
+            return await SaveChangesAsync();
+        }
+
         void INPOManagementContext.SaveChanges()
         {
             
-        }
-        async Task <int> INPOManagementContext.SaveChangesAsync()
-        {
-            return await SaveChangesAsync();
         }
     }
 }

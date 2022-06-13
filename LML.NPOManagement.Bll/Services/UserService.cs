@@ -20,12 +20,10 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
                 cfg.CreateMap<User, UserModel>();
                 cfg.CreateMap<Attachment, AttachmentModel>();
-                cfg.CreateMap<DailySchedule, DailyScheduleModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
                 cfg.CreateMap<Template, TemplateModel>();
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
@@ -34,12 +32,10 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
-                cfg.CreateMap<DailyScheduleModel, DailySchedule>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
                 cfg.CreateMap<NotificationModel, Notification>();
                 cfg.CreateMap<TemplateModel, Template>();
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
@@ -70,19 +66,6 @@ namespace LML.NPOManagement.Bll.Services
             }
             return userModels;
         }
-
-        public async Task<List<UserTypeModel>>  GetAllUserTypes()
-        {
-            List<UserTypeModel> userTypeModels = new List<UserTypeModel>();
-            var types = await _dbContext.UserTypes.ToListAsync();
-            foreach (var type in types)
-            {
-                var userType = _mapper.Map<UserType, UserTypeModel>(type);
-                userTypeModels.Add(userType);
-            }
-            return userTypeModels;
-        }
-
 
         public async Task <UserModel> GetUserById(int id)
         {

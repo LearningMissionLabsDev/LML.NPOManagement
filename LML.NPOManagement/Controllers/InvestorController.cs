@@ -25,11 +25,9 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AttachmentRequest, AttachmentModel>();
-                cfg.CreateMap<DailyScheduleRequest, DailyScheduleModel>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
                 cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
-                cfg.CreateMap<MeetingScheduleRequest, MeetingScheduleModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<RoleRequest, RoleModel>();
                 cfg.CreateMap<TemplateRequest, TemplateModel>();
@@ -40,12 +38,10 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
-                cfg.CreateMap<DailyScheduleModel, DailyScheduleResponse>();
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
-                cfg.CreateMap<MeetingScheduleModel, MeetingScheduleResponse>();
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
@@ -55,7 +51,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
-                cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
                 cfg.CreateMap<LoginRequest, UserModel>();
 
             });

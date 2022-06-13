@@ -1,7 +1,6 @@
 ﻿using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
-using LML.NPOManagement.Dal.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Bll.Services

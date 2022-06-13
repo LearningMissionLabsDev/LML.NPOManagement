@@ -7,7 +7,6 @@ namespace LML.NPOManagement.Bll.Interfaces
     public interface IUserService
     {
         Task<List<UserModel>> GetAllUsers();
-        Task<List<UserTypeModel>> GetAllUserTypes();
         Task<List<UserModel>> GetUsersByRole(int id);
         Task<List<UserModel>> GetUsersByInvestorTier(int id);
         Task<List<UserModel>> GetUsersByAccount(int id);

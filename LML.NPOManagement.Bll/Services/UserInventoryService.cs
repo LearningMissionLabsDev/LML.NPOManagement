@@ -17,12 +17,10 @@ namespace LML.NPOManagement.Bll.Services
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
                 cfg.CreateMap<Attachment, AttachmentModel>();
-                cfg.CreateMap<DailySchedule, DailyScheduleModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<MeetingSchedule, MeetingScheduleModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
                 cfg.CreateMap<Template, TemplateModel>();
                 cfg.CreateMap<TemplateType, TemplateTypeModel>();
@@ -31,12 +29,10 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
-                cfg.CreateMap<DailyScheduleModel, DailySchedule>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<MeetingScheduleModel, MeetingSchedule>();
                 cfg.CreateMap<NotificationModel, Notification>();
                 cfg.CreateMap<TemplateModel, Template>();
                 cfg.CreateMap<TemplateTypeModel, TemplateType>();
@@ -119,14 +115,31 @@ namespace LML.NPOManagement.Bll.Services
             return inventoryTypeModel;
         }
 
-        public async Task<List<InventoryTypeModel>> GetAllInventoryTypes()
+        public async Task<string> GetAllInventoryTypes(string type, DateTime dateTimeStart, DateTime dateTimeFinsh)
         {
-            var inventoryTypes = await _dbContext.InventoryTypes.ToListAsync();
-            if(inventoryTypes.Count == 0)
+            List<UserInventoryModel> inventoryModels = new List<UserInventoryModel>();
+            var amount = string.Empty;
+
+            if (((dateTimeStart <= DateTime.UtcNow) && (dateTimeStart.Year >= 2020)) && (( dateTimeFinsh <= DateTime.UtcNow) && (dateTimeFinsh.Year >= 2020)))
+            {
+                var inventories = await _dbContext.UserInventories.Where(inv => inv.InventoryType.Description == type &&
+                (inv.Date <= dateTimeFinsh && inv.Date >= dateTimeStart)).ToListAsync();
+                foreach (var inventory in inventories)
+                {
+                    amount += inventory.Amount;
+                    var model = _mapper.Map<UserInventory, UserInventoryModel>(inventory);
+                    inventoryModels.Add(model);
+                }
+            }
+            
+            
+            if(inventoryModels.Count == 0)
             {
                 return null;
             }
-            return _mapper.Map<List<InventoryType>, List<InventoryTypeModel>>(inventoryTypes);
+
+
+            return amount;
         }
 
         public async Task<List<UserInventoryModel>> GetInventoryByUser(int id)
@@ -143,6 +156,55 @@ namespace LML.NPOManagement.Bll.Services
                 inventoryModels.Add(newInventoryModel);
             }
             return inventoryModels;
+        }
+
+        public async Task<List<UserInventoryModel>> GetInventoryUserByYear(DateTime dateTimeStart, DateTime dateTimeFins, int id)
+        {
+            var inventories = await _dbContext.UserInventories.Where(inv => inv.UserId == id && (( inv.Date == dateTimeStart) &&
+            (inv.Date == dateTimeFins))).ToListAsync();
+
+            if(inventories.Count == 0)
+            {
+                return null;
+            }
+            List<UserInventoryModel> userInventoryModels = new List<UserInventoryModel>();
+            foreach (var inventory in inventories)
+            {
+                var inventoryModel = _mapper.Map<UserInventory, UserInventoryModel>(inventory);
+                userInventoryModels.Add(inventoryModel);
+            }
+            return userInventoryModels;
+        }
+
+        public async Task<List<UserInventoryModel>> GetInventoryByYear(DateTime dateTimeStart, DateTime dateTimeFins)
+        {
+            var inventories = await _dbContext.UserInventories.Where(inv => (inv.Date == dateTimeStart) &&
+            (inv.Date == dateTimeFins)).ToListAsync();
+
+            if (inventories.Count == 0)
+            {
+                return null;
+            }
+            List<UserInventoryModel> userInventoryModels = new List<UserInventoryModel>();
+            foreach (var inventory in inventories)
+            {
+                var inventoryModel = _mapper.Map<UserInventory, UserInventoryModel>(inventory);
+                userInventoryModels.Add(inventoryModel);
+            }
+            return userInventoryModels;
+        }
+
+        public async Task<UserInventoryModel> DeleteInventory(int id)
+        {
+            var inventory = await _dbContext.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
+            if(inventory == null)
+            {
+                return null;
+            }
+            inventory.Status = (int)StatusEnumModel.Closed;
+            await _dbContext.SaveChangesAsync();
+            var model =_mapper.Map<UserInventory,UserInventoryModel>(inventory);
+            return model;
         }
     }
 }
