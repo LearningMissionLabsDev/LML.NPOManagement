@@ -27,11 +27,9 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AttachmentRequest, AttachmentModel>();
-                cfg.CreateMap<DailyScheduleRequest, DailyScheduleModel>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
                 cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
-                cfg.CreateMap<MeetingScheduleRequest, MeetingScheduleModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<RoleRequest, RoleModel>();
                 cfg.CreateMap<TemplateRequest, TemplateModel>();
@@ -42,12 +40,10 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<AccountModel, AccountResponse>();
                 cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
-                cfg.CreateMap<DailyScheduleModel, DailyScheduleResponse>();
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
-                cfg.CreateMap<MeetingScheduleModel, MeetingScheduleResponse>();
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
@@ -57,7 +53,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
-                cfg.CreateMap<WeeklyScheduleModel, WeeklyScheduleResponse>();
                 cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();
@@ -70,7 +65,7 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserInventoryController>
         [HttpGet]
-        public async Task<IEnumerable<UserInventoryResponse>> Get()
+        public async Task<IEnumerable<UserInventoryResponse>> Get()//???????
         {
             var inventories = await _userInventoryService.GetAllUserInventories();
             return _mapper.Map<List<UserInventoryModel>,List<UserInventoryResponse>>(inventories);
@@ -78,15 +73,52 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserInventoryController>
         [HttpGet("inventoryType")]
-        public async Task<IEnumerable<InventoryTypeResponse>> GetInventoryType()
+        public async Task<ActionResult<string>> GetInventoryType(string type, DateTime dateTimeStart, DateTime dateTimeFinsh)
         {
-            var inventoryTypes = await _userInventoryService.GetAllInventoryTypes();
-            return _mapper.Map<List<InventoryTypeModel>, List<InventoryTypeResponse>>(inventoryTypes);
+            if(type == null)
+            {
+                return BadRequest();
+            }
+            var inventoryAmount = await _userInventoryService.GetAllInventoryTypes(type, dateTimeStart, dateTimeFinsh);
+            if(inventoryAmount == null)
+            {
+                return NotFound();
+            }
+            return inventoryAmount;
+        }
+
+        // GET: api/<UserInventoryController>
+        [HttpGet("inventoryByTime")]
+        public async Task<ActionResult<UserInventoryResponse>> GetInventoryByTime(DateTime dateTimeStart, DateTime dateTimeFinsh)
+        {            
+            var inventories = await _userInventoryService.GetInventoryByYear(dateTimeStart, dateTimeFinsh);
+            if (inventories == null)
+            {
+                return BadRequest();
+            }
+            return Ok(_mapper.Map<List<UserInventoryModel>, List<UserInventoryResponse>>(inventories));
+        }
+
+        // GET: api/<UserInventoryController>
+        [HttpGet("inventoryByUserTime")]
+        public async Task<ActionResult<UserInventoryResponse>> GetInventoryUserByTime(int id, DateTime dateTimeStart, DateTime dateTimeFinsh)//convert datetime 2 avelacnel 2 kalonka status ev amount quantity
+        {
+            var inventory = await _userService.GetUserById(id);
+            if(inventory == null)
+            {
+                return BadRequest("Not user");
+            }
+            var inventories = await _userInventoryService.GetInventoryUserByYear(dateTimeStart, dateTimeFinsh, id);
+            if(inventories == null)
+            {
+                return BadRequest("Not inventory");
+            }
+            return Ok(_mapper.Map<List<UserInventoryModel>, List<UserInventoryResponse>>(inventories));
         }
 
         // GET api/<UserInventoryController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult< UserInventoryResponse>> Get(int id)
+        public async Task<ActionResult< UserInventoryResponse>> Get(int id)//jnjel
         {
             var inventory = await _userInventoryService.GetUserInventoryById(id);
             if(inventory == null)
@@ -146,7 +178,7 @@ namespace LML.NPOManagement.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<UserInventoryResponse>> Put(int id, [FromBody] UserInventoryRequest userInventoryRequest)
         {
-            var inventory = _userInventoryService.GetUserInventoryById(id);
+            var inventory = await _userInventoryService.GetUserInventoryById(id);
             if( inventory == null)
             {
                 return BadRequest();
@@ -166,5 +198,17 @@ namespace LML.NPOManagement.Controllers
             return Ok(newInventory);
         }
 
+        // DELETE api/<UserController>/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var inventory = await _userInventoryService.GetUserInventoryById(id);
+            if (inventory == null)
+            {
+                return BadRequest();
+            }
+            var newInventory = await _userInventoryService.DeleteInventory(id);  
+            return Ok(newInventory);          
+        }
     }
 }
