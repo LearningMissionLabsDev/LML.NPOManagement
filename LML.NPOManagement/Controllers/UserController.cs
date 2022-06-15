@@ -1,5 +1,4 @@
 ﻿using Amazon.S3;
-using Amazon.S3.Model;
 using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
@@ -7,7 +6,6 @@ using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -22,11 +20,9 @@ namespace LML.NPOManagement.Controllers
         private IUserService _userService;
         private IConfiguration _configuration;
         private INotificationService _notificationService;
-        private IWebHostEnvironment _webHostEnvironment;
         private IAmazonS3 _s3Client;
 
-        public UserController(IUserService userService, IConfiguration configuration, INotificationService notificationService,
-                              IWebHostEnvironment webHostEnvironment, IAmazonS3 s3Client)
+        public UserController(IUserService userService, IConfiguration configuration, INotificationService notificationService, IAmazonS3 s3Client)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -38,8 +34,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<RoleRequest, RoleModel>();
-                cfg.CreateMap<TemplateRequest, TemplateModel>();
-                cfg.CreateMap<TemplateTypeRequest, TemplateTypeModel>();
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
@@ -53,8 +47,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
-                cfg.CreateMap<TemplateModel, TemplateResponse>();
-                cfg.CreateMap<TemplateTypeModel, TemplateTypeResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
@@ -65,8 +57,6 @@ namespace LML.NPOManagement.Controllers
             _userService = userService;
             _configuration = configuration;
             _notificationService = notificationService;
-            _webHostEnvironment = webHostEnvironment;
-            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
             _s3Client = s3Client;
         }
 
@@ -178,14 +168,18 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("verifyEmail")]
         public async Task<ActionResult> VerifyEmail([FromQuery] string token)
         {
-            var user = await _userService.ActivationUser(token, _configuration);          
-            _notificationService.SendNotificationUser(user, new NotificationModel());
+            var user = await _userService.ActivationUser(token, _configuration);
+            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            var template = _configuration.GetSection("AppSettings:Templates").Value;
+            var key = template + "RegistracionNotification.html";
+            var body = await GetFileByKeyAsync(bucketName, key);
+            _notificationService.SendNotificationUserAsync(user, new NotificationModel(),body);
             return Ok();
         }
 
         // POST api/<UserController> 
         [HttpPost("registration")]
-        public async Task<ActionResult> Registration([FromBody] UserRequest userRequest)
+        public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
         {
             if (userRequest.Password != userRequest.ConfirmPassword)
             {
@@ -240,8 +234,25 @@ namespace LML.NPOManagement.Controllers
                 default:
                     break;
             }
-            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration);
+            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            var template = _configuration.GetSection("AppSettings:Templates").Value;
+            var key = "NotificationTemplates/CheckingEmail.html";
+            var body = await GetFileByKeyAsync(bucketName, key);
+            
+            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
             return Ok(userInfoId);                  
+        }
+        private async Task<string> GetFileByKeyAsync(string bucketName, string key)
+        {
+            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists)
+            {
+                return null;
+            }    
+
+            var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
+            var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();  
+            return streamReader;
         }
     }
 }

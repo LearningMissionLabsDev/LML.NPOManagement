@@ -4,7 +4,6 @@
     {
         public NotificationModel()
         {
-            NotificationArchives = new HashSet<NotificationArchiveModel>();
             NotificationTransportTypes = new HashSet<NotificationTransportTypeModel>();
             Users = new HashSet<UserModel>();
         }
@@ -20,7 +19,6 @@
 
         public virtual AttachmentModel Attachment { get; set; } 
         public virtual NotificationTypeModel NotificationType { get; set; } 
-        public virtual ICollection<NotificationArchiveModel> NotificationArchives { get; set; }
 
         public virtual ICollection<NotificationTransportTypeModel> NotificationTransportTypes { get; set; }
         public virtual ICollection<UserModel> Users { get; set; }

@@ -22,8 +22,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<Template, TemplateModel>();
-                cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
@@ -34,8 +32,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<TemplateModel, Template>();
-                cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();

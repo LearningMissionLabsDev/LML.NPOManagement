@@ -24,8 +24,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<Template, TemplateModel>();
-                cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
@@ -36,8 +34,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<TemplateModel, Template>();
-                cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
@@ -57,7 +53,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var idea =_mapper.Map<UserIdeaModel,UserIdea>(userIdeaModel);
             await _dbContext.UserIdeas.AddAsync(idea);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
             return userIdeaModel;
         }
         public async Task<List<UserIdeaModel>> GetAllIdea()

@@ -7,7 +7,6 @@ namespace LML.NPOManagement.Dal.Models
     {
         public Notification()
         {
-            NotificationArchives = new HashSet<NotificationArchive>();
             NotificationTransportTypes = new HashSet<NotificationTransportType>();
             Users = new HashSet<User>();
         }
@@ -23,7 +22,6 @@ namespace LML.NPOManagement.Dal.Models
 
         public virtual Attachment Attachment { get; set; } = null!;
         public virtual NotificationType NotificationType { get; set; } = null!;
-        public virtual ICollection<NotificationArchive> NotificationArchives { get; set; }
 
         public virtual ICollection<NotificationTransportType> NotificationTransportTypes { get; set; }
         public virtual ICollection<User> Users { get; set; }

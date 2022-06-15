@@ -1,4 +1,4 @@
-﻿namespace LML.NPOManagement.Request
+﻿namespace LML.NPOManagement.Bll.Model
 {
     public enum NotificationContext
     {

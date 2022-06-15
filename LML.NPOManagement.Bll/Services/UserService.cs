@@ -25,8 +25,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<Template, TemplateModel>();
-                cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
@@ -37,8 +35,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<TemplateModel, Template>();
-                cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
@@ -110,10 +106,11 @@ namespace LML.NPOManagement.Bll.Services
                 var addUser = _mapper.Map<UserModel, User>(userModel);
                 await _dbContext.Users.AddAsync(addUser);
                 await _dbContext.SaveChangesAsync();
-                var newUser = _mapper.Map<User, UserModel>(addUser);
-                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
-                newUser.Password = null;
-                return newUser;                    
+                var newUser = await _dbContext.Users.FirstOrDefaultAsync(us => us.Email == userModel.Email);
+                var newUserModel = _mapper.Map<User, UserModel>(newUser);
+                newUserModel.Token = TokenCreationHelper.GenerateJwtToken(newUserModel, configuration);
+                newUserModel.Password = null;
+                return newUserModel;                    
             }
             else if(user.Status == Convert.ToString(StatusEnumModel.Closed))
             {

@@ -1,10 +1,5 @@
 ﻿using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Dal
 {
@@ -21,8 +16,6 @@ namespace LML.NPOManagement.Dal
         DbSet<NotificationTransportType> NotificationTransportTypes { get; set; }
         DbSet<NotificationType> NotificationTypes { get; set; } 
         DbSet<Role> Roles { get; set; } 
-        DbSet<Template> Templates { get; set; } 
-        DbSet<TemplateType> TemplateTypes { get; set; } 
         DbSet<User> Users { get; set; } 
         DbSet<UserIdea> UserIdeas { get; set; } 
         DbSet<UserInformation> UserInformations { get; set; } 

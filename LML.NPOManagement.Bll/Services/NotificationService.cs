@@ -6,7 +6,6 @@ using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
 
@@ -16,32 +15,27 @@ namespace LML.NPOManagement.Bll.Services
     {
         private IMapper _mapper;
         private readonly INPOManagementContext _dbContext;
-        public string AppRootPath { get; set; }
         public NotificationService(INPOManagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
-                //cfg.CreateMap<Attachment, AttachmentModel>();
+                cfg.CreateMap<Dal.Models.Attachment, AttachmentModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
                 cfg.CreateMap<InventoryType, InventoryTypeModel>();
                 cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<Template, TemplateModel>();
-                cfg.CreateMap<TemplateType, TemplateTypeModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                //cfg.CreateMap<AttachmentModel, Attachment>();
+                cfg.CreateMap<AttachmentModel, Dal.Models.Attachment>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
                 cfg.CreateMap<InventoryTypeModel, InventoryType>();
                 cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<TemplateModel, Template>();
-                cfg.CreateMap<TemplateTypeModel, TemplateType>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
                 cfg.CreateMap<UserTypeModel, UserType>();
@@ -51,9 +45,12 @@ namespace LML.NPOManagement.Bll.Services
             _dbContext = context;
         }
 
-        public int AddNotification(NotificationModel notificationModel)
+        public async Task<NotificationModel> AddNotification(NotificationModel notificationModel)
         {
-            throw new NotImplementedException();
+            var notification = _mapper.Map<NotificationModel,Notification>(notificationModel);
+            await _dbContext.Notifications.AddAsync(notification);
+            await _dbContext.SaveChangesAsync();
+            return notificationModel;
         }
 
         public void DeleteNotification(int id)
@@ -91,59 +88,70 @@ namespace LML.NPOManagement.Bll.Services
             return null;
         }
 
-        public async Task<bool> ModifyNotification(NotificationModel notificationModel, int id)
+        public async Task<NotificationModel> ModifyNotification(NotificationModel notificationModel, int id)
         {
             var notification = await _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
-            if (notification != null)
+            if (notification == null)
             {
-                notification.Id = id;
-                notification.Subject = notificationModel.Subject;
-                notification.AttachmentId = notificationModel.AttachmentId;
-                notification.Body = notificationModel.Body;
-                notification.Reminder = notificationModel.Reminder;
-                notification.Metadata = notificationModel.Metadata;
-                notification.MeetingSchedule = notificationModel.MeetingSchedule;
-                notification.NotificationType.Description = notificationModel.NotificationTypeEnum.ToString();
-                await _dbContext.SaveChangesAsync();
-                return true;
+                return null;
             }
-            return false;
+            notification.Id = id;
+            notification.Subject = notificationModel.Subject;
+            notification.AttachmentId = notificationModel.AttachmentId;
+            notification.Body = notificationModel.Body;
+            notification.Reminder = notificationModel.Reminder;
+            notification.Metadata = notificationModel.Metadata;
+            notification.MeetingSchedule = notificationModel.MeetingSchedule;
+            notification.NotificationType.Description = notificationModel.NotificationTypeEnum.ToString();
+            await _dbContext.SaveChangesAsync();
+            var newNotificationModel =_mapper.Map<Notification,NotificationModel>(notification);
+            return newNotificationModel;
         }
 
-        public void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel)
+        public async void SendNotifications (List<UserModel> userModels, NotificationModel notificationModel, string body)
         {
-            TemplateService templateService = new TemplateService(AppRootPath,_dbContext);
-            string subject = templateService.HtmlSubject();
-
+            if(notificationModel.Subject == null)
+            {
+                notificationModel.Subject = HtmlSubject();
+            }
+            
             foreach (var userModel in userModels)
             {
-                var body = templateService.HtmlBodyNotification(userModel ,notificationModel);
-                SendNotification(body, subject, userModel.Email);
+                var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
+                body = body.Replace("@firstName", userInfo.FirstName);
+                body = body.Replace("@lastName", userInfo.LastName);
+                SendNotification(body, notificationModel.Subject, userModel.Email);
             }           
         }
 
-        public void SendNotificationUser(UserModel userModel, NotificationModel notificationModel)
+        public async void SendNotificationUserAsync(UserModel userModel, NotificationModel notificationModel, string body)
         {
-            TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
             notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByRegistration;
-            string subject = templateService.HtmlSubject();
-            var body = templateService.HtmlBodyNotification(userModel,notificationModel);
-            SendNotification(body, subject, userModel.Email);
+            if (notificationModel.Subject == null)
+            {
+                notificationModel.Subject = HtmlSubject();
+            }
+            var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
+            body = body.Replace("@firstName", userInfo.FirstName);
+            body = body.Replace("@lastName", userInfo.LastName);
+
+            SendNotification(body, notificationModel.Subject, userModel.Email);
         }
 
-        public void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel)
+        public async void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel, string body)
         {      
-            var investor = _dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefault();
-            var user = _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefault();
+            var investor = await _dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefaultAsync();
             var userModel = _mapper.Map<User, UserModel>(user);
 
-            TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
             notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
-            string subject = templateService.HtmlSubject();
-            var body = templateService.HtmlBodyNotification(userModel, notificationModel);
+            if(notificationModel.Subject == null)
+            {
+                notificationModel.Subject = HtmlSubject();
+            }
             body = body.Replace("@amount", Convert.ToString(donationModel.Amount));
             body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
-            SendNotification(body, subject, userModel.Email);
+            SendNotification(body, notificationModel.Subject, userModel.Email);
  
         }
         
@@ -182,12 +190,24 @@ namespace LML.NPOManagement.Bll.Services
             } 
         }
 
-        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration)
+        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string body)
         {
-            TemplateService templateService = new TemplateService(AppRootPath, _dbContext);
-            string subject = templateService.HtmlSubject();
-            var body = templateService.HtmlBodyNotificationVerify(userModel, notificationModel, configuration);
-            SendNotification(body, subject, userModel.Email);
+
+            if (notificationModel.Subject == null)
+            {
+                notificationModel.Subject = HtmlSubject();
+            }
+            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);
+            string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
+            var uri = $"{clientVerificationURL}?token={token}";
+            body = body.Replace("@verifiyCode", uri);
+            SendNotification(body, notificationModel.Subject, userModel.Email);
         }
+
+        private string HtmlSubject()
+        {
+            return " Learning Mission ARMENIA ";
+        }
+
     }
 }
