@@ -25,18 +25,15 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<InvestorInformation> InvestorInformations { get; set; } = null!;
         public virtual DbSet<InvestorTierType> InvestorTierTypes { get; set; } = null!;
         public virtual DbSet<Notification> Notifications { get; set; } = null!;
-        public virtual DbSet<NotificationArchive> NotificationArchives { get; set; } = null!;
         public virtual DbSet<NotificationTransportType> NotificationTransportTypes { get; set; } = null!;
         public virtual DbSet<NotificationType> NotificationTypes { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
-        public virtual DbSet<Template> Templates { get; set; } = null!;
-        public virtual DbSet<TemplateType> TemplateTypes { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<UserIdea> UserIdeas { get; set; } = null!;
         public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
         public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
         public virtual DbSet<UserType> UserTypes { get; set; } = null!;
-
+       
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //            if (!optionsBuilder.IsConfigured)
@@ -201,23 +198,6 @@ namespace LML.NPOManagement.Dal.Models
                         });
             });
 
-            modelBuilder.Entity<NotificationArchive>(entity =>
-            {
-                entity.ToTable("NotificationArchive");
-
-                entity.Property(e => e.NotificationDate).HasColumnType("datetime");
-
-                entity.Property(e => e.NotificationMessage).HasColumnType("text");
-
-                entity.Property(e => e.NotificationRecipients).IsUnicode(false);
-
-                entity.HasOne(d => d.Notification)
-                    .WithMany(p => p.NotificationArchives)
-                    .HasForeignKey(d => d.NotificationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_NotificationArchive_Notification");
-            });
-
             modelBuilder.Entity<NotificationTransportType>(entity =>
             {
                 entity.ToTable("NotificationTransportType");
@@ -230,6 +210,11 @@ namespace LML.NPOManagement.Dal.Models
                 entity.ToTable("NotificationType");
 
                 entity.Property(e => e.Description).HasMaxLength(50);
+
+                entity.Property(e => e.Uri)
+                    .HasMaxLength(1024)
+                    .IsUnicode(false)
+                    .HasColumnName("URI");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -250,28 +235,6 @@ namespace LML.NPOManagement.Dal.Models
 
                             j.ToTable("UserRoleConnection");
                         });
-            });
-
-            modelBuilder.Entity<Template>(entity =>
-            {
-                entity.ToTable("Template");
-
-                entity.Property(e => e.Uri).HasColumnName("URI");
-
-                entity.HasOne(d => d.TemplateType)
-                    .WithMany(p => p.Templates)
-                    .HasForeignKey(d => d.TemplateTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Template_TemplateType");
-            });
-
-            modelBuilder.Entity<TemplateType>(entity =>
-            {
-                entity.ToTable("TemplateType");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.Description).HasMaxLength(50);
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -376,14 +339,14 @@ namespace LML.NPOManagement.Dal.Models
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await SaveChangesAsync();
-        }
-
         void INPOManagementContext.SaveChanges()
         {
-            
+            base.SaveChanges();
         }
+        public async Task<int> SaveChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
+      
     }
 }

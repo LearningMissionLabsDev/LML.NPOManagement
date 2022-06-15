@@ -15,12 +15,10 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private IUserInventoryService _userInventoryService;
-        private IWebHostEnvironment _webHostEnvironment;
         private INotificationService _notificationService;
         private IUserService _userService;
 
-        public UserInventoryController(IUserInventoryService userInventoryService, IWebHostEnvironment webHostEnvironment,
-                                       INotificationService notificationService, IUserService userService)
+        public UserInventoryController(IUserInventoryService userInventoryService, INotificationService notificationService, IUserService userService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -32,8 +30,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<RoleRequest, RoleModel>();
-                cfg.CreateMap<TemplateRequest, TemplateModel>();
-                cfg.CreateMap<TemplateTypeRequest, TemplateTypeModel>();
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
@@ -47,8 +43,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
-                cfg.CreateMap<TemplateModel, TemplateResponse>();
-                cfg.CreateMap<TemplateTypeModel, TemplateTypeResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
@@ -58,8 +52,6 @@ namespace LML.NPOManagement.Controllers
             _mapper = config.CreateMapper();
             _userInventoryService = userInventoryService;
             _notificationService = notificationService;
-            _webHostEnvironment = webHostEnvironment;
-            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
             _userService = userService;
         }
 

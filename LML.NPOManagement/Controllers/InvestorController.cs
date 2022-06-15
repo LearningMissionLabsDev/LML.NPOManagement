@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Amazon.S3;
+using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Request;
@@ -16,9 +17,10 @@ namespace LML.NPOManagement.Controllers
         private IMapper _mapper;
         private IInvestorService _investorInformationService;
         private INotificationService _notificationService;
-        private IWebHostEnvironment _webHostEnvironment;
+        private IConfiguration _configuration;
+        private IAmazonS3 _s3Client;
         public InvestorController(IInvestorService investorInformationService, INotificationService notificationService,
-                                  IWebHostEnvironment webHostEnvironment)
+                                  IConfiguration configuration, IAmazonS3 s3Client)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -30,8 +32,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<RoleRequest, RoleModel>();
-                cfg.CreateMap<TemplateRequest, TemplateModel>();
-                cfg.CreateMap<TemplateTypeRequest, TemplateTypeModel>();
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
@@ -45,8 +45,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
-                cfg.CreateMap<TemplateModel, TemplateResponse>();
-                cfg.CreateMap<TemplateTypeModel, TemplateTypeResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
@@ -57,8 +55,8 @@ namespace LML.NPOManagement.Controllers
             _mapper = config.CreateMapper();
             _investorInformationService = investorInformationService;
             _notificationService = notificationService;
-            _webHostEnvironment = webHostEnvironment;
-            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
+            _configuration = configuration;
+            _s3Client = s3Client;
         }
 
         // GET: api/<InvestorInformationController>
@@ -113,7 +111,11 @@ namespace LML.NPOManagement.Controllers
             }
             var donationModel = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
             var result = await _investorInformationService.AddDonation(donationModel);
-            _notificationService.SendNotificationInvestor(donationModel, new NotificationModel());
+            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            var template = _configuration.GetSection("AppSettings:Templates").Value;
+            var key = template + "DonationNotification.html";
+            var body = await GetFileByKeyAsync(bucketName, key);
+            _notificationService.SendNotificationInvestor(donationModel, new NotificationModel(), body);
             return Ok(result);
         }
 
@@ -140,6 +142,19 @@ namespace LML.NPOManagement.Controllers
                 _investorInformationService.DeleteDonation(id);
             }
             return BadRequest();
+        }
+
+        private async Task<string> GetFileByKeyAsync(string bucketName, string key)
+        {
+            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists)
+            {
+                return null;
+            }
+
+            var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
+            var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();
+            return streamReader;
         }
     }
 }

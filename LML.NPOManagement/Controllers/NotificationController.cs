@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+﻿using Amazon.S3;
+using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,10 +18,11 @@ namespace LML.NPOManagement.Controllers
         private IMapper _mapper;
         private INotificationService _notificationService;
         private IUserService _userService;
-        private  IWebHostEnvironment _webHostEnvironment;
+        private IAmazonS3 _s3Client;
+        private IConfiguration _configuration;
 
         public NotificationController(INotificationService notificationService, IUserService userService,
-                                      IWebHostEnvironment webHostEnvironment)
+                                      IAmazonS3 s3Client, IConfiguration configuration)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -31,8 +34,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
                 cfg.CreateMap<NotificationRequest, NotificationModel>();
                 cfg.CreateMap<RoleRequest, RoleModel>();
-                cfg.CreateMap<TemplateRequest, TemplateModel>();
-                cfg.CreateMap<TemplateTypeRequest, TemplateTypeModel>();
                 cfg.CreateMap<UserInformationRequest, UserInformationModel>();
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
@@ -46,8 +47,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
-                cfg.CreateMap<TemplateModel, TemplateResponse>();
-                cfg.CreateMap<TemplateTypeModel, TemplateTypeResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
@@ -57,14 +56,23 @@ namespace LML.NPOManagement.Controllers
             _mapper = config.CreateMapper();
             _notificationService = notificationService;            
             _userService = userService;
-            _webHostEnvironment = webHostEnvironment;
-            _notificationService.AppRootPath = _webHostEnvironment.ContentRootPath;
-        }        
+            _s3Client = s3Client;
+            _configuration = configuration;
+        }      
+        
+
+
+
+
+
+
 
         // GET: api/<NotificationController>
         [HttpGet]
-        public async Task<List<NotificationResponse>> Get()
+        public async Task<List<NotificationResponse>> Get()//???????
         {
+          
+            
             var notification = await _notificationService.GetAllNotifications();
             return _mapper.Map<List<NotificationModel>, List<NotificationResponse>>(notification);
         }
@@ -77,42 +85,105 @@ namespace LML.NPOManagement.Controllers
             return _mapper.Map<NotificationModel, NotificationResponse>(notification);
         }
 
+
+        // GET api/<NotificationController>/5
+        [HttpGet("templateType")]
+        public async Task<string> GetNotificationByTemplateType(int id)
+        {
+        
+            return null;
+        }
+
+
+
+
+
+
         // POST api/<NotificationController>
         [HttpPost]
-        public async Task<ActionResult> Post(int id, [FromBody] NotificationRequest notificationRequest)
+        public async Task<ActionResult> Post([FromBody] NotificationRequest notificationRequest)
+        {         
+            
+            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            var template = _configuration.GetSection("AppSettings:Templates").Value;
+            var key = template + notificationRequest.Language.ToString() + notificationRequest.BodyName;
+            var body = await GetFileByKeyAsync(bucketName, key);
+
+            switch (notificationRequest.NotificationTransportEnum)
+            {             
+                case NotificationTransportEnum.Email:
+
+
+                    var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
+                    var notificationModel = _notificationService.AddNotification(notification);
+                    
+
+                    break;
+
+                case NotificationTransportEnum.Sms:
+
+
+
+                    break;
+
+                case NotificationTransportEnum.Post:
+
+                    break;
+
+                case NotificationTransportEnum.Other:
+
+                    break;
+            }
+
+            return Ok();
+        }    
+
+
+
+        // POST api/<NotificationController>
+        [HttpPost("send")]
+        public async Task<ActionResult> SendNotification(int id, [FromBody] NotificationRequest notificationRequest )
         {
-            var notification =  _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
-
-            switch (notificationRequest.NotificationContext)
+            var notificationModel = await _notificationService.GetNotificationById(id);
+            if (notificationModel == null)
             {
-                case NotificationContext.Users:
+                return BadRequest();
+            }
+            var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
+            var modifyNotification = await _notificationService.ModifyNotification(notification, id);
 
-                    var users = await  _userService.GetAllUsers();
-                    _notificationService.SendNotifications(users, notification);
-                    return Ok();
-                    
-                case NotificationContext.Account:
 
-                    var userByAccounts = await  _userService.GetUsersByAccount(id);
-                    _notificationService.SendNotifications(userByAccounts, notification);
+            switch (notificationModel.NotificationTypeEnum  )
+            {
+                case NotificationTypeEnum.ByIndividuals:
+
+                    var users = await _userService.GetAllUsers();
+                    //_notificationService.SendNotifications(users, modifyNotification);
                     return Ok();
-                    
-                case NotificationContext.Role:
+
+                case NotificationTypeEnum.ByAccounts:
+
+                    var userByAccounts = await _userService.GetUsersByAccount(id);
+                    //_notificationService.SendNotifications(userByAccounts, modifyNotification);
+                    return Ok();
+
+                case NotificationTypeEnum.ByRoles:
 
                     var userByRoles = await _userService.GetUsersByRole(id);
-                    _notificationService.SendNotifications(userByRoles, notification);
+                    //_notificationService.SendNotifications(userByRoles, modifyNotification);
                     return Ok();
-                   
-                case NotificationContext.InvestorTier:
+
+                case NotificationTypeEnum.ByInvestors:
 
                     var userByInvestorTier = await _userService.GetUsersByInvestorTier(id);
-                     _notificationService.SendNotifications(userByInvestorTier, notification);
+                    //_notificationService.SendNotifications(userByInvestorTier, modifyNotification);
                     return Ok();
-                   
+
                 default:
-                    return BadRequest();                    
-            }           
-        }
+                    return BadRequest();
+            }
+        }      
+
 
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]
@@ -125,12 +196,16 @@ namespace LML.NPOManagement.Controllers
             }
             var notificationModel = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
             var modifyNotification = await _notificationService.ModifyNotification(notificationModel, id);
-            if (modifyNotification)
+            if (modifyNotification != null)
             {
-                return Ok();
+                return Ok(modifyNotification);
             }
             return BadRequest();
         }
+
+
+
+
 
         // DELETE api/<NotificationController>/5
         [HttpDelete("{id}")]
@@ -143,6 +218,19 @@ namespace LML.NPOManagement.Controllers
                 return Ok();
             }
             return BadRequest();
+        }
+
+        private async Task<string> GetFileByKeyAsync(string bucketName, string key)
+        {
+            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+            if (!bucketExists)
+            {
+                return null;
+            }
+
+            var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
+            var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();
+            return streamReader;
         }
     }
 }

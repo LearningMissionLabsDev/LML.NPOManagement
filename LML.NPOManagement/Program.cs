@@ -23,7 +23,6 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
-builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<INPOManagementContext,NPOManagementContext>();
 
 
