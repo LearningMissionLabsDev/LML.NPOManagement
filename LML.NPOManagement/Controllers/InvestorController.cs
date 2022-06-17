@@ -95,9 +95,16 @@ namespace LML.NPOManagement.Controllers
 
         // GET api/<InvestorInformationController>/5
         [HttpGet("year")]
-        public async Task<string> GetDonationByYear(DateTime dateTime)
+        public async Task<ActionResult<DonationResponse>> GetDonationByYear(DateTime dateTimeStart,DateTime dateTimeFinish)
         {
-            return "value";
+            var donations = await _investorInformationService.GetDonationByYear(dateTimeStart, dateTimeFinish);
+            if (donations == null)
+            {
+                return BadRequest();
+            }
+            var donation = _mapper.Map<List<DonationModel>, List<DonationResponse>>(donations);
+            return Ok(donation);
+           
         }
 
         // POST api/<InvestorInformationController>
