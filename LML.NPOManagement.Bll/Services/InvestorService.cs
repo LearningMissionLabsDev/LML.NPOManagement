@@ -111,5 +111,22 @@ namespace LML.NPOManagement.Bll.Services
             }
             return null;
         }
+
+        public async Task<List<DonationModel>> GetDonationByYear(DateTime dateTimeStart,DateTime dateTimeFinish)
+        {
+            var donations = await _dbContext.Donations.Where(don => (don.DateOfCharity == dateTimeStart) &&
+            (don.DateOfCharity == dateTimeFinish)).ToListAsync();
+            if (donations.Count == 0)
+            {
+                return null;
+            }
+            List<DonationModel> DonationModels = new List<DonationModel>();
+            foreach (var donation in donations)
+            {
+                var donationModel = _mapper.Map<Donation, DonationModel>(donation);
+                DonationModels.Add(donationModel);
+            }
+            return DonationModels;
+        }
     }
 }
