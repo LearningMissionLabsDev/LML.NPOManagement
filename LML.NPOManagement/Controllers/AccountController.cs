@@ -92,8 +92,12 @@ namespace LML.NPOManagement.Controllers
 
         // POST api/<AccountController>
         [HttpPost]
-        public void Post([FromBody] string value)
-        {
+        public async Task <ActionResult <AccountResponse>> Post([FromBody] AccountRequest accountRequest)
+        {           
+            var accountModel = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
+            var account = await _accountService.AddAccount(accountModel);
+            var accountResponse = _mapper.Map<AccountModel, AccountResponse>(account);
+            return Ok(accountResponse);
         }
 
         // POST api/<AccountController>
@@ -112,8 +116,15 @@ namespace LML.NPOManagement.Controllers
 
         // PUT api/<AccountController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task <ActionResult> Put(int id, [FromBody] AccountRequest accountRequest)
         {
+            var account = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
+            var modifyAccount = await _accountService.ModifyAccount(account, id);
+            if (modifyAccount != null)
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         // DELETE api/<AccountController>/5
