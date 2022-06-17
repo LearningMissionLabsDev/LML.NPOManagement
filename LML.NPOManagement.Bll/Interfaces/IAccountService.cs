@@ -6,8 +6,8 @@ namespace LML.NPOManagement.Bll.Interfaces
     {
         Task <List<AccountModel>> GetAllAccounts();
         Task<AccountModel> GetAccountById(int id);
-        public int AddAccount(AccountModel accountModel);
-        public int ModifyAccount(AccountModel accountModel, int id);
+        Task <AccountModel> AddAccount(AccountModel accountModel);
+        Task<AccountModel> ModifyAccount(AccountModel accountModel, int id);
         public void DeleteAccount(int id);
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<List<UserIdeaModel>> GetAllIdea();

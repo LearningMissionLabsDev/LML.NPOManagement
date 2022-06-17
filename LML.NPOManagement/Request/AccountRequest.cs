@@ -9,9 +9,9 @@ namespace LML.NPOManagement.Request
         public string Name { get; set; }
 
         [StringLength (int.MaxValue)]
-        public string? Description { get; set; }
+        public string Description { get; set; }
 
         [StringLength (50)]
-        public string? Status { get; set; }
+        public string Status { get; set; }
     }
 }

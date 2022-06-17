@@ -44,9 +44,12 @@ namespace LML.NPOManagement.Bll.Services
             _dbContext = context;
         }
 
-        public int AddAccount(AccountModel accountModel)
+        public async Task <AccountModel> AddAccount(AccountModel accountModel)
         {
-            throw new NotImplementedException();
+            var account = _mapper.Map<AccountModel, Account>(accountModel);
+            await _dbContext.Accounts.AddAsync(account);
+            await _dbContext.SaveChangesAsync();
+            return accountModel;
         }
 
         public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
@@ -104,9 +107,21 @@ namespace LML.NPOManagement.Bll.Services
             return accountModels;
         }
 
-        public int ModifyAccount(AccountModel accountModel, int id)
+        public async Task <AccountModel> ModifyAccount(AccountModel accountModel, int id)
         {
-            throw new NotImplementedException();
-        }       
+            var account = await _dbContext.Accounts.Where(a => a.Id == id).FirstOrDefaultAsync();
+            if (account == null)
+            {
+               return null;
+            }
+            account.Description = accountModel.Description;
+            account.Name = accountModel.Name;
+            account.Status=accountModel.Status;
+            await _dbContext.SaveChangesAsync();
+            var newAccount = _mapper.Map<Account, AccountModel>(account);
+            return newAccount;
+        }
+
+       
     }
 }
