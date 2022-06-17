@@ -114,6 +114,10 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<List<DonationModel>> GetDonationByYear(DateTime dateTimeStart,DateTime dateTimeFinish)
         {
+            if ((dateTimeStart >= DateTime.UtcNow || dateTimeFinish >= DateTime.UtcNow) && dateTimeStart >= dateTimeFinish )
+            {
+                return null;
+            }
             var donations = await _dbContext.Donations.Where(don => (don.DateOfCharity == dateTimeStart) &&
             (don.DateOfCharity == dateTimeFinish)).ToListAsync();
             if (donations.Count == 0)

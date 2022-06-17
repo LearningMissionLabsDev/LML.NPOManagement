@@ -154,10 +154,14 @@ namespace LML.NPOManagement.Bll.Services
             return inventoryModels;
         }
 
-        public async Task<List<UserInventoryModel>> GetInventoryUserByYear(DateTime dateTimeStart, DateTime dateTimeFins, int id)
+        public async Task<List<UserInventoryModel>> GetInventoryUserByYear(DateTime dateTimeStart, DateTime dateTimeFinish, int id)
         {
+            if ((dateTimeStart >= DateTime.UtcNow || dateTimeFinish >= DateTime.UtcNow) && dateTimeStart >= dateTimeFinish)
+            {
+                return null;
+            }
             var inventories = await _dbContext.UserInventories.Where(inv => inv.UserId == id && (( inv.Date == dateTimeStart) &&
-            (inv.Date == dateTimeFins))).ToListAsync();
+            (inv.Date == dateTimeFinish))).ToListAsync();
 
             if(inventories.Count == 0)
             {
@@ -172,10 +176,14 @@ namespace LML.NPOManagement.Bll.Services
             return userInventoryModels;
         }
 
-        public async Task<List<UserInventoryModel>> GetInventoryByYear(DateTime dateTimeStart, DateTime dateTimeFins)
+        public async Task<List<UserInventoryModel>> GetInventoryByYear(DateTime dateTimeStart, DateTime dateTimeFinish)
         {
+            if ((dateTimeStart >= DateTime.UtcNow || dateTimeFinish >= DateTime.UtcNow) && dateTimeStart >= dateTimeFinish)
+            {
+                return null;
+            }
             var inventories = await _dbContext.UserInventories.Where(inv => (inv.Date == dateTimeStart) &&
-            (inv.Date == dateTimeFins)).ToListAsync();
+            (inv.Date == dateTimeFinish)).ToListAsync();
 
             if (inventories.Count == 0)
             {

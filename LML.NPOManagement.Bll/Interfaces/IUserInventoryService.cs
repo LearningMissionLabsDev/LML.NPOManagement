@@ -17,8 +17,8 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<InventoryTypeModel> AddInventoryType(InventoryTypeModel inventoryTypeModel);
         Task<string> GetAllInventoryTypes(string type, DateTime dateTimeStart, DateTime dateTimeFinsh);
         Task<List<UserInventoryModel>> GetInventoryByUser(int id);
-        Task<List<UserInventoryModel>> GetInventoryByYear(DateTime dateTimeStart, DateTime dateTimeFinsh);
-        Task<List<UserInventoryModel>> GetInventoryUserByYear(DateTime dateTimeStart, DateTime dateTimeFins, int id);
+        Task<List<UserInventoryModel>> GetInventoryByYear(DateTime dateTimeStart, DateTime dateTimeFinish);
+        Task<List<UserInventoryModel>> GetInventoryUserByYear(DateTime dateTimeStart, DateTime dateTimeFinish, int id);
         Task<UserInventoryModel> DeleteInventory(int id);
     }
 }
