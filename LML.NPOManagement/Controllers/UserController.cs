@@ -237,9 +237,9 @@ namespace LML.NPOManagement.Controllers
             var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
             var template = _configuration.GetSection("AppSettings:Templates").Value;
             var key = "NotificationTemplates/CheckingEmail.html";
-            var body = await GetFileByKeyAsync(bucketName, key);
+            // var body = await GetFileByKeyAsync(bucketName, key);
             
-            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
+            // _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
             return Ok(userInfoId);                  
         }
         private async Task<string> GetFileByKeyAsync(string bucketName, string key)
@@ -254,5 +254,6 @@ namespace LML.NPOManagement.Controllers
             var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();  
             return streamReader;
         }
+
     }
 }
