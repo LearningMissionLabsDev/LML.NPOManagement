@@ -159,7 +159,7 @@ namespace LML.NPOManagement.Controllers
                 {
                     return Ok(user);
                 }
-                return BadRequest("Please check your email");
+                return StatusCode(620, "Please check your email");
             }
             return Unauthorized(401);
         }

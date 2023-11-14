@@ -24,7 +24,9 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
 builder.Services.AddScoped<INPOManagementContext,NPOManagementContext>();
-
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

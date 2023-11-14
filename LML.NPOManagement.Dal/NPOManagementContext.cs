@@ -33,7 +33,9 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
         public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
         public virtual DbSet<UserType> UserTypes { get; set; } = null!;
-       
+        public virtual DbSet<Message> Messages { get; set; } = null!;
+        public virtual DbSet<MessageKey> MessagesKeys { get; set; } = null!;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //            if (!optionsBuilder.IsConfigured)
@@ -332,6 +334,32 @@ namespace LML.NPOManagement.Dal.Models
 
                             j.ToTable("User2UserType");
                         });
+            });
+
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.ToTable("Message");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().HasColumnName("Id");
+                entity.Property(e => e.SenderId).HasColumnName("SenderId");
+                entity.Property(e => e.RecipientId).HasColumnName("RecipientId");
+                entity.Property(e => e.Subject).HasColumnName("Subject");
+                entity.Property(e => e.message).HasColumnName("Message");
+                entity.Property(e => e.Secret).HasColumnName("Secret");
+                entity.Property(e => e.Opened).HasColumnName("Opened");
+            });
+
+            modelBuilder.Entity<MessageKey>(entity =>
+            {
+                entity.ToTable("MessageKey");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().HasColumnName("Id");
+                entity.Property(e => e.MessageId).HasColumnName("MessageId");
+                entity.Property(e => e.PrivateKey).HasColumnName("PrivateKey");
             });
 
             OnModelCreatingPartial(modelBuilder);
