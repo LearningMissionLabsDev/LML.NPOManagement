@@ -23,7 +23,10 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
-builder.Services.AddScoped<INPOManagementContext,NPOManagementContext>();
+builder.Services.AddScoped<INPOManagementContext, NPOManagementContext>();
+builder.Services.AddScoped<IMessageService, MessageService>(); // 3
+builder.Services.AddScoped<IKeyService, KeyService>();
+
 
 
 var app = builder.Build();

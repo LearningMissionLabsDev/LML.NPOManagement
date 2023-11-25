@@ -20,7 +20,7 @@ namespace LML.NPOManagement.Bll.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
-                cfg.CreateMap<Dal.Models.Attachment, AttachmentModel>();
+                //cfg.CreateMap<Attachment, AttachmentModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
@@ -30,7 +30,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
                 cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Dal.Models.Attachment>();
+                //cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformation>();

@@ -18,13 +18,15 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private IUserService _userService;
+        private IMessageService _messageService;
+        private IKeyService _keyService;
         private IConfiguration _configuration;
         private INotificationService _notificationService;
         private IAmazonS3 _s3Client;
 
-        public UserController(IUserService userService, IConfiguration configuration, INotificationService notificationService, IAmazonS3 s3Client)
+        public UserController(IUserService userService, IMessageService messageService, IKeyService keyService, IConfiguration configuration, INotificationService notificationService, IAmazonS3 s3Client)
         {
-            var config = new MapperConfiguration(cfg =>
+          var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountRequest, AccountModel>();
                 cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
@@ -44,7 +46,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
-                cfg.CreateMap<NotificationModel, NotificationResponse>();
+                //cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
@@ -55,6 +57,8 @@ namespace LML.NPOManagement.Controllers
             });
             _mapper = config.CreateMapper();
             _userService = userService;
+            _messageService = messageService;
+            _keyService = keyService;
             _configuration = configuration;
             _notificationService = notificationService;
             _s3Client = s3Client;
@@ -62,7 +66,7 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserController>
         [HttpGet]
-        public async Task<IEnumerable<UserResponse>> Get()
+        public async Task<List<UserResponse>> Get()
         {
             var userModel = await _userService.GetAllUsers();
             return _mapper.Map<List<UserModel>, List<UserResponse>>(userModel);
@@ -215,8 +219,11 @@ namespace LML.NPOManagement.Controllers
                 PhoneNumber = userInformationRequest.PhoneNumber,
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
+            
             var newUser = await _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            await _keyService.GenerateKeys(newUser.Email);
+             
             switch (userInformationRequest.UserTypeEnum)
             {
                 case UserTypeEnum.Admin:
@@ -242,6 +249,7 @@ namespace LML.NPOManagement.Controllers
             _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
             return Ok(userInfoId);                  
         }
+
         private async Task<string> GetFileByKeyAsync(string bucketName, string key)
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);

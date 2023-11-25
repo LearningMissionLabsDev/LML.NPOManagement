@@ -12,7 +12,8 @@ namespace LML.NPOManagement.Bll.Services
     public class UserService : IUserService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;       
+        private readonly INPOManagementContext _dbContext;
+        
         public UserService(INPOManagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
@@ -84,6 +85,7 @@ namespace LML.NPOManagement.Bll.Services
                 userModelMapper.Token = TokenCreationHelper.GenerateJwtToken(userModelMapper, configuration);
                 return userModelMapper;
             }
+
             return null;
         }
 
@@ -100,13 +102,14 @@ namespace LML.NPOManagement.Bll.Services
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
        
-            if (user == null )
+            if (user == null)
             {             
                 userModel.Password = BC.HashPassword(userModel.Password);
                 var addUser = _mapper.Map<UserModel, User>(userModel);
                 await _dbContext.Users.AddAsync(addUser);
                 await _dbContext.SaveChangesAsync();
                 var newUser = await _dbContext.Users.FirstOrDefaultAsync(us => us.Email == userModel.Email);
+                // if ( newUser == null ) { return null; } <i think>
                 var newUserModel = _mapper.Map<User, UserModel>(newUser);
                 newUserModel.Token = TokenCreationHelper.GenerateJwtToken(newUserModel, configuration);
                 newUserModel.Password = null;
@@ -145,6 +148,8 @@ namespace LML.NPOManagement.Bll.Services
                 });
                 await _dbContext.SaveChangesAsync();
             }
+
+
                
             return userInfo.Id;
         }
@@ -205,8 +210,7 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel)
         {
             var userTypes = await _dbContext.UserTypes.ToListAsync();
-            var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
-            foreach (var userType in userTypes)
+            var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();            foreach (var userType in userTypes)
             {
                 if( userType.Description == Convert.ToString( userInformationModel.UserTypeEnum ))
                 {
