@@ -29,4 +29,10 @@
     <ProjectReference Include="..\LML.NPOManagement.Dal\LML.NPOManagement.Dal.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Utilities\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utilities\" />
+  </ItemGroup>
 </Project>

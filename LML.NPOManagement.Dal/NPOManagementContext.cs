@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Models
 {
@@ -24,6 +23,8 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<InventoryType> InventoryTypes { get; set; } = null!;
         public virtual DbSet<InvestorInformation> InvestorInformations { get; set; } = null!;
         public virtual DbSet<InvestorTierType> InvestorTierTypes { get; set; } = null!;
+        public virtual DbSet<Key> Keys { get; set; } = null!;
+        public virtual DbSet<Messaging> Messagings { get; set; } = null!;
         public virtual DbSet<Notification> Notifications { get; set; } = null!;
         public virtual DbSet<NotificationTransportType> NotificationTransportTypes { get; set; } = null!;
         public virtual DbSet<NotificationType> NotificationTypes { get; set; } = null!;
@@ -33,21 +34,12 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
         public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
         public virtual DbSet<UserType> UserTypes { get; set; } = null!;
-       
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //            if (!optionsBuilder.IsConfigured)
-            //            {
-            //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-            //                optionsBuilder.UseSqlServer("Server=lmldb.cj8tmk4otjem.eu-west-1.rds.amazonaws.com,1433;Database=NPOManagement;User Id=lmladmin;Password=January2021");
-            //            }
             if (!optionsBuilder.IsConfigured)
             {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                              .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                              .AddJsonFile("appsettings.json")
-                              .Build();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=NPOManagement;User ID=sa;Password=098305624v;TrustServerCertificate=true;Encrypt=False;");
             }
         }
 
@@ -143,6 +135,36 @@ namespace LML.NPOManagement.Dal.Models
                 entity.ToTable("InvestorTierType");
 
                 entity.Property(e => e.InvestorTier).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Key>(entity =>
+            {
+                entity.ToTable("Key");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.PublicKey).HasColumnType("text");
+
+                entity.Property(e => e.PrivateKey).HasColumnType("text");
+
+                entity.Property(e => e.Recovery).HasMaxLength(128);
+            });
+
+            modelBuilder.Entity<Messaging>(entity =>
+            {
+                entity.ToTable("Messaging");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Message).HasColumnType("text");
+
+                entity.Property(e => e.Recovery)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Sender)
+                    .HasMaxLength(128)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Notification>(entity =>
@@ -343,10 +365,10 @@ namespace LML.NPOManagement.Dal.Models
         {
             base.SaveChanges();
         }
+
         public async Task<int> SaveChangesAsync()
         {
             return await base.SaveChangesAsync();
         }
-      
     }
 }

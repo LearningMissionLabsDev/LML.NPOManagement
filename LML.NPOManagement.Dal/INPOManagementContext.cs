@@ -14,8 +14,10 @@ namespace LML.NPOManagement.Dal
         DbSet<InvestorTierType> InvestorTierTypes { get; set; } 
         DbSet<Notification> Notifications { get; set; } 
         DbSet<NotificationTransportType> NotificationTransportTypes { get; set; }
-        DbSet<NotificationType> NotificationTypes { get; set; } 
-        DbSet<Role> Roles { get; set; } 
+        DbSet<NotificationType> NotificationTypes { get; set; }
+        DbSet<Key> Keys { get; set; }
+        DbSet<Role> Roles { get; set; }
+        DbSet<Messaging> Messagings { get; set; } 
         DbSet<User> Users { get; set; } 
         DbSet<UserIdea> UserIdeas { get; set; } 
         DbSet<UserInformation> UserInformations { get; set; } 
