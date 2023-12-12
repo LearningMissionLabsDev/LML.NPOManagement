@@ -3,6 +3,7 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
@@ -10,11 +11,11 @@ namespace LML.NPOManagement.Bll.Services
     public class AccountService : IAccountService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
+        private readonly IBaseRepository _baseRepository;
+        private readonly IAccountRepository _accountRepository;
       
-        public AccountService(INPOManagementContext context)
+        public AccountService(IAccountRepository accountRepository, IBaseRepository baseRepository)
         {
-
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountProgress, AccountProgressModel>();
@@ -41,27 +42,28 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserIdea, UserIdeaModel>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = context;
+            _baseRepository = baseRepository;
+            _accountRepository = accountRepository;
         }
 
         public async Task <AccountModel> AddAccount(AccountModel accountModel)
         {
             var account = _mapper.Map<AccountModel, Account>(accountModel);
-            await _dbContext.Accounts.AddAsync(account);
-            await _dbContext.SaveChangesAsync();
+            await _accountRepository.Accounts.AddAsync(account);
+            await _baseRepository.SaveChangesAsync();
             return accountModel;
         }
 
         public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
         {
             var idea =_mapper.Map<UserIdeaModel,UserIdea>(userIdeaModel);
-            await _dbContext.UserIdeas.AddAsync(idea);
-            _dbContext.SaveChanges();
+            await _accountRepository.UserIdeas.AddAsync(idea);
+            _baseRepository.SaveChanges();
             return userIdeaModel;
         }
         public async Task<List<UserIdeaModel>> GetAllIdea()
         {
-            var ideas = await _dbContext.UserIdeas.ToListAsync();
+            var ideas = await _accountRepository.UserIdeas.ToListAsync();
             if(ideas.Count == 0)
             {
                 return null;
@@ -77,16 +79,16 @@ namespace LML.NPOManagement.Bll.Services
 
         public void DeleteAccount(int id)
         {
-            var delatAccount = _dbContext.Accounts.Where(da => da.Id == id).FirstOrDefault();
+            var delatAccount = _accountRepository.Accounts.Where(da => da.Id == id).FirstOrDefault();
             if (delatAccount != null)
             {
-                _dbContext.SaveChanges();
+                _baseRepository.SaveChanges();
             }
         }
 
         public async Task<AccountModel> GetAccountById(int id)
         {
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
+            var account = await _accountRepository.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
             if (account != null)
             {
                 var accountModel = _mapper.Map<Account, AccountModel>(account);
@@ -98,7 +100,7 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<List<AccountModel>> GetAllAccounts()
         {
             List<AccountModel> accountModels = new List<AccountModel>();
-            var accounts = await _dbContext.Accounts.ToListAsync();
+            var accounts = await _accountRepository.Accounts.ToListAsync();
             foreach (var account in accounts)
             {
                 var accountModel = _mapper.Map<Account, AccountModel>(account);
@@ -109,7 +111,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task <AccountModel> ModifyAccount(AccountModel accountModel, int id)
         {
-            var account = await _dbContext.Accounts.Where(a => a.Id == id).FirstOrDefaultAsync();
+            var account = await _accountRepository.Accounts.Where(a => a.Id == id).FirstOrDefaultAsync();
             if (account == null)
             {
                return null;
@@ -117,7 +119,7 @@ namespace LML.NPOManagement.Bll.Services
             account.Description = accountModel.Description;
             account.Name = accountModel.Name;
             account.Status=accountModel.Status;
-            await _dbContext.SaveChangesAsync();
+            await _baseRepository.SaveChangesAsync();
             var newAccount = _mapper.Map<Account, AccountModel>(account);
             return newAccount;
         }

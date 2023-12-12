@@ -16,7 +16,6 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<int> AddDonation(DonationModel donationModel);
         Task<DonationModel> ModifyDonation(DonationModel DonationModel, int id);
         public void DeleteDonation(int id);
-
         Task<List<DonationModel>> GetDonationByYear(DateTime dateTimeStart,DateTime dateTimeFinish);
     }
 }

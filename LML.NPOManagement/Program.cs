@@ -3,6 +3,8 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using LML.NPOManagement.Dal.Repositories.BaseRepositories;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
 using LML.NPOManagement.Middeware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +25,17 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
-builder.Services.AddScoped<INPOManagementContext,NPOManagementContext>();
+builder.Services.AddScoped<IUsersGroupService, UsersGroupService>();
+builder.Services.AddScoped<NPOManagementContext, BaseRepository>();
+builder.Services.AddScoped<IBaseRepository,BaseRepository>();
+builder.Services.AddScoped<IAccountRepository,BaseRepository>();
+builder.Services.AddScoped<IInvestorRepository,BaseRepository>();
+builder.Services.AddScoped<INotificationRepository,BaseRepository>();
+builder.Services.AddScoped<IUserInventoryRepository,BaseRepository>();
+builder.Services.AddScoped<IUserGroupRepository,BaseRepository>();
+builder.Services.AddScoped<IUserRepository,BaseRepository>();
+
+
 
 
 var app = builder.Build();

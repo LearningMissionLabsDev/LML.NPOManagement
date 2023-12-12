@@ -3,6 +3,7 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
@@ -10,8 +11,9 @@ namespace LML.NPOManagement.Bll.Services
     public class UserInventoryService : IUserInventoryService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
-        public UserInventoryService(INPOManagementContext context)
+        private readonly IBaseRepository _baseRepository;
+        private readonly IUserInventoryRepository _userInventoryRepository;
+        public UserInventoryService(IUserInventoryRepository userInventoryRepository, IBaseRepository baseRepository)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -37,15 +39,16 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = context;
+            _baseRepository = baseRepository;
+            _userInventoryRepository = userInventoryRepository;
         }
 
         public async Task<UserInventoryModel> AddUserInventory(UserInventoryModel userInventoryModel)
         {
             var inventory = _mapper.Map<UserInventoryModel,UserInventory>(userInventoryModel);
-            await _dbContext.UserInventories.AddAsync(inventory);
-            await _dbContext.SaveChangesAsync();
-            var newInventory = await _dbContext.UserInventories.Where(inv => inv.Date == userInventoryModel.Date).FirstOrDefaultAsync();
+            await _userInventoryRepository.UserInventories.AddAsync(inventory);
+            await _baseRepository.SaveChangesAsync();
+            var newInventory = await _userInventoryRepository.UserInventories.Where(inv => inv.Date == userInventoryModel.Date).FirstOrDefaultAsync();
             if (newInventory == null)
             {
                 return null;
@@ -56,7 +59,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<List<UserInventoryModel>> GetAllUserInventories()
         {
-            var inventories = await _dbContext.UserInventories.ToListAsync();
+            var inventories = await _userInventoryRepository.UserInventories.ToListAsync();
             if(inventories.Count == 0)
             {
                 return null;
@@ -66,7 +69,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<UserInventoryModel> GetUserInventoryById(int id)
         {
-            var inventory = await _dbContext.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
+            var inventory = await _userInventoryRepository.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
             if(inventory == null)
             {
                 return null;
@@ -76,7 +79,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<UserInventoryModel> ModifyUserInventory(UserInventoryModel userInventoryModel, int id)
         {
-            var inventory = await _dbContext.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
+            var inventory = await _userInventoryRepository.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
             if( inventory == null)
             {
                 return null;
@@ -86,8 +89,8 @@ namespace LML.NPOManagement.Bll.Services
             inventory.Metadata = userInventoryModel.Metadata;
             inventory.Date = userInventoryModel.Date;
             inventory.UserId = userInventoryModel.UserId;
-            await _dbContext.UserInventories.AddAsync(inventory);
-            await _dbContext.SaveChangesAsync();
+            await _userInventoryRepository.UserInventories.AddAsync(inventory);
+            await _baseRepository.SaveChangesAsync();
             var inventoryModel = _mapper.Map<UserInventory,UserInventoryModel>(inventory);
             return inventoryModel;
 
@@ -95,7 +98,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<InventoryTypeModel> GetUserInventoryTypeById(int id)
         {
-            var inventoryType = await _dbContext.InventoryTypes.Where(type => type.Id == id).FirstOrDefaultAsync();
+            var inventoryType = await _userInventoryRepository.InventoryTypes.Where(type => type.Id == id).FirstOrDefaultAsync();
             if(inventoryType == null)
             {
                 return null;
@@ -106,8 +109,8 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<InventoryTypeModel> AddInventoryType(InventoryTypeModel inventoryTypeModel)
         {
             var inventory = _mapper.Map<InventoryTypeModel, InventoryType>(inventoryTypeModel);
-            await _dbContext.InventoryTypes.AddAsync(inventory);
-            await _dbContext.SaveChangesAsync();
+            await _userInventoryRepository.InventoryTypes.AddAsync(inventory);
+            await _baseRepository.SaveChangesAsync();
             return inventoryTypeModel;
         }
 
@@ -118,7 +121,7 @@ namespace LML.NPOManagement.Bll.Services
 
             if (((dateTimeStart <= DateTime.UtcNow) && (dateTimeStart.Year >= 2020)) && (( dateTimeFinsh <= DateTime.UtcNow) && (dateTimeFinsh.Year >= 2020)))
             {
-                var inventories = await _dbContext.UserInventories.Where(inv => inv.InventoryType.Description == type &&
+                var inventories = await _userInventoryRepository.UserInventories.Where(inv => inv.InventoryType.Description == type &&
                 (inv.Date <= dateTimeFinsh && inv.Date >= dateTimeStart)).ToListAsync();
                 foreach (var inventory in inventories)
                 {
@@ -140,7 +143,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<List<UserInventoryModel>> GetInventoryByUser(int id)
         {
-            var userInventories = await _dbContext.UserInventories.Where(inv => inv.UserId == id).ToListAsync();
+            var userInventories = await _userInventoryRepository.UserInventories.Where(inv => inv.UserId == id).ToListAsync();
             if(userInventories.Count == 0)
             {
                 return null;
@@ -160,7 +163,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var inventories = await _dbContext.UserInventories.Where(inv => inv.UserId == id && (( inv.Date == dateTimeStart) &&
+            var inventories = await _userInventoryRepository.UserInventories.Where(inv => inv.UserId == id && (( inv.Date == dateTimeStart) &&
             (inv.Date == dateTimeFinish))).ToListAsync();
 
             if(inventories.Count == 0)
@@ -182,7 +185,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var inventories = await _dbContext.UserInventories.Where(inv => (inv.Date == dateTimeStart) &&
+            var inventories = await _userInventoryRepository.UserInventories.Where(inv => (inv.Date == dateTimeStart) &&
             (inv.Date == dateTimeFinish)).ToListAsync();
 
             if (inventories.Count == 0)
@@ -200,13 +203,13 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<UserInventoryModel> DeleteInventory(int id)
         {
-            var inventory = await _dbContext.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
+            var inventory = await _userInventoryRepository.UserInventories.Where(inv => inv.Id == id).FirstOrDefaultAsync();
             if(inventory == null)
             {
                 return null;
             }
             inventory.Status = (int)StatusEnumModel.Closed;
-            await _dbContext.SaveChangesAsync();
+            await _baseRepository.SaveChangesAsync();
             var model =_mapper.Map<UserInventory,UserInventoryModel>(inventory);
             return model;
         }

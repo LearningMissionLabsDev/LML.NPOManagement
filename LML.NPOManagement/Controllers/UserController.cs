@@ -60,6 +60,39 @@ namespace LML.NPOManagement.Controllers
             _s3Client = s3Client;
         }
 
+        [HttpGet("Search")]
+        public async Task<List<UserInformationResponse>> SearchUser([FromQuery] string name)
+        {
+            var userRequest = new UserInformationModel()
+            {
+                FirstName = name,
+                LastName = name,
+            };
+
+            var users = await _userService.GetUserByName(userRequest);
+            if (users == null)
+            {
+                return null;
+            }
+            var newUsers = new List<UserInformationResponse>();
+            foreach (var newUser in users)
+            {
+                if(newUser.UserTypeEnum == UserTypeEnum.Admin)
+                {
+                    var us = new UserInformationResponse
+                    {
+                       
+                        UserId = newUser.UserId,
+                        FirstName = newUser.FirstName,
+                        LastName = newUser.LastName,
+                    };
+                    newUsers.Add(us);
+                }
+        
+               
+            }
+            return newUsers;
+        }
         // GET: api/<UserController>
         [HttpGet]
         public async Task<IEnumerable<UserResponse>> Get()
