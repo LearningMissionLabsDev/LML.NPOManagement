@@ -1,7 +1,6 @@
 ﻿using LML.NPOManagement.Bll.Model;
 using Microsoft.Extensions.Configuration;
 
-
 namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IUsersGroupService

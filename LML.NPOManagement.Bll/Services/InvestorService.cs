@@ -12,9 +12,9 @@ namespace LML.NPOManagement.Bll.Services
     public class InvestorService : IInvestorService
     {
         private IMapper _mapper;
-        private readonly IBaseRepository _baseRepository;
+        //private readonly IBaseRepository _baseRepository;
         private readonly IInvestorRepository _investorRepository;
-        public InvestorService(IInvestorRepository investorRepository, IBaseRepository baseRepository)
+        public InvestorService(IInvestorRepository investorRepository/* IBaseRepository baseRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -40,7 +40,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
-            _baseRepository = baseRepository;
+            //_baseRepository = baseRepository;
             _investorRepository = investorRepository;
            
         }
@@ -49,7 +49,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var donation =  _mapper.Map<DonationModel, Donation>(donationModel);
             _investorRepository.Donations.Add(donation);
-            _baseRepository.SaveChanges();
+            _investorRepository.SaveChanges();
             return donation.Id;
         }
 
@@ -57,7 +57,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var donation = _investorRepository.Donations.Where(d => d.Id == id).FirstOrDefault();
             donation.Investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
-            _baseRepository.SaveChanges();
+            _investorRepository.SaveChanges();
         }
 
         public async Task<List<InvestorInformationModel>> GetAllInvestorInformations()
@@ -110,7 +110,7 @@ namespace LML.NPOManagement.Bll.Services
             if (donation != null)
             {
                 var modifyDonation = _mapper.Map<DonationModel, Donation>(donationModel);
-                _baseRepository.SaveChanges();
+                _investorRepository.SaveChanges();
                 var newDonation = _mapper.Map<Donation, DonationModel>(modifyDonation);
                 return newDonation;
             }

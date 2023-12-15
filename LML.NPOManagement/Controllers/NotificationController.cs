@@ -59,20 +59,11 @@ namespace LML.NPOManagement.Controllers
             _s3Client = s3Client;
             _configuration = configuration;
         }      
-        
-
-
-
-
-
-
 
         // GET: api/<NotificationController>
         [HttpGet]
         public async Task<List<NotificationResponse>> Get()//???????
-        {
-          
-            
+        {  
             var notification = await _notificationService.GetAllNotifications();
             return _mapper.Map<List<NotificationModel>, List<NotificationResponse>>(notification);
         }
@@ -85,25 +76,17 @@ namespace LML.NPOManagement.Controllers
             return _mapper.Map<NotificationModel, NotificationResponse>(notification);
         }
 
-
         // GET api/<NotificationController>/5
         [HttpGet("templateType")]
         public async Task<string> GetNotificationByTemplateType(int id)
         {
-        
             return null;
         }
-
-
-
-
-
 
         // POST api/<NotificationController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] NotificationRequest notificationRequest)
-        {         
-            
+        {                
             var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
             var template = _configuration.GetSection("AppSettings:Templates").Value;
             var key = template + notificationRequest.Language.ToString() + notificationRequest.BodyName;
@@ -112,33 +95,21 @@ namespace LML.NPOManagement.Controllers
             switch (notificationRequest.NotificationTransportEnum)
             {             
                 case NotificationTransportEnum.Email:
-
-
                     var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
                     var notificationModel = _notificationService.AddNotification(notification);
-                    
-
                     break;
-
+                
                 case NotificationTransportEnum.Sms:
-
-
-
                     break;
-
+                
                 case NotificationTransportEnum.Post:
-
                     break;
-
+  
                 case NotificationTransportEnum.Other:
-
                     break;
             }
-
             return Ok();
         }    
-
-
 
         // POST api/<NotificationController>
         [HttpPost("send")]
@@ -152,15 +123,12 @@ namespace LML.NPOManagement.Controllers
             var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
             var modifyNotification = await _notificationService.ModifyNotification(notification, id);
 
-
             switch (notificationModel.NotificationTypeEnum  )
             {
                 case NotificationTypeEnum.ByIndividuals:
-
                     var users = await _userService.GetAllUsers();
                     //_notificationService.SendNotifications(users, modifyNotification);
                     return Ok();
-
                 case NotificationTypeEnum.ByAccounts:
 
                     var userByAccounts = await _userService.GetUsersByAccount(id);
@@ -184,7 +152,6 @@ namespace LML.NPOManagement.Controllers
             }
         }      
 
-
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] NotificationRequest notificationRequest)
@@ -202,10 +169,6 @@ namespace LML.NPOManagement.Controllers
             }
             return BadRequest();
         }
-
-
-
-
 
         // DELETE api/<NotificationController>/5
         [HttpDelete("{id}")]

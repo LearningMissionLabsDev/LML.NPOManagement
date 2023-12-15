@@ -1,11 +1,5 @@
 ﻿using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Dal.Repositories.Interfaces
 {
@@ -15,5 +9,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         DbSet<UserInformation> UserInformations { get; set; }
         DbSet<UserType> UserTypes { get; set; }
         DbSet<Role> Roles { get; set; }
+        Task<int> SaveChangesAsync();
+        void SaveChanges();
     }
 }

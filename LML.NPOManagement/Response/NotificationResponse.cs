@@ -11,6 +11,5 @@ namespace LML.NPOManagement.Response
         public int AttachmentId { get; set; }
         public string Metadate { get; set; } 
         public string Reminder { get; set; }
-
     }
 }

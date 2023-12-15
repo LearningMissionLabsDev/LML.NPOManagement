@@ -4,7 +4,6 @@ using System.Net;
 
 namespace LML.NPOManagement.Middeware
 {
-
     public static class ExceptionMiddleware
     {
         public static void ConfigureExceptionHandler(this IApplicationBuilder app, IWebHostEnvironment env)
@@ -39,8 +38,4 @@ namespace LML.NPOManagement.Middeware
             });
         }
     }
-
-
-
-
 }

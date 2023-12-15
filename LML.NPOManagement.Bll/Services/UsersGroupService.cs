@@ -16,11 +16,11 @@ namespace LML.NPOManagement.Bll.Services
     public class UsersGroupService : IUsersGroupService
     {
         private IMapper _mapper;
-        private readonly IBaseRepository _baseRepository;
+        //private readonly IBaseRepository _baseRepository;
         private readonly IUserGroupRepository _userGroupRepository;
         private readonly IUserRepository _userRepository;
 
-        public UsersGroupService(IUserGroupRepository userGroupRepository, IUserRepository userRepository, IBaseRepository baseRepository)
+        public UsersGroupService(IUserGroupRepository userGroupRepository, IUserRepository userRepository/*, IBaseRepository baseRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -34,7 +34,7 @@ namespace LML.NPOManagement.Bll.Services
             _mapper = config.CreateMapper();
             _userGroupRepository = userGroupRepository;
             _userRepository = userRepository;
-            _baseRepository = baseRepository;
+            //_baseRepository = baseRepository;
         }
         public async Task<List<UserModel>> GetUserByUsername(string userName, bool showGroupsOnly)
         {
@@ -87,7 +87,7 @@ namespace LML.NPOManagement.Bll.Services
             usersGroup.CreatorId = usersGroupModel.CreatedByUserId;
             
             await _userGroupRepository.UsersGroups.AddAsync(usersGroup);
-            await _baseRepository.SaveChangesAsync();
+            await _userGroupRepository.SaveChangesAsync();
 
             //var newUsersGroup = _mapper.Map<UsersGroup,UsersGroupModel> (usersGroup);
             var newUsersGroup = new UsersGroupModel()

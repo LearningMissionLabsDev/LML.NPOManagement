@@ -26,14 +26,14 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
 builder.Services.AddScoped<IUsersGroupService, UsersGroupService>();
+builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 builder.Services.AddScoped<NPOManagementContext, BaseRepository>();
-builder.Services.AddScoped<IBaseRepository,BaseRepository>();
-builder.Services.AddScoped<IAccountRepository,BaseRepository>();
-builder.Services.AddScoped<IInvestorRepository,BaseRepository>();
-builder.Services.AddScoped<INotificationRepository,BaseRepository>();
-builder.Services.AddScoped<IUserInventoryRepository,BaseRepository>();
-builder.Services.AddScoped<IUserGroupRepository,BaseRepository>();
-builder.Services.AddScoped<IUserRepository,BaseRepository>();
+builder.Services.AddScoped<IAccountRepository, BaseRepository>();
+builder.Services.AddScoped<IInvestorRepository, BaseRepository>();
+builder.Services.AddScoped<INotificationRepository, BaseRepository>();
+builder.Services.AddScoped<IUserInventoryRepository, BaseRepository>();
+builder.Services.AddScoped<IUserGroupRepository, BaseRepository>();
+builder.Services.AddScoped<IUserRepository, BaseRepository>();
 
 
 

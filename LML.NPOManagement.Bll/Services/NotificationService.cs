@@ -16,11 +16,11 @@ namespace LML.NPOManagement.Bll.Services
     public class NotificationService : INotificationService
     {
         private IMapper _mapper;
-        private readonly IBaseRepository _baseRepository;
+        //private readonly IBaseRepository _baseRepository;
         private readonly INotificationRepository _notificationRepository;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
-        public NotificationService(INotificationRepository notificationRepository, IUserRepository userRepository,IInvestorRepository investorRepository,IBaseRepository baseRepository)
+        public NotificationService(INotificationRepository notificationRepository, IUserRepository userRepository,IInvestorRepository investorRepository/*,IBaseRepository baseRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -47,7 +47,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
-            _baseRepository = baseRepository;
+            //_baseRepository = baseRepository;
             _notificationRepository = notificationRepository;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
@@ -57,7 +57,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var notification = _mapper.Map<NotificationModel,Notification>(notificationModel);
             await _notificationRepository.Notifications.AddAsync(notification);
-            await _baseRepository.SaveChangesAsync();
+            await _notificationRepository.SaveChangesAsync();
             return notificationModel;
         }
 
@@ -65,7 +65,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var notification = _notificationRepository.Notifications.Where(n => n.Id == id).FirstOrDefault();
             _notificationRepository.Notifications.Remove(notification);
-            _baseRepository.SaveChanges();
+            _notificationRepository.SaveChanges();
         }
 
         public async Task<List<NotificationModel>> GetAllNotifications()
@@ -83,7 +83,6 @@ namespace LML.NPOManagement.Bll.Services
             }
             return null;
         }
-
 
         public async Task<NotificationModel> GetNotificationById(int id)
         {
@@ -111,7 +110,7 @@ namespace LML.NPOManagement.Bll.Services
             notification.Metadata = notificationModel.Metadata;
             notification.MeetingSchedule = notificationModel.MeetingSchedule;
             notification.NotificationType.Description = notificationModel.NotificationTypeEnum.ToString();
-            await _baseRepository.SaveChangesAsync();
+            await _notificationRepository.SaveChangesAsync();
             var newNotificationModel =_mapper.Map<Notification,NotificationModel>(notification);
             return newNotificationModel;
         }

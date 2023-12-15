@@ -1,17 +1,36 @@
 ﻿using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LML.NPOManagement.Dal.Repositories.BaseRepositories
 {
-    public class BaseRepository : NPOManagementContext, IBaseRepository, IAccountRepository, IInvestorRepository, INotificationRepository, IUserRepository, IUserInventoryRepository, IUserGroupRepository
+    public class BaseRepository : NPOManagementContext,IBaseRepository, IAccountRepository, IInvestorRepository, INotificationRepository, IUserRepository, IUserInventoryRepository, IUserGroupRepository
     {
-        void IBaseRepository.SaveChanges()
+        void IAccountRepository.SaveChanges()
+        {
+            base.SaveChanges();
+        }
+
+        void IInvestorRepository.SaveChanges()
+        {
+            base.SaveChanges();
+        }
+
+        void INotificationRepository.SaveChanges()
+        {
+            base.SaveChanges();
+        }
+
+        void IUserRepository.SaveChanges()
+        {
+            base.SaveChanges();
+        }
+
+        void IUserInventoryRepository.SaveChanges()
+        {
+            base.SaveChanges();
+        }
+
+        void IUserGroupRepository.SaveChanges()
         {
             base.SaveChanges();
         }

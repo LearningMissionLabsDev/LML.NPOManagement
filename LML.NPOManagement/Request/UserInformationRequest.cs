@@ -9,7 +9,6 @@ namespace LML.NPOManagement.Request
         [Range(1, 3)]
         public UserTypeEnum UserTypeEnum { get; set; }
 
-
         [Required]
         [StringLength(50)]
         public string FirstName { get; set; }

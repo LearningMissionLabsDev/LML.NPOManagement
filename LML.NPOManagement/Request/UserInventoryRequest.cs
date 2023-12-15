@@ -26,6 +26,5 @@ namespace LML.NPOManagement.Request
 
         [StringLength(int.MaxValue)]
         public string Description { get; set; }
-
     }
 }

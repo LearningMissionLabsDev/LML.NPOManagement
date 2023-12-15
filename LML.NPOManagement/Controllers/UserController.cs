@@ -87,9 +87,7 @@ namespace LML.NPOManagement.Controllers
                         LastName = newUser.LastName,
                     };
                     newUsers.Add(us);
-                }
-        
-               
+                }       
             }
             return newUsers;
         }

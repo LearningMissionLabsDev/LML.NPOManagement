@@ -14,7 +14,6 @@
         public string? Status { get; set; }
 
         public virtual ICollection<AccountProgressModel> AccountProgresses { get; set; }
-
         public virtual ICollection<UserModel> Users { get; set; }
     }
 }

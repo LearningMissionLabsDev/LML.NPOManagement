@@ -11,9 +11,9 @@ namespace LML.NPOManagement.Bll.Services
     public class UserInventoryService : IUserInventoryService
     {
         private IMapper _mapper;
-        private readonly IBaseRepository _baseRepository;
+        //private readonly IBaseRepository _baseRepository;
         private readonly IUserInventoryRepository _userInventoryRepository;
-        public UserInventoryService(IUserInventoryRepository userInventoryRepository, IBaseRepository baseRepository)
+        public UserInventoryService(IUserInventoryRepository userInventoryRepository /*IBaseRepository baseRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -39,7 +39,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
-            _baseRepository = baseRepository;
+            //_baseRepository = baseRepository;
             _userInventoryRepository = userInventoryRepository;
         }
 
@@ -47,7 +47,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var inventory = _mapper.Map<UserInventoryModel,UserInventory>(userInventoryModel);
             await _userInventoryRepository.UserInventories.AddAsync(inventory);
-            await _baseRepository.SaveChangesAsync();
+            await _userInventoryRepository.SaveChangesAsync();
             var newInventory = await _userInventoryRepository.UserInventories.Where(inv => inv.Date == userInventoryModel.Date).FirstOrDefaultAsync();
             if (newInventory == null)
             {
@@ -90,7 +90,7 @@ namespace LML.NPOManagement.Bll.Services
             inventory.Date = userInventoryModel.Date;
             inventory.UserId = userInventoryModel.UserId;
             await _userInventoryRepository.UserInventories.AddAsync(inventory);
-            await _baseRepository.SaveChangesAsync();
+            await _userInventoryRepository.SaveChangesAsync();
             var inventoryModel = _mapper.Map<UserInventory,UserInventoryModel>(inventory);
             return inventoryModel;
 
@@ -110,7 +110,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var inventory = _mapper.Map<InventoryTypeModel, InventoryType>(inventoryTypeModel);
             await _userInventoryRepository.InventoryTypes.AddAsync(inventory);
-            await _baseRepository.SaveChangesAsync();
+            await _userInventoryRepository.SaveChangesAsync();
             return inventoryTypeModel;
         }
 
@@ -136,7 +136,6 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-
 
             return amount;
         }
@@ -209,7 +208,7 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
             inventory.Status = (int)StatusEnumModel.Closed;
-            await _baseRepository.SaveChangesAsync();
+            await _userInventoryRepository.SaveChangesAsync();
             var model =_mapper.Map<UserInventory,UserInventoryModel>(inventory);
             return model;
         }

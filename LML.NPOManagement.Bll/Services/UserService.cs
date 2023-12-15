@@ -13,11 +13,11 @@ namespace LML.NPOManagement.Bll.Services
     public class UserService : IUserService
     {
         private IMapper _mapper;
-        private readonly IBaseRepository _baseRepository;
+        //private readonly IBaseRepository _baseRepository;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
         private readonly IAccountRepository _accountRepository;
-        public UserService(IUserRepository userRepository, IInvestorRepository investorRepository, IAccountRepository accountRepository, IBaseRepository baseRepository)
+        public UserService(IUserRepository userRepository, IInvestorRepository investorRepository, IAccountRepository accountRepository/*, IBaseRepository baseRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {     
@@ -45,10 +45,9 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserModel, User>();
                 cfg.CreateMap<UserModel, UserInformation>();
                 cfg.CreateMap<UserInformation,UserModel>();
-
             });
             _mapper = config.CreateMapper();
-            _baseRepository = baseRepository;
+            //_baseRepository = baseRepository;
             _userRepository = userRepository;
             _investorRepository = investorRepository;
             _accountRepository = accountRepository;
@@ -58,7 +57,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var user = _userRepository.Users.Where(us => us.Id == id).FirstOrDefault();
             user.Status = Convert.ToString(StatusEnumModel.Closed);
-            _baseRepository.SaveChanges();
+            _userRepository.SaveChanges();
         }
 
         public async Task<List<UserModel>> GetAllUsers()
@@ -125,7 +124,7 @@ namespace LML.NPOManagement.Bll.Services
             var user = await _userRepository.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
             user.Email = userModel.Email;
             user.Password = BC.HashPassword(userModel.Password);
-            await _baseRepository.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
             return true;
         }
 
@@ -138,7 +137,7 @@ namespace LML.NPOManagement.Bll.Services
                 userModel.Password = BC.HashPassword(userModel.Password);
                 var addUser = _mapper.Map<UserModel, User>(userModel);
                 await _userRepository.Users.AddAsync(addUser);
-                await _baseRepository.SaveChangesAsync();
+                await _userRepository.SaveChangesAsync();
                 var newUser = await _userRepository.Users.FirstOrDefaultAsync(us => us.Email == userModel.Email);
                 var newUserModel = _mapper.Map<User, UserModel>(newUser);
                 newUserModel.Token = TokenCreationHelper.GenerateJwtToken(newUserModel, configuration);
@@ -168,7 +167,7 @@ namespace LML.NPOManagement.Bll.Services
                 PhoneNumber = userInformationModel.PhoneNumber,
             };
             await _userRepository.UserInformations.AddAsync(userInfo);
-            await _baseRepository.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
             if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
             {
                 _investorRepository.InvestorInformations.Add(new InvestorInformation()
@@ -176,7 +175,7 @@ namespace LML.NPOManagement.Bll.Services
                     UserId = userInformationModel.UserId,
                     InvestorTierId = Convert.ToInt16(InvestorTierEnum.Basic),
                 });
-                await _baseRepository.SaveChangesAsync();
+                await _userRepository.SaveChangesAsync();
             }
 
             return userInfo.Id;
@@ -244,7 +243,7 @@ namespace LML.NPOManagement.Bll.Services
                 if (userType.Description == Convert.ToString(userInformationModel.UserTypeEnum))
                 {
                     user.UserTypes.Add(userType);
-                    await _baseRepository.SaveChangesAsync();
+                    await _userRepository.SaveChangesAsync();
                     var newUserType = _mapper.Map<UserType, UserTypeModel>(userType);
                     return newUserType;
                 }
@@ -257,7 +256,7 @@ namespace LML.NPOManagement.Bll.Services
             var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
             var user = await _userRepository.Users.Where(us => us.Id == newUser.Id).FirstOrDefaultAsync();
             user.Status = StatusEnumModel.Activ.ToString();
-            await _baseRepository.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
             var userModel = _mapper.Map<User, UserModel>(user);
             return userModel;
         }
@@ -293,7 +292,7 @@ namespace LML.NPOManagement.Bll.Services
                     user.UserTypes.Add(userType);
                 }
             }
-            await _baseRepository.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
             return true;
         }
     }
