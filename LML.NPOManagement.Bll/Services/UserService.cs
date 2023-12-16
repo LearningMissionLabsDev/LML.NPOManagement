@@ -44,7 +44,47 @@ namespace LML.NPOManagement.Bll.Services
             _dbContext = context;
         }
 
-        public void DeleteUser(int id)
+		public async Task<List<UserInformationModel>> GetUserByUsername(string firstChars, bool showGroupsOnly, int userId)
+		{
+			List<User> users = new();
+
+
+			if (!showGroupsOnly)
+			{
+				users = await _dbContext.Users.ToListAsync();
+			}
+			else
+			{
+                var groupIds = _dbContext.Users
+                    .Where(u => u.Id == userId)
+                    .SelectMany(u => u.Groups.Select(g => g.Id))
+                    .ToList();
+
+                users = _dbContext.Users
+                    .Where(u => u.UsersGroups.Any(g => groupIds.Contains(g.Id)))
+                    .ToList();
+            }
+
+			List<UserInformationModel> result = new();
+
+			foreach (var user in users)
+			{
+				var userInfo = await _dbContext.UserInformations.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+				if (userInfo != null)
+				{
+					string fullName = userInfo.FirstName + " " + userInfo.LastName;
+					if (fullName.StartsWith(firstChars, StringComparison.OrdinalIgnoreCase))
+					{
+						var userModel = _mapper.Map<UserInformation, UserInformationModel>(userInfo);
+						result.Add(userModel);
+					}
+				}
+			}
+
+			return result;
+		}
+
+		public void DeleteUser(int id)
         {
             var user = _dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
             user.Status = Convert.ToString(StatusEnumModel.Closed);
@@ -264,4 +304,5 @@ namespace LML.NPOManagement.Bll.Services
             return true;
         }
     }
+
 }

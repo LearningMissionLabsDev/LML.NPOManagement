@@ -75,9 +75,27 @@ namespace LML.NPOManagement.Controllers
             var user = await  _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }
-          
-        // PUT api/<UserController>/5
-        [HttpPut("{id}")]
+
+		[HttpGet("byUsername")] 
+		public async Task<ActionResult<List<UserInformationResponse>>> GetByFirstChars(string firstChars, bool showGroupsOnly)
+		{
+            var currentUser = HttpContext.Items["User"] as UserModel;
+            if (currentUser == null)
+            {
+                return BadRequest(); 
+            }
+
+			var users = await _userService.GetUserByUsername(firstChars, showGroupsOnly, currentUser.Id);
+			if (users.Count == 0)
+			{
+				return NotFound("Users Not Found");
+			}
+
+            return Ok(_mapper.Map<List<UserInformationModel>, List<UserInformationResponse>>(users));
+		}
+
+		// PUT api/<UserController>/5
+		[HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
             var user = await _userService.GetUserById(id);
