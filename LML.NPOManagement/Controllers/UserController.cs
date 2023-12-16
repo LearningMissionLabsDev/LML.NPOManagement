@@ -76,27 +76,26 @@ namespace LML.NPOManagement.Controllers
             return _mapper.Map<UserModel, UserResponse>(user);
         }
 
-		[HttpGet("byFirstChars")] // Api Endpoint correction ? 
-		public async Task<ActionResult<List<UserInformationResponse>>> GetByFirstChars(string firstChars, bool showGroupsOnly)
+        [HttpGet("byFirstChars")] // Api Endpoint correction ? 
+        public async Task<ActionResult<List<UserInformationResponse>>> GetByFirstChars(string firstChars, bool showGroupsOnly)
 		{
-            var currentUser = HttpContext.Items["User"] as UserModel;
-            if (currentUser == null)
-            {
-                return BadRequest("Current User Null");
-            }
+           var currentUser = HttpContext.Items["User"] as UserModel;
+           if (currentUser == null)
+           {
+               return BadRequest("Current User Null");
+           }
+           
+           var users = await _userService.GetUserByUsername(firstChars, showGroupsOnly, currentUser.Id);
+           if (users == null)
+           {
+           	return NotFound("Users Not Found");
+           }
+          
+           return Ok(_mapper.Map<List<UserInformationModel>, List<UserInformationResponse>>(users));
+        }
 
-            var users = await _userService.GetUserByUsername(firstChars, showGroupsOnly, currentUser.Id);
-			if (users == null)
-			{
-				return NotFound("Users Not Found");
-			}
-
-
-			return Ok(_mapper.Map<List<UserInformationModel>, List<UserInformationResponse>>(users));
-		}
-
-		// PUT api/<UserController>/5
-		[HttpPut("{id}")]
+        // PUT api/<UserController>/5
+        [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
             var user = await _userService.GetUserById(id);
