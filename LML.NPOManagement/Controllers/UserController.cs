@@ -91,6 +91,7 @@ namespace LML.NPOManagement.Controllers
 				return NotFound("Users Not Found");
 			}
 
+
 			return Ok(_mapper.Map<List<UserInformationModel>, List<UserInformationResponse>>(users));
 		}
 
