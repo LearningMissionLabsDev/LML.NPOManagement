@@ -20,7 +20,8 @@ namespace LML.NPOManagement.Dal
         DbSet<UserIdea> UserIdeas { get; set; } 
         DbSet<UserInformation> UserInformations { get; set; } 
         DbSet<UserInventory> UserInventories { get; set; } 
-        DbSet<UserType> UserTypes { get; set; } 
+        DbSet<UserType> UserTypes { get; set; }
+        DbSet<UsersGroup> UsersGroups { get; set; }
         Task<int> SaveChangesAsync();
         void SaveChanges();
     }
