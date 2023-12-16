@@ -79,13 +79,13 @@ namespace LML.NPOManagement.Controllers
 		[HttpGet("byFirstChars")] // Api Endpoint correction ? 
 		public async Task<ActionResult<List<UserInformationResponse>>> GetByFirstChars(string firstChars, bool showGroupsOnly)
 		{
-			//var currentUser = HttpContext.Items["User"] as UserModel;
-   //         if (currentUser == null)
-   //         {
-   //             return BadRequest("Current User Null");
-   //         }
+            var currentUser = HttpContext.Items["User"] as UserModel;
+            if (currentUser == null)
+            {
+                return BadRequest("Current User Null");
+            }
 
-			var users = await _userService.GetUserByUsername(firstChars, showGroupsOnly, 1);
+            var users = await _userService.GetUserByUsername(firstChars, showGroupsOnly, currentUser.Id);
 			if (users == null)
 			{
 				return NotFound("Users Not Found");
