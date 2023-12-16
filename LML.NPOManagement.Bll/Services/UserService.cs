@@ -263,5 +263,44 @@ namespace LML.NPOManagement.Bll.Services
             await _dbContext.SaveChangesAsync();
             return true;
         }
-    }
+
+		public async Task<List<UserInformationModel>> GetUserByUsername(string userName, bool showGroupsOnly, int userId)
+		{
+			List<User> users = new();
+
+			if (!showGroupsOnly)
+			{
+				users = await _dbContext.Users.ToListAsync();
+			}
+			else
+			{
+                var groupIds = _dbContext.Users
+                    .Where(u => u.Id == userId)
+                    .SelectMany(u => u.Groups.Select(g => g.Id))
+                    .ToList();
+
+                users = _dbContext.Users
+                    .Where(u => u.UsersGroups.Any(g => groupIds.Contains(g.Id)))
+                    .ToList();
+            }
+
+            List<UserInformationModel> result = new();
+
+			foreach (var user in users)
+			{
+				var userInfo = await _dbContext.UserInformations.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+				if (userInfo != null)
+				{
+					string fullName = userInfo.FirstName + " " + userInfo.LastName;
+					if (fullName.StartsWith(userName, StringComparison.OrdinalIgnoreCase))
+					{
+						var userInformationModel = _mapper.Map<UserInformation, UserInformationModel>(userInfo);
+						result.Add(userInformationModel);
+					}
+				}
+			}
+
+			return result;
+		}
+	}
 }

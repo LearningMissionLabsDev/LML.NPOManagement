@@ -44,7 +44,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
-                cfg.CreateMap<NotificationModel, NotificationResponse>();
+                //cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
@@ -75,9 +75,27 @@ namespace LML.NPOManagement.Controllers
             var user = await  _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }
-          
-        // PUT api/<UserController>/5
-        [HttpPut("{id}")]
+
+		[HttpGet("byFirstChars")] // Api Endpoint correction ? 
+		public async Task<ActionResult<List<UserInformationResponse>>> GetByFirstChars(string firstChars, bool showGroupsOnly)
+		{
+			//var currentUser = HttpContext.Items["User"] as UserModel;
+   //         if (currentUser == null)
+   //         {
+   //             return BadRequest("Current User Null");
+   //         }
+
+			var users = await _userService.GetUserByUsername(firstChars, showGroupsOnly, 1);
+			if (users == null)
+			{
+				return NotFound("Users Not Found");
+			}
+
+			return Ok(_mapper.Map<List<UserInformationModel>, List<UserInformationResponse>>(users));
+		}
+
+		// PUT api/<UserController>/5
+		[HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
             var user = await _userService.GetUserById(id);
