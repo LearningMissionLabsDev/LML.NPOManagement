@@ -31,4 +31,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="LML.NPOManagement.Bll">
+      <HintPath>..\LML.NPOManagement.Bll\bin\Debug\net6.0\LML.NPOManagement.Bll.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

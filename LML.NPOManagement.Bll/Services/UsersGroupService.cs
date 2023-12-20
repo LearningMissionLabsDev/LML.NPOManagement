@@ -7,20 +7,15 @@ using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Collections;
-using System.Text.RegularExpressions;
 
 namespace LML.NPOManagement.Bll.Services
 {
     public class UsersGroupService : IUsersGroupService
     {
         private IMapper _mapper;
-        //private readonly IBaseRepository _baseRepository;
-        private readonly IUserGroupRepository _userGroupRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly INPOManagementContext _dbContext;
 
-        public UsersGroupService(IUserGroupRepository userGroupRepository, IUserRepository userRepository/*, IBaseRepository baseRepository*/)
+        public UsersGroupService(INPOManagementContext dbContext)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -32,9 +27,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UsersGroup, UsersGroupModel>();
             });
             _mapper = config.CreateMapper();
-            _userGroupRepository = userGroupRepository;
-            _userRepository = userRepository;
-            //_baseRepository = baseRepository;
+            _dbContext = dbContext;
         }
         public async Task<List<UserModel>> GetUserByUsername(string userName, bool showGroupsOnly)
         {
@@ -43,16 +36,16 @@ namespace LML.NPOManagement.Bll.Services
 
             if (!showGroupsOnly)
             {
-                users = await _userRepository.Users.ToListAsync();
+                users = await _dbContext.Users.ToListAsync();
             }
             else
             {
-                var groupIds = _userRepository.Users
+                var groupIds = _dbContext.Users
                  .Where(u => u.Id == userId)
                  .SelectMany(u => u.Groups.Select(g => g.Id))
                  .ToList();
 
-                users = _userRepository.Users
+                users = _dbContext.Users
                  .Where(u => u.Groups.Any(g => groupIds.Contains(g.Id)))
                  .ToList();
             }
@@ -61,7 +54,7 @@ namespace LML.NPOManagement.Bll.Services
 
             foreach (var user in users)
             {
-                var userInfo = await _userRepository.UserInformations.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
+                var userInfo = await _dbContext.UserInformations.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
                 if (userInfo != null)
                 {
                     string fullName = userInfo.FirstName + " " + userInfo.LastName;
@@ -76,7 +69,7 @@ namespace LML.NPOManagement.Bll.Services
         }
         public async Task<UsersGroupModel> AddUsersGroup(UsersGroupModel usersGroupModel, List<int> userIds)
         {
-            var users = await _userRepository.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
+            var users = await _dbContext.Users.Where(u => userIds.Contains(u.Id)).ToListAsync();
             if (users.Count < 2)
             {
                 return null;
@@ -86,10 +79,9 @@ namespace LML.NPOManagement.Bll.Services
             usersGroup.Users = users;
             usersGroup.CreatorId = usersGroupModel.CreatedByUserId;
             
-            await _userGroupRepository.UsersGroups.AddAsync(usersGroup);
-            await _userGroupRepository.SaveChangesAsync();
+            await _dbContext.UsersGroups.AddAsync(usersGroup);
+            await _dbContext.SaveChangesAsync();
 
-            //var newUsersGroup = _mapper.Map<UsersGroup,UsersGroupModel> (usersGroup);
             var newUsersGroup = new UsersGroupModel()
             {
                 Id = usersGroup.Id,

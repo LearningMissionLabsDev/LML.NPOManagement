@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Models
 {
-    public partial class NPOManagementContext : DbContext
+    public partial class NPOManagementContext : DbContext, INPOManagementContext
     {
         public NPOManagementContext()
         {
@@ -369,5 +369,13 @@ namespace LML.NPOManagement.Dal.Models
             OnModelCreatingPartial(modelBuilder);
         }
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        void INPOManagementContext.SaveChanges()
+        {
+            base.SaveChanges();
+        }
+        public async Task<int> SaveChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
     }
 }

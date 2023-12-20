@@ -3,8 +3,6 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
-using LML.NPOManagement.Dal.Repositories.BaseRepositories;
-using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
@@ -12,9 +10,8 @@ namespace LML.NPOManagement.Bll.Services
     public class InvestorService : IInvestorService
     {
         private IMapper _mapper;
-        //private readonly IBaseRepository _baseRepository;
-        private readonly IInvestorRepository _investorRepository;
-        public InvestorService(IInvestorRepository investorRepository/* IBaseRepository baseRepository*/)
+        private readonly INPOManagementContext _dbContext;
+        public InvestorService(INPOManagementContext dbContext)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -40,30 +37,29 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
-            //_baseRepository = baseRepository;
-            _investorRepository = investorRepository;
+            _dbContext = dbContext;
            
         }
 
         public async Task<int> AddDonation(DonationModel donationModel)
         {
             var donation =  _mapper.Map<DonationModel, Donation>(donationModel);
-            _investorRepository.Donations.Add(donation);
-            _investorRepository.SaveChanges();
+            _dbContext.Donations.Add(donation);
+            _dbContext.SaveChanges();
             return donation.Id;
         }
 
         public void DeleteDonation(int id)
         {
-            var donation = _investorRepository.Donations.Where(d => d.Id == id).FirstOrDefault();
+            var donation = _dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
             donation.Investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
-            _investorRepository.SaveChanges();
+            _dbContext.SaveChanges();
         }
 
         public async Task<List<InvestorInformationModel>> GetAllInvestorInformations()
         {
             List<InvestorInformationModel> investorInformationModels = new List<InvestorInformationModel>();
-            var investors = await _investorRepository.InvestorInformations.ToListAsync();
+            var investors = await _dbContext.InvestorInformations.ToListAsync();
             foreach (var investor in investors)
             {
                 var InvestorModel = _mapper.Map<InvestorInformation, InvestorInformationModel>(investor);
@@ -75,7 +71,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<InvestorInformationModel> GetInvestorInformationById(int id)
         {
-            var investor = await _investorRepository.InvestorInformations.Where(d => d.Id == id).FirstOrDefaultAsync();
+            var investor = await _dbContext.InvestorInformations.Where(d => d.Id == id).FirstOrDefaultAsync();
             if (investor != null)
             {
                 return _mapper.Map<InvestorInformation, InvestorInformationModel>(investor);
@@ -86,7 +82,7 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<List<DonationModel>> GetAllDonation()
         {
             List<DonationModel> donationModels = new List<DonationModel>();
-            var donations = await _investorRepository.Donations.ToListAsync();
+            var donations = await _dbContext.Donations.ToListAsync();
             foreach (var donation in donations)
             {
                 var donationModel = _mapper.Map<Donation, DonationModel>(donation);
@@ -97,7 +93,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<DonationModel> GetDonationById(int id)
         {
-            var donation = await _investorRepository.Donations.Where(d => d.Id == id).FirstOrDefaultAsync();
+            var donation = await _dbContext.Donations.Where(d => d.Id == id).FirstOrDefaultAsync();
             if (donation != null)
             {
                 return _mapper.Map<Donation, DonationModel>(donation);
@@ -106,11 +102,11 @@ namespace LML.NPOManagement.Bll.Services
         }
         public async Task<DonationModel> ModifyDonation(DonationModel donationModel, int id)
         {
-            var donation = await _investorRepository.Donations.Where(d => d.Id == id).FirstOrDefaultAsync();
+            var donation = await _dbContext.Donations.Where(d => d.Id == id).FirstOrDefaultAsync();
             if (donation != null)
             {
                 var modifyDonation = _mapper.Map<DonationModel, Donation>(donationModel);
-                _investorRepository.SaveChanges();
+                _dbContext.SaveChanges();
                 var newDonation = _mapper.Map<Donation, DonationModel>(modifyDonation);
                 return newDonation;
             }
@@ -123,7 +119,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var donations = await _investorRepository.Donations.Where(don => (don.DateOfCharity == dateTimeStart) &&
+            var donations = await _dbContext.Donations.Where(don => (don.DateOfCharity == dateTimeStart) &&
             (don.DateOfCharity == dateTimeFinish)).ToListAsync();
             if (donations.Count == 0)
             {

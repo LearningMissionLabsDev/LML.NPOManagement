@@ -15,9 +15,6 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<bool> ModifyUser(UserModel userModel, int id);
         Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int id);
         public void DeleteUser(int id);
-        Task<UserModel> Login(UserModel userModel, IConfiguration configuration);
-        Task<UserModel> Registration(UserModel userModel, IConfiguration configuration);
-        Task<int> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
         Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel);
         Task<UserModel> ActivationUser(string token, IConfiguration configuration);
     }

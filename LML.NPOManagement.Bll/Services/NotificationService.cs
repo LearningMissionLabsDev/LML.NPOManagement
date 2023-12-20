@@ -16,11 +16,9 @@ namespace LML.NPOManagement.Bll.Services
     public class NotificationService : INotificationService
     {
         private IMapper _mapper;
-        //private readonly IBaseRepository _baseRepository;
-        private readonly INotificationRepository _notificationRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IInvestorRepository _investorRepository;
-        public NotificationService(INotificationRepository notificationRepository, IUserRepository userRepository,IInvestorRepository investorRepository/*,IBaseRepository baseRepository*/)
+        private readonly INPOManagementContext _dbContext;
+
+        public NotificationService(INPOManagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -47,31 +45,28 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
-            //_baseRepository = baseRepository;
-            _notificationRepository = notificationRepository;
-            _userRepository = userRepository;
-            _investorRepository = investorRepository;
+            _dbContext = context;
         }
 
         public async Task<NotificationModel> AddNotification(NotificationModel notificationModel)
         {
             var notification = _mapper.Map<NotificationModel,Notification>(notificationModel);
-            await _notificationRepository.Notifications.AddAsync(notification);
-            await _notificationRepository.SaveChangesAsync();
+            await _dbContext.Notifications.AddAsync(notification);
+            await _dbContext.SaveChangesAsync();
             return notificationModel;
         }
 
         public void DeleteNotification(int id)
         {
-            var notification = _notificationRepository.Notifications.Where(n => n.Id == id).FirstOrDefault();
-            _notificationRepository.Notifications.Remove(notification);
-            _notificationRepository.SaveChanges();
+            var notification = _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefault();
+            _dbContext.Notifications.Remove(notification);
+            _dbContext.SaveChanges();
         }
 
         public async Task<List<NotificationModel>> GetAllNotifications()
         {
             List<NotificationModel> notificationModels = new List<NotificationModel>();
-            var notifications = await _notificationRepository.Notifications.ToListAsync();
+            var notifications = await _dbContext.Notifications.ToListAsync();
             if (notifications != null)
             {
                 foreach (var notification in notifications)
@@ -86,7 +81,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<NotificationModel> GetNotificationById(int id)
         {
-            var notification = await _notificationRepository.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
+            var notification = await _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
             if (notification != null)
             {
                 var notificationModel = _mapper.Map<Notification, NotificationModel>(notification);
@@ -97,7 +92,7 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<NotificationModel> ModifyNotification(NotificationModel notificationModel, int id)
         {
-            var notification = await _notificationRepository.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
+            var notification = await _dbContext.Notifications.Where(n => n.Id == id).FirstOrDefaultAsync();
             if (notification == null)
             {
                 return null;
@@ -110,7 +105,7 @@ namespace LML.NPOManagement.Bll.Services
             notification.Metadata = notificationModel.Metadata;
             notification.MeetingSchedule = notificationModel.MeetingSchedule;
             notification.NotificationType.Description = notificationModel.NotificationTypeEnum.ToString();
-            await _notificationRepository.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             var newNotificationModel =_mapper.Map<Notification,NotificationModel>(notification);
             return newNotificationModel;
         }
@@ -124,7 +119,7 @@ namespace LML.NPOManagement.Bll.Services
             
             foreach (var userModel in userModels)
             {
-                var userInfo = await _userRepository.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
+                var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
                 body = body.Replace("@firstName", userInfo.FirstName);
                 body = body.Replace("@lastName", userInfo.LastName);
                 SendNotification(body, notificationModel.Subject, userModel.Email);
@@ -138,7 +133,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 notificationModel.Subject = HtmlSubject();
             }
-            var userInfo = await _userRepository.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
+            var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
             body = body.Replace("@firstName", userInfo.FirstName);
             body = body.Replace("@lastName", userInfo.LastName);
 
@@ -147,8 +142,8 @@ namespace LML.NPOManagement.Bll.Services
 
         public async void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel, string body)
         {      
-            var investor = await _investorRepository.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefaultAsync();
-            var user = await _userRepository.Users.Where(us => us.Id == investor.UserId).FirstOrDefaultAsync();
+            var investor = await _dbContext.InvestorInformations.Where(inv => inv.Id == donationModel.InvestorId).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(us => us.Id == investor.UserId).FirstOrDefaultAsync();
             var userModel = _mapper.Map<User, UserModel>(user);
 
             notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByDonation;
@@ -159,7 +154,6 @@ namespace LML.NPOManagement.Bll.Services
             body = body.Replace("@amount", Convert.ToString(donationModel.Amount));
             body = body.Replace("@dateTime", Convert.ToString(donationModel.DateOfCharity));
             SendNotification(body, notificationModel.Subject, userModel.Email);
- 
         }
         
         private void SendNotification(string body, string subject, string email)

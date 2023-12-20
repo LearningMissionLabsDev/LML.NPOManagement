@@ -1,14 +1,11 @@
-﻿using LML.NPOManagement.Dal.Models;
+﻿using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Dal.Repositories.Interfaces
 {
     public interface IInvestorRepository
     {
-        DbSet<Donation> Donations { get; set; }
-        DbSet<InvestorInformation> InvestorInformations { get; set; }
-        DbSet<InvestorTierType> InvestorTierTypes { get; set; }
-        Task<int> SaveChangesAsync();
-        void SaveChanges();
+        Task AddInvestor(UserInformationModel userInformationModel);
     }
 }
