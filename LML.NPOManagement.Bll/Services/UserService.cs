@@ -263,5 +263,49 @@ namespace LML.NPOManagement.Bll.Services
             await _dbContext.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups)
+        {
+            var users = await _dbContext.UserInformations
+                .Where(u => u.FirstName.Contains(firstChars) || u.LastName.Contains(firstChars))
+                .ToListAsync();
+
+            var groups = new List<UsersGroup>();
+
+            if (includeGroups)
+            {
+                 groups = await _dbContext.UsersGroups
+                .Where(g => g.GroupName.Contains(firstChars))
+                .ToListAsync();
+            }
+
+            List<SearchModel> result = new();
+
+            foreach (var user in users)
+            {
+                var searchModel = new SearchModel()
+                {
+                    Id = user.Id,
+                    Name = user.FirstName + " " + user.LastName,
+                    Type = SearchType.User
+                };
+
+                result.Add(searchModel);
+            }
+
+            foreach (var group in groups)
+            {
+                var searchModel = new SearchModel()
+                {
+                    Id = group.Id,
+                    Name = group.GroupName,
+                    Type = SearchType.Group
+                };
+
+                result.Add(searchModel);
+            }
+
+            return result;
+        }
     }
 }

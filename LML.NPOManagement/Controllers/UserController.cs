@@ -44,7 +44,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
                 cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
                 cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
-                cfg.CreateMap<NotificationModel, NotificationResponse>();
                 cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
                 cfg.CreateMap<RoleModel, RoleResponse>();
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
@@ -52,6 +51,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserTypeModel, UserTypeResponse>();
                 cfg.CreateMap<LoginRequest, UserModel>();
+                cfg.CreateMap<SearchModel, SearchResponse>();
             });
             _mapper = config.CreateMapper();
             _userService = userService;
@@ -75,7 +75,22 @@ namespace LML.NPOManagement.Controllers
             var user = await  _userService.GetUserById(id);
             return _mapper.Map<UserModel, UserResponse>(user);
         }
-          
+
+        //GET: api/<UserController>/
+        [HttpGet("byFirstChars")] 
+        public async Task<ActionResult<List<SearchResponse>>> GetByFirstChars(string nameFirstChars, bool includeGroups)
+        {
+            var searchResults = await _userService.GetSearchResult(nameFirstChars, includeGroups);
+            if (searchResults == null || !searchResults.Any())
+            { 
+                return NotFound("Users Not Found");
+            }
+
+            var searchResponses = _mapper.Map<List<SearchModel>, List<SearchResponse>>(searchResults);
+
+            return Ok(searchResponses);
+        }
+
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] UserRequest userRequest)

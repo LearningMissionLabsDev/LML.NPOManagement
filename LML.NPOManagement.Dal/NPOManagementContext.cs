@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Models
 {
@@ -33,21 +32,18 @@ namespace LML.NPOManagement.Dal.Models
         public virtual DbSet<UserInformation> UserInformations { get; set; } = null!;
         public virtual DbSet<UserInventory> UserInventories { get; set; } = null!;
         public virtual DbSet<UserType> UserTypes { get; set; } = null!;
-       
+        public virtual DbSet<UsersGroup> UsersGroups { get; set; } = null!;
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //            if (!optionsBuilder.IsConfigured)
-            //            {
-            //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-            //                optionsBuilder.UseSqlServer("Server=lmldb.cj8tmk4otjem.eu-west-1.rds.amazonaws.com,1433;Database=NPOManagement;User Id=lmladmin;Password=January2021");
-            //            }
             if (!optionsBuilder.IsConfigured)
             {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                              .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                              .AddJsonFile("appsettings.json")
-                              .Build();
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=NPOManagement;User ID=sa;Password=098305624v;TrustServerCertificate=true;Encrypt=False;");
             }
         }
 
@@ -248,6 +244,19 @@ namespace LML.NPOManagement.Dal.Models
                 entity.Property(e => e.Password).HasMaxLength(250);
 
                 entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasMany(d => d.Groups)
+                    .WithMany(p => p.Users)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "UserGroupMembership",
+                        l => l.HasOne<UsersGroup>().WithMany().HasForeignKey("GroupId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserGroup__Group__19DFD96B"),
+                        r => r.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__UserGroup__UserI__47A6A41B"),
+                        j =>
+                        {
+                            j.HasKey("UserId", "GroupId").HasName("PK__UserGrou__A6C1637AC2561575");
+
+                            j.ToTable("UserGroupMembership");
+                        });
             });
 
             modelBuilder.Entity<UserIdea>(entity =>
@@ -334,6 +343,23 @@ namespace LML.NPOManagement.Dal.Models
                         });
             });
 
+            modelBuilder.Entity<UsersGroup>(entity =>
+            {
+                entity.ToTable("UsersGroup");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.GroupName).HasMaxLength(255);
+
+                entity.HasOne(d => d.CreatedByUser)
+                    .WithMany(p => p.UsersGroups)
+                    .HasForeignKey(d => d.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UsersGroup_User");
+            });
+
             OnModelCreatingPartial(modelBuilder);
         }
 
@@ -343,10 +369,5 @@ namespace LML.NPOManagement.Dal.Models
         {
             base.SaveChanges();
         }
-        public async Task<int> SaveChangesAsync()
-        {
-            return await base.SaveChangesAsync();
-        }
-      
     }
 }
