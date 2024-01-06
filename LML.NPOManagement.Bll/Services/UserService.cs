@@ -264,40 +264,45 @@ namespace LML.NPOManagement.Bll.Services
             return true;
         }
 
-        public async Task<List<UserInformationModel>> GetUserByUsername(string userName, bool showGroupsOnly, int userId)
+        public async Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups)
         {
-            List<User> users = new();
+            var users = await _dbContext.UserInformations
+                .Where(u => u.FirstName.Contains(firstChars) || u.LastName.Contains(firstChars))
+                .ToListAsync();
 
-            if (!showGroupsOnly)
-            {
-                users = await _dbContext.Users.ToListAsync();
-            }
-            else
-            {
-                var groupIds = _dbContext.Users
-                    .Where(u => u.Id == userId)
-                    .SelectMany(u => u.Groups.Select(g => g.Id))
-                    .ToList();
+            var groups = new List<UsersGroup>();
 
-                users = _dbContext.Users
-                    .Where(u => u.UsersGroups.Any(g => groupIds.Contains(g.Id)))
-                    .ToList();
+            if (includeGroups)
+            {
+                 groups = await _dbContext.UsersGroups
+                .Where(g => g.GroupName.Contains(firstChars))
+                .ToListAsync();
             }
-                
-            List<UserInformationModel> result = new();
+
+            List<SearchModel> result = new();
 
             foreach (var user in users)
             {
-                var userInfo = await _dbContext.UserInformations.Where(u => u.UserId == user.Id).FirstOrDefaultAsync();
-                if (userInfo != null)
+                var searchModel = new SearchModel()
                 {
-                    string fullName = userInfo.FirstName + " " + userInfo.LastName;
-                    if (fullName.StartsWith(userName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        var userInformationModel = _mapper.Map<UserInformation, UserInformationModel>(userInfo);
-                        result.Add(userInformationModel);
-                    }
-                }
+                    Id = user.Id,
+                    Name = user.FirstName + " " + user.LastName,
+                    Type = SearchType.User
+                };
+
+                result.Add(searchModel);
+            }
+
+            foreach (var group in groups)
+            {
+                var searchModel = new SearchModel()
+                {
+                    Id = group.Id,
+                    Name = group.GroupName,
+                    Type = SearchType.Group
+                };
+
+                result.Add(searchModel);
             }
 
             return result;

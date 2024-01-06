@@ -19,6 +19,6 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<int> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
         Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel);
         Task<UserModel> ActivationUser(string token, IConfiguration configuration);
-        Task<List<UserInformationModel>> GetUserByUsername(string userName, bool showGroupsOnly, int userId);
+        Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups);
     }
 }
