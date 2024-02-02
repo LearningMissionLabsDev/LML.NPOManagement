@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using AutoMapper;
 using Grpc.Core;
 using LML.NPOManagement.Bll.Interfaces;
-using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
@@ -16,9 +16,10 @@ namespace LML.NPOManagement.Bll.Services
     public class NotificationService : INotificationService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
+        //private readonly INotificationRepository _notificationRepository;
+        private readonly NpomanagementContext _dbContext;
 
-        public NotificationService(INPOManagementContext context)
+        public NotificationService(/*INotificationRepository notificationRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -45,7 +46,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = context;
+            //_notificationRepository = notificationRepository;
         }
 
         public async Task<NotificationModel> AddNotification(NotificationModel notificationModel)
@@ -193,7 +194,6 @@ namespace LML.NPOManagement.Bll.Services
 
         public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string body)
         {
-
             if (notificationModel.Subject == null)
             {
                 notificationModel.Subject = HtmlSubject();

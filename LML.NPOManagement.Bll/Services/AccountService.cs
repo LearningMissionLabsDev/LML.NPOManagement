@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
-using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
@@ -11,9 +12,10 @@ namespace LML.NPOManagement.Bll.Services
     public class AccountService : IAccountService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
+        //private readonly IAccountRepository _accountRepository;
+        private readonly NpomanagementContext _dbContext;
 
-        public AccountService(INPOManagementContext dbContext)
+        public AccountService(/*IAccountRepository accountRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -41,7 +43,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserIdea, UserIdeaModel>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = dbContext;
+            //_accountRepository = accountRepository;
         }
 
         public async Task <AccountModel> AddAccount(AccountModel accountModel)
@@ -115,7 +117,7 @@ namespace LML.NPOManagement.Bll.Services
             }
             account.Description = accountModel.Description;
             account.Name = accountModel.Name;
-            account.Status=accountModel.Status;
+            //account.Status=accountModel.Status;
             await _dbContext.SaveChangesAsync();
             var newAccount = _mapper.Map<Account, AccountModel>(account);
             return newAccount;

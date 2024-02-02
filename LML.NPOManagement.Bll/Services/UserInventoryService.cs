@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
-using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
@@ -11,9 +12,11 @@ namespace LML.NPOManagement.Bll.Services
     public class UserInventoryService : IUserInventoryService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
+        //private readonly IUserInventoryRepository _userInventoryRepository;
+        private readonly NpomanagementContext _dbContext;
 
-        public UserInventoryService(INPOManagementContext context)
+
+        public UserInventoryService(/*IUserInventoryRepository userInventoryRepository*/)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -39,7 +42,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = context;
+            //_userInventoryRepository = userInventoryRepository;
         }
 
         public async Task<UserInventoryModel> AddUserInventory(UserInventoryModel userInventoryModel)
@@ -206,7 +209,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            inventory.Status = (int)StatusEnumModel.Closed;
+            inventory.Status = (int)StatusEnumModel.Deleted;
             await _dbContext.SaveChangesAsync();
             var model =_mapper.Map<UserInventory,UserInventoryModel>(inventory);
             return model;

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
-using LML.NPOManagement.Bll.Model;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LML.NPOManagement.Bll.Services
@@ -10,8 +12,10 @@ namespace LML.NPOManagement.Bll.Services
     public class InvestorService : IInvestorService
     {
         private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
-        public InvestorService(INPOManagementContext dbContext)
+        private readonly IInvestorRepository _investorRepository;
+        private readonly NpomanagementContext _dbContext;
+
+        public InvestorService(IInvestorRepository investorRepository)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -37,7 +41,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = dbContext;
+            _investorRepository = investorRepository;
            
         }
 
@@ -52,7 +56,7 @@ namespace LML.NPOManagement.Bll.Services
         public void DeleteDonation(int id)
         {
             var donation = _dbContext.Donations.Where(d => d.Id == id).FirstOrDefault();
-            donation.Investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
+            //donation.Investor.User.Status = Convert.ToString(StatusEnumModel.Closed);
             _dbContext.SaveChanges();
         }
 

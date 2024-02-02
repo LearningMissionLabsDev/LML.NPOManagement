@@ -25,11 +25,11 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
-builder.Services.AddScoped<IUsersGroupService, UsersGroupService>();
-builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+//builder.Services.AddScoped<IAccountRepository>();
+//builder.Services.AddScoped<INotificationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvestorRepository, InvestorRepository>();
-builder.Services.AddScoped <INPOManagementContext, NPOManagementContext>();
+builder.Services.AddScoped <NpomanagementContext>();
 
 
 

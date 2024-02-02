@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Bll.Model;
+﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Dal.Models;
 using Microsoft.EntityFrameworkCore;
 

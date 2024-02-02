@@ -1,206 +1,175 @@
 ﻿using AutoMapper;
-using LML.NPOManagement.Bll.Model;
-using LML.NPOManagement.Bll.Services;
-using LML.NPOManagement.Dal.Model;
+using FluentEmail.Core;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using BC = BCrypt.Net.BCrypt;
 
 namespace LML.NPOManagement.Dal.Repositories
 {
     public class UserRepository : IUserRepository
     {
         IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;
-        public UserRepository(INPOManagementContext context)
+        private readonly NpomanagementContext _dbContext;
+        public UserRepository(NpomanagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<AccountProgress, AccountProgressModel>();
                 cfg.CreateMap<User, UserModel>();
-                cfg.CreateMap<Attachment, AttachmentModel>();
-                cfg.CreateMap<Donation, DonationModel>();
-                cfg.CreateMap<Account, AccountModel>();
-                cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
-                cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<Notification, NotificationModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
-                cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<UserInformation, UserModel>();
-                cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Attachment>();
-                cfg.CreateMap<DonationModel, Donation>();
-                cfg.CreateMap<AccountModel, Account>();
-                cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
-                cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<NotificationModel, Notification>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
-                cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserTypeModel, UserType>();
-                cfg.CreateMap<UserModel, UserInformation>();
                 cfg.CreateMap<UserModel, User>();
+                cfg.CreateMap<UsersGroupModel, UsersGroup>();
+                cfg.CreateMap<UsersGroup, UsersGroupModel>();
 
             });
             _mapper = config.CreateMapper();
             _dbContext = context;
         }
 
-        public async Task<UserModel> ActivationUser(string token, IConfiguration configuration)
+        public async Task UpdateUserStatus(int userId, StatusEnumModel status)
         {
-            var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
-            var user = await _dbContext.Users.Where(us => us.Id == newUser.Id).FirstOrDefaultAsync();
-            user.Status = StatusEnumModel.Activ.ToString();
-            await _dbContext.SaveChangesAsync();
-            var userModel = _mapper.Map<User, UserModel>(user);
-            return userModel;
-        }
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
 
-        public async Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel)
-        {
-            var userTypes = await _dbContext.UserTypes.ToListAsync();
-            var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
-            foreach (var userType in userTypes)
+            if (user != null)
             {
-                if (userType.Description == Convert.ToString(userInformationModel.UserTypeEnum))
-                {
-                    user.UserTypes.Add(userType);
-                    await _dbContext.SaveChangesAsync();
-                    var newUserType = _mapper.Map<UserType, UserTypeModel>(userType);
-
-                    return newUserType;
-                }
+                user.StatusId = (int)status;
+                await _dbContext.SaveChangesAsync();
             }
-            return null;
         }
 
-        public void DeleteUser(int id)
+        public async Task UpdateGroupStatus(int userId, GroupStatusEnum status)
         {
-            var user = _dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
-            user.Status = Convert.ToString(StatusEnum.Closed);
-            _dbContext.SaveChanges();
+            var group = await _dbContext.UsersGroups.Where(gr => gr.Id == userId).FirstOrDefaultAsync();
+
+            if (group != null)
+            {
+                group.StatusId = (int)status;
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task<List<UserModel>> GetAllUsers()
         {
             var users = await _dbContext.Users.ToListAsync();
-            if (users.Count == 0)
+
+            if (users.Count < 1)
             {
                 return null;
             }
-            List<UserModel> userModels = new List<UserModel>();
-            foreach (var user in users)
-            {
-                var userModel = _mapper.Map<User, UserModel>(user);
-                userModels.Add(userModel);
-            }
-            return userModels;
+
+            return _mapper.Map<List<UserModel>>(users);
         }
 
-        public async Task<UserModel> GetUserById(int id)
+        public async Task<UserModel> GetUserById(int userId)
         {
-            var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (user != null)
-            {
-                var userModel = _mapper.Map<User, UserModel>(user);
-                return userModel;
-            }
-            return null;
-        }
-
-        public async Task<List<UserInformationModel>> GetUserByName(UserInformationModel searchUser)
-        {
-            var allUsers = await _dbContext.UserInformations.Where(name => (EF.Functions.Like(name.FirstName, $"%{searchUser.FirstName}%") || EF.Functions.Like(name.LastName, $"%{searchUser.LastName}%"))).ToListAsync();
-            if (allUsers.Count == 0)
+            if (userId <= 0)
             {
                 return null;
             }
-            var userInfoModelList = new List<UserInformationModel>();
+            var user = await _dbContext.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
 
-            foreach (var user in allUsers)
+            if (user == null)
             {
-                var newUserInfoModel = _mapper.Map<UserInformation, UserInformationModel>(user);
-                userInfoModelList.Add(newUserInfoModel);
+                return null;
             }
-            return userInfoModelList;
+
+            return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<List<UserModel>> GetUsersByAccount(int id)
+        public async Task<List<UserInformationModel>> GetUsersByName(UserInformationModel userInfo)
         {
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
+            var users = await _dbContext.UserInformations.Where(name => (EF.Functions.Like(name.FirstName, $"%{userInfo.FirstName}%") || EF.Functions.Like(name.LastName, $"%{userInfo.LastName}%"))).ToListAsync();
+
+            if (users.Count < 1)
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UserInformationModel>>(users);
+        }
+
+        public async Task<List<UserModel>> GetUsersByAccount(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                return null;
+            }
+            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
+            if (account == null)
+            {
+                return null;
+            }
             var users = await _dbContext.Users.Where(acc => acc.Accounts.Contains(account)).ToListAsync();
-            if (users.Count > 0)
+
+            if (users.Count < 1)
             {
-                var userModel = new List<UserModel>();
-                foreach (var user in users)
-                {
-                    var userByAccount = _mapper.Map<User, UserModel>(user);
-                    userModel.Add(userByAccount);
-                }
-                return userModel;
+                return null;
             }
-            return null;
+
+            return _mapper.Map<List<UserModel>>(users);
         }
 
-        public async Task<List<UserModel>> GetUsersByInvestorTier(int id)
+        public async Task<List<UserModel>> GetUsersByInvestorTier(int investorTierId)
         {
-            var investor = await _dbContext.InvestorInformations.Where(inv => inv.InvestorTierId == id).FirstOrDefaultAsync();
-
+            if (investorTierId <= 0)
+            {
+                return null;
+            }
+            var investor = await _dbContext.InvestorInformations.Where(inv => inv.InvestorTierId == investorTierId).FirstOrDefaultAsync();
+            if (investor == null)
+            {
+                return null;
+            }
             var users = await _dbContext.Users.Where(inv => inv.Id == investor.UserId).ToListAsync();
 
-            if (users.Count > 0)
+            if (users.Count < 1)
             {
-                var userModel = new List<UserModel>();
-                foreach (var user in users)
-                {
-                    var userByAccount = _mapper.Map<User, UserModel>(user);
-                    userModel.Add(userByAccount);
-                }
-                return userModel;
+                return null;
+
             }
-            return null;
+
+            return _mapper.Map<List<UserModel>>(users);
         }
 
-        public async Task<List<UserModel>> GetUsersByRole(int id)
+        public async Task<UserModel> ModifyUserCredentials(string email, string password, int userId, int statusId)
         {
-            var userRole = await _dbContext.Roles.Where(r => r.Id == id).FirstOrDefaultAsync();
-            var users = await _dbContext.Users.Where(ro => ro.Roles.Contains(userRole)).ToListAsync();
-            if (users.Count > 0)
+            if (userId <= 0 || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(email))
             {
-                var userModel = new List<UserModel>();
-                foreach (var user in users)
-                {
-                    var userByRole = _mapper.Map<User, UserModel>(user);
-                    userModel.Add(userByRole);
-                }
-                return userModel;
+                return null;
             }
-            return null;
-        }
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
 
-        public async Task<bool> ModifyUser(UserModel userModel, int id)
-        {
-            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
-            user.Email = userModel.Email;
-            user.Password = BC.HashPassword(userModel.Password);
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Email = email;
+            user.Password = password;
+            user.StatusId = statusId;
+
             await _dbContext.SaveChangesAsync();
-            return true;
+
+            return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int id)
+        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int userId)
         {
-            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == id).FirstOrDefaultAsync();
+            if (userId <= 0)
+            {
+                return false;
+            }
+            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == userId).FirstOrDefaultAsync();
 
             if (userInfo == null)
             {
                 return false;
             }
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
 
-            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
-
-            userInfo.UserId = id;
+            userInfo.UserId = userId;
             userInfo.FirstName = userInformationModel.FirstName;
             userInfo.LastName = userInformationModel.LastName;
             userInfo.PhoneNumber = userInformationModel.PhoneNumber;
@@ -221,27 +190,119 @@ namespace LML.NPOManagement.Dal.Repositories
                 }
             }
             await _dbContext.SaveChangesAsync();
+
             return true;
         }
 
         public async Task<UserModel> GetUserByEmail(string email)
         {
-           var user = await _dbContext.Users.Where(user=>user.Email == email).FirstOrDefaultAsync();
-            if(user != null)
+            if (string.IsNullOrEmpty(email))
             {
-                var userModel = _mapper.Map<User, UserModel>(user);
-                return userModel;
+                return null;
             }
-            return null;
+            var user = await _dbContext.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<UserModel>(user);
+        }
+
+        public async Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups)
+        {
+            if (string.IsNullOrEmpty(firstChars))
+            {
+                return null;
+            }
+            var users = await _dbContext.UserInformations
+                .Where(u => u.FirstName.Contains(firstChars) || u.LastName.Contains(firstChars))
+                .ToListAsync();
+
+            var groups = new List<UsersGroup>();
+
+            if (includeGroups)
+            {
+                groups = await _dbContext.UsersGroups
+               .Where(g => g.GroupName.Contains(firstChars))
+               .ToListAsync();
+            }
+
+            List<SearchModel> result = new();
+
+            foreach (var user in users)
+            {
+                var searchModel = new SearchModel()
+                {
+                    Id = user.Id,
+                    Name = user.FirstName + " " + user.LastName,
+                    Type = SearchTypeEnum.User
+                };
+
+                result.Add(searchModel);
+            }
+
+            foreach (var group in groups)
+            {
+                var searchModel = new SearchModel()
+                {
+                    Id = group.Id,
+                    Name = group.GroupName,
+                    Type = SearchTypeEnum.Group
+                };
+
+                result.Add(searchModel);
+            }
+
+            return result;
+        }
+
+        public async Task<UsersGroupModel> AddGroup(UsersGroupModel usersGroupModel)
+        {
+            if (usersGroupModel == null || string.IsNullOrEmpty(usersGroupModel.GroupName))
+            {
+                return null;
+            }
+            var usersGroup = _mapper.Map<UsersGroupModel, UsersGroup>(usersGroupModel);
+
+            var users = await _dbContext.Users.Where(u => usersGroupModel.UserIds.Contains(u.Id)).ToListAsync();
+
+            if (users.Count > 0)
+            {
+                foreach (var user in users)
+                {
+                    if (user.StatusId == (int)StatusEnumModel.Active)
+                    {
+                        usersGroup.Users.Add(user);
+                    }
+                }
+            }
+
+            await _dbContext.UsersGroups.AddAsync(usersGroup);
+            await _dbContext.SaveChangesAsync();
+
+            var newUsersGroup = new UsersGroupModel()
+            {
+                Id = usersGroup.Id,
+                GroupName = usersGroup.GroupName,
+                CreatorId = usersGroup.CreatorId,
+                Description = usersGroup.Description,
+                UserIds = usersGroupModel.UserIds
+            };
+
+            return newUsersGroup;
         }
 
         public async Task AddUser(UserModel userModel)
         {
-            if(userModel != null)
+            if (userModel != null)
             {
                 var user = _mapper.Map<UserModel, User>(userModel);
+                user.StatusId = (int)StatusEnumModel.Pending;
+
                 await _dbContext.Users.AddAsync(user);
-                await _dbContext.SaveChangesAsync();   
+                await _dbContext.SaveChangesAsync();
             }
         }
 
@@ -262,9 +323,139 @@ namespace LML.NPOManagement.Dal.Repositories
                     Metadata = userInformationModel.Metadata,
                     PhoneNumber = userInformationModel.PhoneNumber,
                 };
+
                 await _dbContext.UserInformations.AddAsync(userInfo);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<UsersGroupModel>> GetAllGroups()
+        {
+            var groups = await _dbContext.UsersGroups.ToListAsync();
+
+            if (groups.Count < 1)
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UsersGroupModel>>(groups);
+        }
+
+        public async Task<List<UsersGroupModel>> GetGroupsByName(string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                return null;
+            }
+            var groups = await _dbContext.UsersGroups.Where(group => group.GroupName.Contains(groupName)).ToListAsync();
+
+            if (groups.Count < 1)
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UsersGroupModel>>(groups);
+        }
+
+        public async Task<UsersGroupModel> GetGroupById(int groupId)
+        {
+            if (groupId <= 0)
+            {
+                return null;
+            }
+            var group = await _dbContext.UsersGroups.Where(group => group.Id == groupId).FirstOrDefaultAsync();
+
+            if (group == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<UsersGroupModel>(group);
+        }
+
+        public async Task<List<UserModel>> GetUsersByGroupId(int groupId)
+        {
+            if (groupId <= 0)
+            {
+                return null;
+            }
+            var group = await _dbContext.UsersGroups.Include(g => g.Users).FirstOrDefaultAsync(g => g.Id == groupId);
+
+            if (group == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UserModel>>(group.Users);
+        }
+
+        public async Task<List<UsersGroupModel>> GetGroupsForUser(int userId)
+        {
+            if (userId <= 0)
+            {
+                return null;
+            }
+            var user = await _dbContext.Users.Include(g => g.Groups).FirstOrDefaultAsync(g => g.Id == userId);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UsersGroupModel>>(user.Groups);
+        }
+
+        public async Task DeleteUserFromGroup(int userId, int groupId)
+        {
+            if (userId <= 0 || groupId <= 0)
+            {
+                throw new ArgumentException("Delete failed");
+            }
+            var group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
+
+            if (group != null)
+            {
+                var userToRemove = group.Users.FirstOrDefault(user => user.Id == userId);
+
+                if (userToRemove != null)
+                {
+                    group.Users.Remove(userToRemove);
+                }
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteGroup(int groupId)
+        {
+            var group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
+            if (group != null)
+            {
+                group.Users.Clear();
+                _dbContext.Remove(group);
+
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> AddUserToGroup(int userId, int groupId)
+        {
+            if (userId <= 0 || groupId <= 0)
+            {
+                return false;
+            }
+            var group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+            if (user == null || group == null)
+            {
+                return false;
+            }
+            if (group.Users.Contains(user))
+            {
+                return false;
+            }
+            group.Users.Add(user);
+
+            return true;
         }
     }
 }
