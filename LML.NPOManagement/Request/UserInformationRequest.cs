@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Bll.Model;
+﻿using LML.NPOManagement.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
@@ -6,9 +6,8 @@ namespace LML.NPOManagement.Request
     public class UserInformationRequest
     {
         [Required]
-        [Range(1, 3)]
+        [Range(1, 4)]
         public UserTypeEnum UserTypeEnum { get; set; }
-
 
         [Required]
         [StringLength(50)]

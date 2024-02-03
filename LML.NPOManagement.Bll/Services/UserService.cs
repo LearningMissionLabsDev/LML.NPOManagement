@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
-using LML.NPOManagement.Bll.Model;
-using LML.NPOManagement.Dal;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
+using LML.NPOManagement.Dal.Repositories;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
@@ -11,257 +14,353 @@ namespace LML.NPOManagement.Bll.Services
 {
     public class UserService : IUserService
     {
-        private IMapper _mapper;
-        private readonly INPOManagementContext _dbContext;       
-        public UserService(INPOManagementContext context)
+        IMapper _mapper;
+        private readonly IUserRepository _userRepository;
+        private readonly IInvestorRepository _investorRepository;
+
+        public UserService(IUserRepository userRepository, IInvestorRepository investorRepository)
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<AccountProgress, AccountProgressModel>();
                 cfg.CreateMap<User, UserModel>();
-                cfg.CreateMap<Attachment, AttachmentModel>();
-                cfg.CreateMap<Donation, DonationModel>();
-                cfg.CreateMap<Account, AccountModel>();
-                cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
-                cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<UserInformation, UserInformationModel>();
-                cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Attachment>();
-                cfg.CreateMap<DonationModel, Donation>();
-                cfg.CreateMap<AccountModel, Account>();
-                cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
-                cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<UserInformationModel, UserInformation>();
-                cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserTypeModel, UserType>();
                 cfg.CreateMap<UserModel, User>();
             });
             _mapper = config.CreateMapper();
-            _dbContext = context;
+            _userRepository = userRepository;
+            _investorRepository = investorRepository;
         }
 
-        public void DeleteUser(int id)
+        public async Task<UserModel> ActivationUser(string token, IConfiguration configuration)
         {
-            var user = _dbContext.Users.Where(us => us.Id == id).FirstOrDefault();
-            user.Status = Convert.ToString(StatusEnumModel.Closed);
-            _dbContext.SaveChanges();
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+            var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
+
+            if (newUser == null)
+            {
+                return null;
+            }
+            await _userRepository.UpdateUserStatus(newUser.Id, StatusEnumModel.Active);
+            newUser.StatusId = (int)StatusEnumModel.Active;
+
+            return newUser;
+        }
+
+        public async Task DeleteUser(int userId)
+        {
+            if(userId == 0)
+            {
+                throw new ArgumentException("Invalid user");
+            }
+            await _userRepository.UpdateUserStatus(userId, StatusEnumModel.Deleted);
         }
 
         public async Task<List<UserModel>> GetAllUsers()
         {
-            List<UserModel> userModels = new List<UserModel>();
-            var users = await _dbContext.Users.ToListAsync();
-            foreach (var user in users)
+            var userModel = await _userRepository.GetAllUsers();
+
+            if (userModel == null)
             {
-                var userModel = _mapper.Map<User, UserModel>(user);
-                userModels.Add(userModel);
+                return null;
             }
-            return userModels;
+
+            return userModel;
         }
 
-        public async Task <UserModel> GetUserById(int id)
+        public async Task DeleteUserFromGroup(int userId, int groupId)
         {
-            var user = await _dbContext.Users.Where(x => x.Id == id).FirstOrDefaultAsync();
+            await _userRepository.DeleteUserFromGroup(userId, groupId);
+        }
+
+        public async Task<UserModel> GetUserById(int userId)
+        {
+            var userModel = await _userRepository.GetUserById(userId);
+
+            if (userModel == null)
+            {
+                return null;
+            }
+
+            return userModel;
+        }
+
+        public async Task<UserModel> GetUserByEmail(string email)
+        {
+            var userModel = await _userRepository.GetUserByEmail(email);
+
+            if (userModel == null)
+            {
+                return null;
+            }
+
+            return userModel;
+        }
+
+        public async Task<List<UserInformationModel>> GetUsersByName(UserInformationModel userInfo)
+        {
+            var userModel = await _userRepository.GetUsersByName(userInfo);
+
+            if (userModel == null)
+            {
+                return null;
+            }
+
+            return userModel;
+        }
+
+        public async Task<List<UserModel>> GetUsersByAccount(int userId)
+        {
+            var usersByAccount = await _userRepository.GetUsersByAccount(userId);
+
+            if (usersByAccount == null)
+            {
+                return null;
+            }
+
+            return usersByAccount;
+        }
+
+        public async Task<List<UserModel>> GetUsersByInvestorTier(int userId)
+        {
+            var userModel = await _userRepository.GetUsersByInvestorTier(userId);
+
+            if (userModel == null)
+            {
+                return null;
+            }
+
+            return userModel;
+        }
+
+        public async Task<UserModel> ModifyUserCredentials(string email, string password, int userId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+            var user = await _userRepository.GetUserByEmail(email);
+
             if (user != null)
             {
-                var userModel = _mapper.Map<User,UserModel>(user);
-                return userModel;
+                throw new ArgumentException("Email already exists", "Email");
             }
-            return null;
+
+            var existingUser = await _userRepository.GetUserById(userId);
+
+            if (existingUser == null)
+            {
+                return null;
+            }
+
+            if (string.Compare(existingUser.Email, email, true) != 0)
+            {
+                user.Email = email;
+                user.StatusId = (int)StatusEnumModel.Pending;
+            }
+            user.Password = BC.HashPassword(password);
+
+            var newUserModel = await _userRepository.ModifyUserCredentials(email, password, userId, user.StatusId.Value);
+
+            if (newUserModel == null)
+            {
+                return null;
+            }
+            newUserModel.Password = null;
+
+            return newUserModel;
+        }
+
+        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int userId)
+        {
+            var user = await _userRepository.ModifyUserInfo(userInformationModel, userId);
+
+            return user;
         }
 
         public async Task<UserModel> Login(UserModel userModel, IConfiguration configuration)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
+            var user = await _userRepository.GetUserByEmail(userModel.Email);
+
             if (user != null && BC.Verify(userModel.Password, user.Password))
             {
-                var userModelMapper = _mapper.Map<User, UserModel>(user);
-                userModelMapper.Password = null;
-                userModelMapper.Token = TokenCreationHelper.GenerateJwtToken(userModelMapper, configuration);
-                return userModelMapper;
+                user.Password = null;
+                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration);
+
+                return user;
             }
             return null;
-        }
-
-        public async Task<bool> ModifyUser(UserModel userModel, int id)
-        {
-            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();            
-            user.Email = userModel.Email;
-            user.Password = BC.HashPassword(userModel.Password);                
-            await _dbContext.SaveChangesAsync();          
-            return true;
         }
 
         public async Task<UserModel> Registration(UserModel userModel, IConfiguration configuration)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(m => m.Email == userModel.Email);
-       
-            if (user == null )
-            {             
-                userModel.Password = BC.HashPassword(userModel.Password);
-                var addUser = _mapper.Map<UserModel, User>(userModel);
-                await _dbContext.Users.AddAsync(addUser);
-                await _dbContext.SaveChangesAsync();
-                var newUser = await _dbContext.Users.FirstOrDefaultAsync(us => us.Email == userModel.Email);
-                var newUserModel = _mapper.Map<User, UserModel>(newUser);
-                newUserModel.Token = TokenCreationHelper.GenerateJwtToken(newUserModel, configuration);
-                newUserModel.Password = null;
-                return newUserModel;                    
-            }
-            else if(user.Status == Convert.ToString(StatusEnumModel.Closed))
+            var user = await _userRepository.GetUserByEmail(userModel.Email);
+
+            if (user == null)
             {
-                return null;//to do handle this condition differently
+                userModel.Password = BC.HashPassword(userModel.Password);
+                await _userRepository.AddUser(userModel);
+
+                var newUser = await _userRepository.GetUserByEmail(userModel.Email);
+                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
+                newUser.Password = null;
+
+                return newUser;
+            }
+            else if (user.StatusId == (int)StatusEnumModel.Deleted)
+            {
+                return null;
             }
             return null;
         }
 
-        public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel,IConfiguration configuration )
+        public async Task<int> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration)
         {
-            var userInfo = new UserInformation()
-            {
-                FirstName = userInformationModel.FirstName,
-                LastName = userInformationModel.LastName,
-                DateOfBirth = userInformationModel.DateOfBirth,
-                CreateDate = DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
-                UserId = userInformationModel.UserId,
-                Gender = (int)userInformationModel.Gender,
-                MiddleName = userInformationModel.MiddleName,
-                Metadata = userInformationModel.Metadata,
-                PhoneNumber = userInformationModel.PhoneNumber,
-            };
-            await _dbContext.UserInformations.AddAsync(userInfo);
-            await _dbContext.SaveChangesAsync();
+            await _userRepository.AddUserInformation(userInformationModel);
+
             if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
             {
-                _dbContext.InvestorInformations.Add(new InvestorInformation()
-                {
-                    UserId = userInformationModel.UserId,
-                    InvestorTierId = Convert.ToInt16(InvestorTierEnum.Basic),
-                });
-                await _dbContext.SaveChangesAsync();
+                await _investorRepository.AddInvestor(userInformationModel);
             }
-               
-            return userInfo.Id;
+
+            return userInformationModel.Id;
         }
 
-        public async Task<List<UserModel>> GetUsersByRole(int id)
+        public async Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups)
         {
-            var userRole = await _dbContext.Roles.Where(r => r.Id == id).FirstOrDefaultAsync();
-            var users = await _dbContext.Users.Where(ro => ro.Roles.Contains(userRole)).ToListAsync();
-            if (users.Count > 0)
+            if (string.IsNullOrEmpty(searchParam))
             {
-                var userModel = new List<UserModel>();
-                foreach (var user in users)
-                {
-                    var userByRole = _mapper.Map<User, UserModel>(user);                     
-                    userModel.Add(userByRole);
-                }
-                return userModel;
+                return null;
             }
-            return null;
-        }
+            var users = await _userRepository.GetSearchResults(searchParam, includeGroups);
 
-        public async Task<List<UserModel>> GetUsersByAccount(int id)
-        {
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
-            var users = await _dbContext.Users.Where(acc => acc.Accounts.Contains(account)).ToListAsync();
-            if (users.Count > 0)
+            if (users == null)
             {
-                var userModel = new List<UserModel>();
-                foreach (var user in users)
-                {
-                    var userByAccount = _mapper.Map<User, UserModel>(user);
-                    userModel.Add(userByAccount);
-                }
-                return userModel;
+                return null;
             }
-            return null;
+
+            return users;
         }
 
-        public async Task<List<UserModel>> GetUsersByInvestorTier(int id)
+        public async Task<UsersGroupModel> CreateGroup(UsersGroupModel usersGroupModel)
         {
-            var investor = await _dbContext.InvestorInformations.Where(inv => inv.InvestorTierId == id).FirstOrDefaultAsync();
-
-            var users = await _dbContext.Users.Where(inv => inv.Id == investor.UserId).ToListAsync();
-
-            if (users.Count > 0)
+            if (string.IsNullOrEmpty(usersGroupModel.GroupName))
             {
-                var userModel = new List<UserModel>();
-                foreach (var user in users)
-                {
-                    var userByAccount = _mapper.Map<User, UserModel>(user);
-                    userModel.Add(userByAccount);
-                }
-                return userModel;
+                return null;
             }
-            return null;
-        }
-
-        public async Task<UserTypeModel> AddUserType(UserInformationModel userInformationModel)
-        {
-            var userTypes = await _dbContext.UserTypes.ToListAsync();
-            var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
-            foreach (var userType in userTypes)
+            var creatorUser = await _userRepository.GetUserById(usersGroupModel.CreatorId);
+            if (creatorUser == null)
             {
-                if( userType.Description == Convert.ToString( userInformationModel.UserTypeEnum ))
-                {
-                    user.UserTypes.Add(userType);
-                    await _dbContext.SaveChangesAsync();
-                    var newUserType = _mapper.Map<UserType, UserTypeModel>(userType);
-                    return newUserType;
-                }
+                return null;
             }
-            return null;
+            usersGroupModel.UserIds.Add(creatorUser.Id);
+
+            var usersGroup = await _userRepository.AddGroup(usersGroupModel);
+
+            if (usersGroup == null)
+            {
+                return null;
+            }
+
+            return usersGroup;
         }
 
-        public async Task<UserModel> ActivationUser(string token,IConfiguration configuration)
+        public async Task<List<UsersGroupModel>> GetAllGroups()
         {
-            var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
-            var user = await _dbContext.Users.Where(us => us.Id == newUser.Id).FirstOrDefaultAsync();
-            user.Status = StatusEnumModel.Activ.ToString();
-            await _dbContext.SaveChangesAsync();
-            var userModel = _mapper.Map<User,UserModel>(user);
-            return userModel;
+            var groupsModel = await _userRepository.GetAllGroups();
+
+            if (groupsModel == null)
+            {
+                return null;
+            }
+
+            return groupsModel;
         }
 
-        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int id)
+        public async Task<List<UsersGroupModel>> GetGroupsByName(string groupName)
         {
-            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == id).FirstOrDefaultAsync();            
+            if (string.IsNullOrEmpty(groupName))
+            {
+                return null;
+            }
+            var groupsModel = await _userRepository.GetGroupsByName(groupName);
 
-            if (userInfo == null)
+            if (groupsModel == null)
+            {
+                return null;
+            }
+
+            return groupsModel;
+        }
+
+        public async Task<UsersGroupModel> GetGroupById(int groupId)
+        {
+            if (groupId <= 0)
+            {
+                return null;
+            }
+            var groupModel = await _userRepository.GetGroupById(groupId);
+
+            if (groupModel == null)
+            {
+                return null;
+            }
+
+            return groupModel;
+        }
+
+        public async Task<List<UserModel>> GetUsersByGroupId(int groupId)
+        {
+            if (groupId <= 0)
+            {
+                return null;
+            }
+
+            var users = await _userRepository.GetUsersByGroupId(groupId);
+
+            if (users == null)
+            {
+                return null;
+            }
+
+            return users;
+        }
+
+        public async Task<List<UsersGroupModel>> GetGroupsForUser(int userId)
+        {
+            if (userId <= 0)
+            {
+                return null;
+            }
+            var groups = await _userRepository.GetGroupsForUser(userId);
+
+            if (groups == null)
+            {
+                return null;
+            }
+            return groups;
+        }
+
+        public async Task DeleteGroup(int groupId)
+        {
+            if (groupId <= 0)
+            {
+                throw new ArgumentException("Group not found");
+            }
+
+            await _userRepository.DeleteGroup(groupId);
+        }
+
+        public async Task<bool> AddUserToGroup(int userId, int groupId)
+        {
+            if (userId <= 0 || groupId <= 0)
             {
                 return false;
             }
+            var user = await _userRepository.AddUserToGroup(userId, groupId);
 
-            var user = await _dbContext.Users.Where(us => us.Id == id).FirstOrDefaultAsync();
-
-            userInfo.UserId = id;
-            userInfo.FirstName = userInformationModel.FirstName;
-            userInfo.LastName = userInformationModel.LastName;
-            userInfo.PhoneNumber = userInformationModel.PhoneNumber;
-            userInfo.UpdateDate = DateTime.UtcNow;
-            userInfo.MiddleName = userInformationModel.MiddleName;
-            userInfo.Metadata = userInformationModel.Metadata;
-            userInfo.DateOfBirth = userInformationModel.DateOfBirth;
-            userInfo.Gender = (int) userInformationModel.Gender;
-           
-            var userTypes = await _dbContext.UserTypes.ToListAsync();
-
-            foreach (var userType in userTypes)
-            {
-                if ( userType.Description == Convert.ToString(userInformationModel.UserTypeEnum) &&
-                     user.UserTypes.Where(us => us.Description == Convert.ToString(userInformationModel.UserTypeEnum)) == null)
-                {
-                    user.UserTypes.Add(userType);            
-                }
-            }
-            await _dbContext.SaveChangesAsync();
-            return true;
+            return user;
         }
     }
 }

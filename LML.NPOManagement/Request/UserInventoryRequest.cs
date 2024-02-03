@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Bll.Model;
+﻿using LML.NPOManagement.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
@@ -26,6 +26,5 @@ namespace LML.NPOManagement.Request
 
         [StringLength(int.MaxValue)]
         public string Description { get; set; }
-
     }
 }

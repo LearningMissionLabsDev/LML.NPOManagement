@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Bll.Model;
+﻿using LML.NPOManagement.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
@@ -8,21 +8,14 @@ namespace LML.NPOManagement.Request
         [Required]
         [StringLength(100)]
         public string Subject { get; set; }
-
         public NotificationTransportEnum NotificationTransportEnum { get; set; }
-
         public NotificationTypeEnum NotificationTypeEnum { get; set; }
-
         public NotificationContext NotificationContext { get; set; }
         public Languages Language { get; set; }
-
         public string BodyName { get; set; }
-
         [DataType(DataType.Time)]
         public string Reminder { get; set; }
-
         public string MeetingSchedule { get; set; }
         public string Metadata { get; set; }
-
     }
 }
