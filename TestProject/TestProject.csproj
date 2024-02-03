@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LML.NPOManagement.Bll\LML.NPOManagement.Bll.csproj" />
+    <ProjectReference Include="..\LML.NPOManagement.Common\LML.NPOManagement.Common.csproj" />
     <ProjectReference Include="..\LML.NPOManagement\LML.NPOManagement.csproj" />
   </ItemGroup>
 

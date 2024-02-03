@@ -265,11 +265,11 @@ public partial class NpomanagementContext : DbContext
                     "UserGroupMembership",
                     r => r.HasOne<UsersGroup>().WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK__UserGroup__Group__19DFD96B"),
                     l => l.HasOne<User>().WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK__UserGroup__UserI__114A936A"),
                     j =>
                     {

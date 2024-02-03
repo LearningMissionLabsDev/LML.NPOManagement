@@ -227,13 +227,13 @@ namespace LML.NPOManagement.Bll.Services
             return userInformationModel.Id;
         }
 
-        public async Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups)
+        public async Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups)
         {
-            if (string.IsNullOrEmpty(firstChars))
+            if (string.IsNullOrEmpty(searchParam))
             {
                 return null;
             }
-            var users = await _userRepository.GetSearchResult(firstChars, includeGroups);
+            var users = await _userRepository.GetSearchResults(searchParam, includeGroups);
 
             if (users == null)
             {
@@ -249,6 +249,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
+            var creatorUser = await _userRepository.GetUserById(usersGroupModel.CreatorId);
+            if (creatorUser == null)
+            {
+                return null;
+            }
+            usersGroupModel.UserIds.Add(creatorUser.Id);
+
             var usersGroup = await _userRepository.AddGroup(usersGroupModel);
 
             if (usersGroup == null)

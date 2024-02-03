@@ -20,7 +20,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task DeleteUserFromGroup(int userId, int groupId);
         Task DeleteGroup(int groupId);
         Task<UserModel> GetUserByEmail(string email);
-        Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups);
+        Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> AddGroup(UsersGroupModel groupModel);
         Task<bool> AddUserToGroup(int userId,int groupId);
         Task<List<UsersGroupModel>> GetAllGroups();

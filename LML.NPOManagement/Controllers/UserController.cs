@@ -42,78 +42,44 @@ namespace LML.NPOManagement.Controllers
             _s3Client = s3Client;
         }
 
-        [HttpGet("search")]
-        public async Task<List<UserInformationResponse>> SearchUser(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                return null;
-            }
-            var userRequest = new UserInformationModel()
-            {
-                FirstName = name,
-                LastName = name,
-            };
-            var users = await _userService.GetUsersByName(userRequest);
-
-            if (users == null)
-            {
-                return null;
-            }
-
-            var newUsers = new List<UserInformationResponse>();
-
-            foreach (var newUser in users)
-            {
-                var userInfoResponse = new UserInformationResponse()
-                {
-                    UserId = newUser.UserId,
-                    FirstName = newUser.FirstName,
-                    LastName = newUser.LastName,
-                };
-                newUsers.Add(userInfoResponse);
-            }
-
-            return newUsers;
-        }
-
         [HttpGet]
-        public async Task<IEnumerable<UserResponse>> Get()
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
         {
             var userModel = await _userService.GetAllUsers();
 
             if (userModel == null)
             {
-                return null;
+                return NotFound();
             }
             var userResponses = new List<UserResponse>();
 
             foreach (var user in userModel)
             {
-                var newUserResponse = new UserResponse
+                var newUserResponse = new UserResponse()
                 {
-                    Email = user.Email,
+                    Id = user.Id,
+                    Email = user.Email
                 };
                 userResponses.Add(newUserResponse);
             }
 
-            return userResponses;
+            return Ok(userResponses);
         }
 
         [HttpGet("groups")]
-        public async Task<IEnumerable<UsersGroupResponse>> GetAllGroups()
+        public async Task<ActionResult<IEnumerable<UsersGroupResponse>>> GetGroups()
         {
             var groupsModel = await _userService.GetAllGroups();
 
             if (groupsModel == null)
             {
-                return null;
+                return NotFound();
             }
             var groups = new List<UsersGroupResponse>();
 
             foreach (var group in groupsModel)
             {
-                var groupResponse = new UsersGroupResponse
+                var groupResponse = new UsersGroupResponse()
                 {
                     Id = group.Id,
                     CreatorId = group.CreatorId,
@@ -123,47 +89,46 @@ namespace LML.NPOManagement.Controllers
                 groups.Add(groupResponse);
             }
 
-            return groups;
+            return Ok(groups);
         }
 
-        [HttpGet("user")]
-        public async Task<UserResponse> GetUserbyId(int userId)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<UserResponse>> GetUserbyId(int userId)
         {
             if (userId <= 0)
             {
-                return null;
+                return BadRequest();
             }
             var user = await _userService.GetUserById(userId);
 
             if (user == null)
             {
-                return null;
+                return NotFound();
             }
 
-            var userResponse = new UserResponse
+            var userResponse = new UserResponse()
             {
                 Email = user.Email
             };
 
-            return userResponse;
+            return Ok(userResponse);
         }
 
         [HttpGet("group/{groupId}")]
-        public async Task<UsersGroupResponse> GetGroupById(int groupId)
+        public async Task<ActionResult<UsersGroupResponse>> GetGroupById(int groupId)
         {
             if (groupId <= 0)
             {
-                return null;
+                return BadRequest();
             }
-
             var groupModel = await _userService.GetGroupById(groupId);
 
             if (groupModel == null)
             {
-                return null;
+                return NotFound();
             }
 
-            var groupResponse = new UsersGroupResponse
+            var groupResponse = new UsersGroupResponse()
             {
                 Id = groupModel.Id,
                 CreatorId = groupModel.CreatorId,
@@ -171,26 +136,26 @@ namespace LML.NPOManagement.Controllers
                 Description = groupModel.Description,
             };
 
-            return groupResponse;
+            return Ok(groupResponse);
         }
 
-        [HttpGet("groupName")]
-        public async Task<List<UsersGroupResponse>> GetGroupsByName(string groupName)
+        [HttpGet("group/search/{groupName}")]
+        public async Task<ActionResult<List<UsersGroupResponse>>> GetGroupsByName(string groupName)
         {
             if (string.IsNullOrEmpty(groupName))
             {
-                return null;
+                return BadRequest();
             }
             var groupModel = await _userService.GetGroupsByName(groupName);
 
             if (groupModel == null)
             {
-                return null;
+                return NotFound();
             }
             var groups = new List<UsersGroupResponse>();
             foreach (var group in groupModel)
             {
-                var groupResponse = new UsersGroupResponse
+                var groupResponse = new UsersGroupResponse()
                 {
                     Id = group.Id,
                     CreatorId = group.CreatorId,
@@ -199,40 +164,65 @@ namespace LML.NPOManagement.Controllers
                 };
                 groups.Add(groupResponse);
             }
-            return groups;
+            return Ok(groups);
         }
 
-        [HttpGet("groups/user")]
-        public async Task<List<UsersGroupResponse>> GetGroupsForUser(int userId)
+        [HttpGet("group/user/{userId}")]
+        public async Task<ActionResult<List<UsersGroupResponse>>> GetGroupsForUser(int userId)
         {
             if (userId <= 0)
             {
-                return null;
+                return BadRequest();
             }
             var usersGroupModel = await _userService.GetGroupsForUser(userId);
 
             if (usersGroupModel == null)
             {
-                return null;
+                return NotFound();
             }
-            return _mapper.Map<List<UsersGroupResponse>>(usersGroupModel);
+            var userGroups = new List<UsersGroupResponse>();
+
+            foreach (var user in usersGroupModel)
+            {
+                var userResponse = new UsersGroupResponse()
+                {
+                    Id = user.Id,
+                    CreatorId = user.CreatorId,
+                    GroupName = user.GroupName,
+                    Description = user.Description
+                };
+                userGroups.Add(userResponse);
+            }
+
+            return Ok(userGroups);
         }
 
-        [HttpGet("group/users")]
-        public async Task<List<UserResponse>> GetUsersByGroupId(int groupId)
+        [HttpGet("group/members/{groupId}")]
+        public async Task<ActionResult<List<UserResponse>>> GetUsersByGroupId(int groupId)
         {
             if (groupId <= 0)
             {
-                return null;
+                return BadRequest();
             }
             var usersModel = await _userService.GetUsersByGroupId(groupId);
 
-            if (usersModel == null)
+            if (usersModel == null || !usersModel.Any())
             {
-                return null;
+                return NotFound();
+            }
+            var users = new List<UserResponse>();
+
+            foreach (var user in usersModel)
+            {
+                var usersResponse = new UserResponse()
+                {
+                    Id = user.Id,
+                    Email = user.Email
+                };
+                users.Add(usersResponse);
             }
 
-            return _mapper.Map<List<UserModel>, List<UserResponse>>(usersModel);
+            return Ok(users);
         }
 
         [HttpGet("verifyEmail")]
@@ -268,14 +258,14 @@ namespace LML.NPOManagement.Controllers
             return BadRequest("Not User");
         }
 
-        [HttpGet("byFirstChars")]
-        public async Task<ActionResult<List<SearchResponse>>> GetByFirstChars(string nameFirstChars, bool includeGroups)
+        [HttpGet("search/{searchParam}/{includeGroups}")]
+        public async Task<ActionResult<List<SearchResponse>>> SearchByName(string searchParam, bool includeGroups)
         {
-            if (string.IsNullOrEmpty(nameFirstChars))
+            if (string.IsNullOrEmpty(searchParam))
             {
                 return BadRequest("This field is required!");
             }
-            var searchResults = await _userService.GetSearchResult(nameFirstChars, includeGroups);
+            var searchResults = await _userService.GetSearchResults(searchParam, includeGroups);
 
             if (searchResults == null || !searchResults.Any())
             {
@@ -358,7 +348,7 @@ namespace LML.NPOManagement.Controllers
             return Ok(userInfoId);
         }
 
-        [HttpPost("groups")]
+        [HttpPost("group")]
         [Authorize]
         public async Task<ActionResult<UsersGroupResponse>> AddGroup([FromBody] UsersGroupRequest usersGroupRequest)
         {
@@ -378,24 +368,24 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("Your Request Is Not Valid");
             }
-
             var newUsersGroupResponse = _mapper.Map<UsersGroupModel, UsersGroupResponse>(newUsersGroupModel);
 
             return Ok(newUsersGroupResponse);
         }
 
-        [HttpPost("groups/addUser")]
-        public async Task<ActionResult> AddUserToGroup(int userId, int groupId)
+        [HttpPost("group/addUser")]
+        [Authorize]
+        public async Task<ActionResult> AddUserToGroup([FromBody] AddUserToGroupRequest addUserToGroupRequest)
         {
-            if (userId <= 0 || groupId <= 0)
+            if (addUserToGroupRequest.UserId <= 0 || addUserToGroupRequest.GroupId <= 0)
             {
                 return BadRequest("Process Failed");
             }
-            var result = await _userService.AddUserToGroup(userId, groupId);
+            var result = await _userService.AddUserToGroup(addUserToGroupRequest.UserId,addUserToGroupRequest.GroupId);
 
             if (!result)
             {
-                return BadRequest("Process Failed");
+                return Conflict();
             }
             return Ok();
         }
@@ -474,7 +464,7 @@ namespace LML.NPOManagement.Controllers
 
             return Ok();
         }
-        
+
         [HttpDelete("groups")]
         public async Task<ActionResult> DeleteUserFromGroup(int userId, int groupId)
         {
@@ -486,7 +476,7 @@ namespace LML.NPOManagement.Controllers
 
             return Ok();
         }
-        
+
         [HttpDelete("group")]
         public async Task<ActionResult> DeleteGroup(int groupId)
         {
@@ -496,7 +486,7 @@ namespace LML.NPOManagement.Controllers
             }
             await _userService.DeleteGroup(groupId);
 
-            return NoContent();
+            return Ok();
         }
 
         private async Task<string> GetFileByKeyAsync(string bucketName, string key)

@@ -210,14 +210,14 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups)
+        public async Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups)
         {
-            if (string.IsNullOrEmpty(firstChars))
+            if (string.IsNullOrEmpty(searchParam))
             {
                 return null;
             }
             var users = await _dbContext.UserInformations
-                .Where(u => u.FirstName.Contains(firstChars) || u.LastName.Contains(firstChars))
+                .Where(u => u.FirstName.Contains(searchParam) || u.LastName.Contains(searchParam))
                 .ToListAsync();
 
             var groups = new List<UsersGroup>();
@@ -225,7 +225,7 @@ namespace LML.NPOManagement.Dal.Repositories
             if (includeGroups)
             {
                 groups = await _dbContext.UsersGroups
-               .Where(g => g.GroupName.Contains(firstChars))
+               .Where(g => g.GroupName.Contains(searchParam))
                .ToListAsync();
             }
 
@@ -265,6 +265,11 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
             var usersGroup = _mapper.Map<UsersGroupModel, UsersGroup>(usersGroupModel);
+            //var creatorUser = await _dbContext.Users.Where(cr => cr.Id == usersGroupModel.CreatorId).FirstOrDefaultAsync();
+            //if (creatorUser == null)
+            //{
+            //    return null;
+            //}
 
             var users = await _dbContext.Users.Where(u => usersGroupModel.UserIds.Contains(u.Id)).ToListAsync();
 
@@ -431,6 +436,8 @@ namespace LML.NPOManagement.Dal.Repositories
             if (group != null)
             {
                 group.Users.Clear();
+                await _dbContext.SaveChangesAsync();
+
                 _dbContext.Remove(group);
 
                 await _dbContext.SaveChangesAsync();
@@ -445,6 +452,7 @@ namespace LML.NPOManagement.Dal.Repositories
             }
             var group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
             var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+
             if (user == null || group == null)
             {
                 return false;

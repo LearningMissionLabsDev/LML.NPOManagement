@@ -23,7 +23,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<UserModel> Login(UserModel userModel, IConfiguration configuration);
         Task<UserModel> Registration(UserModel userModel, IConfiguration configuration);
         Task<int> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
-        Task<List<SearchModel>> GetSearchResult(string firstChars, bool includeGroups);
+        Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> CreateGroup(UsersGroupModel userGroupModel);
         Task<List<UsersGroupModel>> GetAllGroups();
         Task<List<UsersGroupModel>> GetGroupsByName(string groupName);
