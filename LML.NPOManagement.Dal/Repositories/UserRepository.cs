@@ -454,6 +454,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 return false;
             }
             group.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
 
             return true;
         }

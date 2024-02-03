@@ -438,7 +438,7 @@ namespace LML.NPOManagement.Controllers
 
             if (user == null)
             {
-                return BadRequest();
+                return BadRequest("Please logged in");
             }
 
             var userInfoModel = new UserInformationModel()
