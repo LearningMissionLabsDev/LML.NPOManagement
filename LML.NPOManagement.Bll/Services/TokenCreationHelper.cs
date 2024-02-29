@@ -42,21 +42,21 @@ namespace LML.NPOManagement.Bll.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public static string GenerateJwtTokenUserAccount(List<Account2UserModel> account2UserModels, IConfiguration configuration)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] {
-                    new Claim("Id", user.Id.ToString()),
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
-                SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+        //public static string GenerateJwtTokenUserAccount(List<Account2UserModel> account2UserModels, IConfiguration configuration)
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
+        //    var tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[] {
+        //            new Claim("Id", user.Id.ToString()),
+        //        }),
+        //        Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+        //        SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+        //    };
+        //    var token = tokenHandler.CreateToken(tokenDescriptor);
+        //    return tokenHandler.WriteToken(token);
+        //}
 
         public static UserModel ValidateJwtToken(string token, IConfiguration configuration)
         {
