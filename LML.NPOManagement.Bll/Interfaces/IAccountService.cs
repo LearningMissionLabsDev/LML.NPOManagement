@@ -1,16 +1,20 @@
 ﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
+using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IAccountService
     {
-        Task <List<AccountModel>> GetAllAccounts();
+        Task<List<AccountModel>> GetAllAccounts();
         Task<AccountModel> GetAccountById(int id);
-        Task <AccountModel> AddAccount(AccountModel accountModel);
+        Task<List<AccountModel>> GetAccountsByName(string name);
+        Task<List<UserModel>> GetUsersByAccount(int id);
+        Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel, IConfiguration configuration);
+        Task<AccountModel> AddAccount(AccountModel accountModel);
+        Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRoleEnum);
         Task<AccountModel> ModifyAccount(AccountModel accountModel, int id);
-        public void DeleteAccount(int id);
-        Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
-        Task<List<UserIdeaModel>> GetAllIdea();
+        Task<bool> RemoveUserFromAccount(int accountId, int userId);
+        Task<bool> DeleteAccount(int accountId);
     }
 }

@@ -22,21 +22,30 @@ namespace LML.NPOManagement.Dal.Repositories
                 cfg.CreateMap<UserModel, User>();
                 cfg.CreateMap<UsersGroupModel, UsersGroup>();
                 cfg.CreateMap<UsersGroup, UsersGroupModel>();
+                cfg.CreateMap<UserIdea, UserIdeaModel>();
+                cfg.CreateMap<UserIdeaModel, UserIdea>();
 
             });
             _mapper = config.CreateMapper();
             _dbContext = context;
         }
 
-        public async Task UpdateUserStatus(int userId, StatusEnumModel status)
+        public async Task<UserModel> UpdateUserStatus(int userId, StatusEnumModel status)
         {
             var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
-
-            if (user != null)
+            if(user == null)
             {
-                user.StatusId = (int)status;
-                await _dbContext.SaveChangesAsync();
+                return null;
             }
+            if (user.StatusId == (int)status)
+            {
+                return null;   
+            }
+            user.StatusId = (int)status;
+            await _dbContext.SaveChangesAsync();
+            user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+
+            return _mapper.Map<UserModel>(user);
         }
 
         public async Task UpdateGroupStatus(int userId, GroupStatusEnum status)
@@ -78,39 +87,6 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<List<UserInformationModel>> GetUsersByName(UserInformationModel userInfo)
-        {
-            var users = await _dbContext.UserInformations.Where(name => (EF.Functions.Like(name.FirstName, $"%{userInfo.FirstName}%") || EF.Functions.Like(name.LastName, $"%{userInfo.LastName}%"))).ToListAsync();
-
-            if (users.Count < 1)
-            {
-                return null;
-            }
-
-            return _mapper.Map<List<UserInformationModel>>(users);
-        }
-
-        public async Task<List<UserModel>> GetUsersByAccount(int accountId)
-        {
-            if (accountId <= 0)
-            {
-                return null;
-            }
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
-            if (account == null)
-            {
-                return null;
-            }
-            var users = await _dbContext.Users.Where(acc => acc.Accounts.Contains(account)).ToListAsync();
-
-            if (users.Count < 1)
-            {
-                return null;
-            }
-
-            return _mapper.Map<List<UserModel>>(users);
-        }
-
         public async Task<List<UserModel>> GetUsersByInvestorTier(int investorTierId)
         {
             if (investorTierId <= 0)
@@ -127,11 +103,30 @@ namespace LML.NPOManagement.Dal.Repositories
             if (users.Count < 1)
             {
                 return null;
-
             }
 
             return _mapper.Map<List<UserModel>>(users);
         }
+
+        public async Task<List<UserIdeaModel>> GetAllIdea()
+        {
+            var ideas = await _dbContext.UserIdeas.ToListAsync();
+
+            if (ideas.Count < 1)
+            {
+                return null;
+            }
+            return _mapper.Map<List<UserIdeaModel>>(ideas);
+        }
+
+        public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
+        {
+            var idea = _mapper.Map<UserIdea>(userIdeaModel);
+            await _dbContext.UserIdeas.AddAsync(idea);
+            await _dbContext.SaveChangesAsync();
+
+            return _mapper.Map<UserIdeaModel>(idea);
+        }    
 
         public async Task<UserModel> ModifyUserCredentials(string email, string password, int userId, int statusId)
         {
@@ -179,16 +174,16 @@ namespace LML.NPOManagement.Dal.Repositories
             userInfo.DateOfBirth = userInformationModel.DateOfBirth;
             userInfo.Gender = (int)userInformationModel.Gender;
 
-            var userTypes = await _dbContext.UserTypes.ToListAsync();
+            //var userTypes = await _dbContext.UserTypes.ToListAsync();
 
-            foreach (var userType in userTypes)
-            {
-                if (userType.Description == Convert.ToString(userInformationModel.UserTypeEnum) &&
-                     user.UserTypes.Where(us => us.Description == Convert.ToString(userInformationModel.UserTypeEnum)) == null)
-                {
-                    user.UserTypes.Add(userType);
-                }
-            }
+            //foreach (var userType in userTypes)
+            //{
+            //    if (userType.Description == Convert.ToString(userInformationModel.UserTypeEnum) &&
+            //         user.UserTypes.Where(us => us.Description == Convert.ToString(userInformationModel.UserTypeEnum)) == null)
+            //    {
+            //        user.UserTypes.Add(userType);
+            //    }
+            //}
             await _dbContext.SaveChangesAsync();
 
             return true;
@@ -265,11 +260,6 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
             var usersGroup = _mapper.Map<UsersGroupModel, UsersGroup>(usersGroupModel);
-            //var creatorUser = await _dbContext.Users.Where(cr => cr.Id == usersGroupModel.CreatorId).FirstOrDefaultAsync();
-            //if (creatorUser == null)
-            //{
-            //    return null;
-            //}
 
             var users = await _dbContext.Users.Where(u => usersGroupModel.UserIds.Contains(u.Id)).ToListAsync();
 
@@ -312,7 +302,7 @@ namespace LML.NPOManagement.Dal.Repositories
         }
 
         public async Task AddUserInformation(UserInformationModel userInformationModel)
-        {
+        {          
             if (userInformationModel != null)
             {
                 var userInfo = new UserInformation()
@@ -328,6 +318,13 @@ namespace LML.NPOManagement.Dal.Repositories
                     Metadata = userInformationModel.Metadata,
                     PhoneNumber = userInformationModel.PhoneNumber,
                 };
+                var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == userInformationModel.UserId);
+                //var userType = await _dbContext.UserTypes.Where(usType => usType.Description == Convert.ToString(userInformationModel.UserTypeEnum)).FirstOrDefaultAsync();
+                
+                //    if(user != null && userType != null)
+                //    {
+                //        user.UserTypes.Add(userType);
+                //    }
 
                 await _dbContext.UserInformations.AddAsync(userInfo);
                 await _dbContext.SaveChangesAsync();
@@ -410,38 +407,46 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<List<UsersGroupModel>>(user.Groups);
         }
 
-        public async Task DeleteUserFromGroup(int userId, int groupId)
+        public async Task<UsersGroupModel> DeleteUserFromGroup(int userId, int groupId)
         {
             if (userId <= 0 || groupId <= 0)
             {
                 throw new ArgumentException("Delete failed");
             }
             var group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
-
-            if (group != null)
+            var user = await _dbContext.Users.FirstOrDefaultAsync(us => us.Id == userId);
+            if (group == null || user == null)
             {
-                var userToRemove = group.Users.FirstOrDefault(user => user.Id == userId);
-
-                if (userToRemove != null)
-                {
-                    group.Users.Remove(userToRemove);
-                }
-                await _dbContext.SaveChangesAsync();
+                return null;
             }
+            var userToRemove = group.Users.FirstOrDefault(user => user.Id == userId);
+
+            if (userToRemove == null)
+            {
+                return null;
+            }
+            group.Users.Remove(userToRemove);
+            await _dbContext.SaveChangesAsync();
+            group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
+
+            return _mapper.Map<UsersGroupModel>(group);
         }
 
-        public async Task DeleteGroup(int groupId)
+        public async Task<bool> DeleteGroup(int groupId)
         {
             var group = await _dbContext.UsersGroups.Include(us => us.Users).FirstOrDefaultAsync(gr => gr.Id == groupId);
-            if (group != null)
+            if (group == null)
             {
-                group.Users.Clear();
-                await _dbContext.SaveChangesAsync();
-
-                _dbContext.Remove(group);
-
-                await _dbContext.SaveChangesAsync();
+                return false;
             }
+            group.Users.Clear();
+            await _dbContext.SaveChangesAsync();
+
+            _dbContext.Remove(group);
+
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> AddUserToGroup(int userId, int groupId)
@@ -464,6 +469,10 @@ namespace LML.NPOManagement.Dal.Repositories
             group.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
+            if (!group.Users.Contains(user))
+            {
+                return false;
+            }
             return true;
         }
     }

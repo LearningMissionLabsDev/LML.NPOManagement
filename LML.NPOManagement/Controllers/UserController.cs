@@ -7,7 +7,6 @@ using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 using LML.NPOManagement.Common.Model;
-using System.Text.RegularExpressions;
 
 namespace LML.NPOManagement.Controllers
 {
@@ -225,6 +224,53 @@ namespace LML.NPOManagement.Controllers
             return Ok(users);
         }
 
+        // DONE
+        [HttpGet("idea")]
+        public async Task<ActionResult<List<UserIdeaResponse>>> GetIdeas()
+        {
+            var ideas = await _userService.GetAllIdea();
+
+            if (ideas == null)
+            {
+                return NotFound();
+            }
+            List<UserIdeaResponse> ideaResponses = new List<UserIdeaResponse>();
+
+            foreach (var idea in ideas)
+            {
+                var ideaResponse = new UserIdeaResponse()
+                {
+                    Id = idea.Id,
+                    UserId = idea.UserId,
+                    IdeaDescription = idea.IdeaDescription,
+                    IdeaCategory = idea.IdeaCategory,
+                };
+                ideaResponses.Add(ideaResponse);
+            }
+            return Ok(ideaResponses);
+        }
+
+        [HttpPost("submitComments")]
+        public async Task<ActionResult> SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var ideaModel = _mapper.Map<UserIdeaRequest, UserIdeaModel>(userIdeaRequest);
+            ideaModel.UserId = user.Id;
+
+            var idea = await _userService.AddUserIdea(ideaModel);
+            if(idea == null)
+            {
+                return Conflict();
+            }
+            return Ok();
+        }
+
+
         [HttpGet("verifyEmail")]
         public async Task<ActionResult> VerifyEmail([FromQuery] string token)
         {
@@ -324,7 +370,7 @@ namespace LML.NPOManagement.Controllers
 
             var userInformationModel = new UserInformationModel()
             {
-                UserTypeEnum = userInformationRequest.UserTypeEnum,
+                RequestedUserTypeEnum = userInformationRequest.UserTypeEnum,
                 UserId = user.Id,
                 Gender = userInformationRequest.Gender,
                 FirstName = userInformationRequest.FirstName,
@@ -381,7 +427,7 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("Process Failed");
             }
-            var result = await _userService.AddUserToGroup(addUserToGroupRequest.UserId,addUserToGroupRequest.GroupId);
+            var result = await _userService.AddUserToGroup(addUserToGroupRequest.UserId, addUserToGroupRequest.GroupId);
 
             if (!result)
             {
@@ -400,7 +446,6 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
 
             var modifyUser = await _userService.ModifyUserCredentials(userModel.Email, userModel.Password, user.Id);
@@ -433,7 +478,7 @@ namespace LML.NPOManagement.Controllers
 
             var userInfoModel = new UserInformationModel()
             {
-                UserTypeEnum = userInformationRequest.UserTypeEnum,
+                RequestedUserTypeEnum = userInformationRequest.UserTypeEnum,
                 UserId = user.Id,
                 Gender = userInformationRequest.Gender,
                 FirstName = userInformationRequest.FirstName,
@@ -444,7 +489,7 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var modifyUser = await _userService.ModifyUserInfo(userInfoModel, user.Id);
+            var modifyUser = await _userService.ModifyUserInfo(userInfoModel, /*user.Id*/ 9);
 
             if (modifyUser)
             {
@@ -460,8 +505,12 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            await _userService.DeleteUser(userId);
+            var deletedUser = await _userService.DeleteUser(userId);
 
+            if (deletedUser == null)
+            {
+                return NotFound();
+            }
             return Ok();
         }
 
@@ -472,8 +521,12 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("Unable to remove user from group");
             }
-            await _userService.DeleteUserFromGroup(userId, groupId);
+            var user = await _userService.DeleteUserFromGroup(userId, groupId);
 
+            if (!user)
+            {
+                return NotFound();
+            }
             return Ok();
         }
 
@@ -482,10 +535,14 @@ namespace LML.NPOManagement.Controllers
         {
             if (groupId <= 0)
             {
-                return BadRequest("Group not found");
+                return BadRequest();
             }
-            await _userService.DeleteGroup(groupId);
+            var group = await _userService.DeleteGroup(groupId);
 
+            if (!group)
+            {
+                return NotFound();
+            }
             return Ok();
         }
 

@@ -4,6 +4,6 @@ namespace LML.NPOManagement.Response
 {
     public class UserTypeResponse
     {
-        public UserTypeEnum UserTypeEnum { get; set; }
+        public RequestedUserTypeEnum UserTypeEnum { get; set; }
     }
 }

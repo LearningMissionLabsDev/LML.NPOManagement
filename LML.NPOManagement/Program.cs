@@ -25,7 +25,7 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
-//builder.Services.AddScoped<IAccountRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 //builder.Services.AddScoped<INotificationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvestorRepository, InvestorRepository>();

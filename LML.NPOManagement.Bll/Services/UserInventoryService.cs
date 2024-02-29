@@ -20,7 +20,6 @@ namespace LML.NPOManagement.Bll.Services
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<AccountProgress, AccountProgressModel>();
                 cfg.CreateMap<Attachment, AttachmentModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
@@ -29,8 +28,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<Notification, NotificationModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<AccountProgressModel, AccountProgress>();
+                //cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AttachmentModel, Attachment>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
@@ -39,7 +37,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<NotificationModel, Notification>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserTypeModel, UserType>();
+                //cfg.CreateMap<UserTypeModel, UserType>();
             });
             _mapper = config.CreateMapper();
             //_userInventoryRepository = userInventoryRepository;

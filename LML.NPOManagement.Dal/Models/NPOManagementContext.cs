@@ -17,9 +17,11 @@ public partial class NpomanagementContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
-    public virtual DbSet<AccountProgress> AccountProgresses { get; set; }
+    public virtual DbSet<Account2User> Account2Users { get; set; }
 
     public virtual DbSet<AccountStatus> AccountStatuses { get; set; }
+
+    public virtual DbSet<AccountUserActivity> AccountUserActivities { get; set; }
 
     public virtual DbSet<Attachment> Attachments { get; set; }
 
@@ -37,7 +39,11 @@ public partial class NpomanagementContext : DbContext
 
     public virtual DbSet<NotificationType> NotificationTypes { get; set; }
 
+    public virtual DbSet<RequestedUserType> RequestedUserTypes { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserAccountRole> UserAccountRoles { get; set; }
 
     public virtual DbSet<UserIdea> UserIdeas { get; set; }
 
@@ -46,8 +52,6 @@ public partial class NpomanagementContext : DbContext
     public virtual DbSet<UserInventory> UserInventories { get; set; }
 
     public virtual DbSet<UserStatus> UserStatuses { get; set; }
-
-    public virtual DbSet<UserType> UserTypes { get; set; }
 
     public virtual DbSet<UsersGroup> UsersGroups { get; set; }
 
@@ -63,42 +67,45 @@ public partial class NpomanagementContext : DbContext
         {
             entity.ToTable("Account");
 
-            entity.Property(e => e.Description).HasColumnType("ntext");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(50);
             entity.Property(e => e.Name).HasMaxLength(50);
+
+            entity.HasOne(d => d.Creator).WithMany(p => p.Accounts)
+                .HasForeignKey(d => d.CreatorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Account_User");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Accounts)
                 .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AccountStatus");
-
-            entity.HasMany(d => d.Users).WithMany(p => p.Accounts)
-                .UsingEntity<Dictionary<string, object>>(
-                    "AccountUserInformationConnection",
-                    r => r.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_AccountUserInformationConnection_User"),
-                    l => l.HasOne<Account>().WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_AccountUserInformationConnection_Account"),
-                    j =>
-                    {
-                        j.HasKey("AccountId", "UserId").HasName("PK_AccountBeneficiaryConnaction");
-                        j.ToTable("AccountUserInformationConnection");
-                    });
         });
 
-        modelBuilder.Entity<AccountProgress>(entity =>
+        modelBuilder.Entity<Account2User>(entity =>
         {
-            entity.ToTable("AccountProgress");
+            entity.HasKey(e => e.Id).HasName("PK_Account2User_1");
 
-            entity.Property(e => e.Id).HasComment("From Progress in account");
-            entity.Property(e => e.Description).HasColumnType("ntext");
+            entity.ToTable("Account2User");
 
-            entity.HasOne(d => d.Account).WithMany(p => p.AccountProgresses)
+            entity.HasIndex(e => new { e.AccountId, e.UserId, e.AccountRoleId }, "IX_Account2User").IsUnique();
+
+            entity.HasOne(d => d.Account).WithMany(p => p.Account2Users)
                 .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_AccountProgress_Account");
+                .HasConstraintName("FK_Account2User_Account");
+
+            entity.HasOne(d => d.AccountRole).WithMany(p => p.Account2Users)
+                .HasForeignKey(d => d.AccountRoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Account2User_UserAccountRole");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Account2Users)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Account2User_User");
         });
 
         modelBuilder.Entity<AccountStatus>(entity =>
@@ -110,6 +117,21 @@ public partial class NpomanagementContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<AccountUserActivity>(entity =>
+        {
+            entity.ToTable("AccountUserActivity");
+
+            entity.Property(e => e.ActivityInfo).HasColumnType("ntext");
+            entity.Property(e => e.DateCreated)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Account2User).WithMany(p => p.AccountUserActivities)
+                .HasForeignKey(d => d.Account2UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AccountUserActivity_Account2User");
         });
 
         modelBuilder.Entity<Attachment>(entity =>
@@ -247,6 +269,15 @@ public partial class NpomanagementContext : DbContext
                 .HasColumnName("URI");
         });
 
+        modelBuilder.Entity<RequestedUserType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_UserType");
+
+            entity.ToTable("RequestedUserType");
+
+            entity.Property(e => e.Description).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("User");
@@ -258,6 +289,7 @@ public partial class NpomanagementContext : DbContext
 
             entity.HasOne(d => d.Status).WithMany(p => p.Users)
                 .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UserStatus");
 
             entity.HasMany(d => d.Groups).WithMany(p => p.Users)
@@ -270,12 +302,21 @@ public partial class NpomanagementContext : DbContext
                     l => l.HasOne<User>().WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK__UserGroup__UserI__114A936A"),
+                        .HasConstraintName("FK__UserGroup__UserI__73BA3083"),
                     j =>
                     {
                         j.HasKey("UserId", "GroupId");
                         j.ToTable("UserGroupMembership");
                     });
+        });
+
+        modelBuilder.Entity<UserAccountRole>(entity =>
+        {
+            entity.ToTable("UserAccountRole");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<UserIdea>(entity =>
@@ -287,7 +328,7 @@ public partial class NpomanagementContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.UserIdeas)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_UserIdea_User");
+                .HasConstraintName("FK_UserIdea_User1");
         });
 
         modelBuilder.Entity<UserInformation>(entity =>
@@ -304,6 +345,11 @@ public partial class NpomanagementContext : DbContext
             entity.Property(e => e.MiddleName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).HasMaxLength(50);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.RequestedUserRole).WithMany(p => p.UserInformations)
+                .HasForeignKey(d => d.RequestedUserRoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserInformation_UserType");
 
             entity.HasOne(d => d.User).WithMany(p => p.UserInformations)
                 .HasForeignKey(d => d.UserId)
@@ -341,30 +387,6 @@ public partial class NpomanagementContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<UserType>(entity =>
-        {
-            entity.ToTable("UserType");
-
-            entity.Property(e => e.Description).HasMaxLength(50);
-
-            entity.HasMany(d => d.Users).WithMany(p => p.UserTypes)
-                .UsingEntity<Dictionary<string, object>>(
-                    "User2UserType",
-                    r => r.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_User2UserType_User1"),
-                    l => l.HasOne<UserType>().WithMany()
-                        .HasForeignKey("UserTypeId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_User2UserType_UserType1"),
-                    j =>
-                    {
-                        j.HasKey("UserTypeId", "UserId").HasName("PK_User2UserTypeConnection");
-                        j.ToTable("User2UserType");
-                    });
         });
 
         modelBuilder.Entity<UsersGroup>(entity =>

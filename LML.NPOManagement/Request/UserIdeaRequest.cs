@@ -4,6 +4,6 @@
     {
         public int UserId { get; set; }
         public string? IdeaCategory { get; set; }
-        public string IdeaDeskcription { get; set; }
+        public string IdeaDescription { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace LML.NPOManagement.Response
 {
     public class UserInformationResponse
     {
-        public UserTypeEnum UserTypeEnum { get; set; }
+        public RequestedUserTypeEnum UserTypeEnum { get; set; }
         public int UserId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
