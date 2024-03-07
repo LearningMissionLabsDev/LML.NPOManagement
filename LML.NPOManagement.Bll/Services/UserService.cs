@@ -24,7 +24,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
+            var newUser = await TokenCreationHelper.ValidateJwtToken(token, configuration, _userRepository);
 
             if (newUser == null)
             {
@@ -32,7 +32,7 @@ namespace LML.NPOManagement.Bll.Services
             }
             await _userRepository.UpdateUserStatus(newUser.Id, StatusEnumModel.Active);
             newUser.StatusId = (int)StatusEnumModel.Active;
-
+            
             return newUser;
         }
 
@@ -184,9 +184,16 @@ namespace LML.NPOManagement.Bll.Services
 
             if (user != null && BC.Verify(userModel.Password, user.Password))
             {
-                user.Password = null;
-                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration);
+                var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
 
+                if (accounts == null)
+                {
+                    return null;
+                }
+                user.Password = null;
+
+                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration);
+                
                 return user;
             }
             return null;
@@ -202,7 +209,7 @@ namespace LML.NPOManagement.Bll.Services
                 await _userRepository.AddUser(userModel);
 
                 var newUser = await _userRepository.GetUserByEmail(userModel.Email);
-                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
+                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration/*, _userRepository*/);
                 newUser.Password = null;
 
                 return newUser;
@@ -374,7 +381,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             var idea = await _userRepository.AddUserIdea(userIdeaModel);
 
-            if(idea == null)
+            if (idea == null)
             {
                 return null;
             }

@@ -16,6 +16,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task UpdateGroupStatus(int userId, GroupStatusEnum status);
         Task<UsersGroupModel> DeleteUserFromGroup(int userId, int groupId);
         Task<bool> DeleteGroup(int groupId);
+        Task<List<Account2UserModel>> GetUsersInfoAccount(int userId);
         Task<UserModel> GetUserByEmail(string email);
         Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> AddGroup(UsersGroupModel groupModel);

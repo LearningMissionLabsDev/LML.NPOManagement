@@ -223,20 +223,5 @@ namespace LML.NPOManagement.Dal.Repositories
 
             return _mapper.Map<AccountModel>(account);
         }
-
-        public async Task<List<Account2UserModel>> GetUsersInfoInAccount(int userId)
-        {
-            if (userId <= 0)
-            {
-                return null;
-            }
-            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).ToListAsync();
-
-            if(!account2user.Any())
-            {
-                return null;
-            }
-            return _mapper.Map<List<Account2UserModel>>(account2user);
-        }
     }
 }

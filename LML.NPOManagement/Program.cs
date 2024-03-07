@@ -6,6 +6,7 @@ using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using LML.NPOManagement.Middeware;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,10 +31,6 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvestorRepository, InvestorRepository>();
 builder.Services.AddScoped <NpomanagementContext>();
-
-
-
-
 
 var app = builder.Build();
 

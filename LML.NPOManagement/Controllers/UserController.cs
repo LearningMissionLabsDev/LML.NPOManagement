@@ -7,6 +7,7 @@ using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 using LML.NPOManagement.Common.Model;
+using LML.NPOManagement.Dal.Models;
 
 namespace LML.NPOManagement.Controllers
 {
@@ -32,7 +33,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UsersGroupRequest, UsersGroupModel>();
                 cfg.CreateMap<UsersGroupModel, UsersGroupResponse>();
-
+                cfg.CreateMap<Account2UserRequest, Account2UserModel>();
             });
             _mapper = config.CreateMapper();
             _userService = userService;
@@ -323,17 +324,18 @@ namespace LML.NPOManagement.Controllers
             return Ok(searchResponses);
         }
 
-        [HttpPost("login")]
-        public async Task<ActionResult<UserModel>> Login([FromBody] LoginRequest loginRequest)
+        [HttpPost("login/{accountId}")]
+        //[Authorize(3)]
+        public async Task<ActionResult<UserModel>> Login(int accountId, [FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
             var user = await _userService.Login(userModel, _configuration);
-
+            var existingAccount = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
             if (user != null)
             {
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
-                    return Ok(user);
+                    return Ok(existingAccount);
                 }
                 return BadRequest("Please check your email");
             }
@@ -358,7 +360,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("userInfoRegistration")]
-        [Authorize]
+        [Authorize(1)]
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -395,7 +397,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("group")]
-        [Authorize]
+        [Authorize(1)]
         public async Task<ActionResult<UsersGroupResponse>> AddGroup([FromBody] UsersGroupRequest usersGroupRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -420,7 +422,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("group/addUser")]
-        [Authorize]
+        [Authorize(1)]
         public async Task<ActionResult> AddUserToGroup([FromBody] AddUserToGroupRequest addUserToGroupRequest)
         {
             if (addUserToGroupRequest.UserId <= 0 || addUserToGroupRequest.GroupId <= 0)
@@ -437,7 +439,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        [Authorize(1)]
         public async Task<ActionResult> Put([FromBody] UserRequest userRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;

@@ -10,7 +10,6 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<AccountModel> GetAccountById(int id);
         Task<List<AccountModel>> GetAccountsByName(string name);
         Task<List<UserModel>> GetUsersByAccount(int id);
-        Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel, IConfiguration configuration);
         Task<AccountModel> AddAccount(AccountModel accountModel);
         Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRoleEnum);
         Task<AccountModel> ModifyAccount(AccountModel accountModel, int id);

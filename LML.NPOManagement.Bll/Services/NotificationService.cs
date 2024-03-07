@@ -196,11 +196,11 @@ namespace LML.NPOManagement.Bll.Services
             {
                 notificationModel.Subject = HtmlSubject();
             }
-            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);
-            string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
-            var uri = $"{clientVerificationURL}?token={token}";
-            body = body.Replace("@verifiyCode", uri);
-            SendNotification(body, notificationModel.Subject, userModel.Email);
+            //string token = await TokenCreationHelper.GenerateJwtToken(userModel, configuration);
+            //string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
+            //var uri = $"{clientVerificationURL}?token={token}";
+            //body = body.Replace("@verifiyCode", uri);
+            //SendNotification(body, notificationModel.Subject, userModel.Email);
         }
 
         private string HtmlSubject()

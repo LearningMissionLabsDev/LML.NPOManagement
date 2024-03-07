@@ -1,5 +1,6 @@
 ﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
+using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,37 +29,43 @@ namespace LML.NPOManagement.Bll.Services
 
         public static string GenerateJwtToken(UserModel user, IConfiguration configuration)
         {
+            string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            if (user.Account2Users.Count == 1)
             {
-                Subject = new ClaimsIdentity(new[] {
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
+                    new Claim("AccountId",user.Account2Users.First().AccountId.ToString()),
+                    new Claim("AccountRoleId",user.Account2Users.First().AccountRoleId.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
-                SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                token = tokenHandler.WriteToken(createdToken);
+                return token;
+            }
+            else if (user.Account2Users.Count > 1)
+            {
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] {
+                        new Claim("Id", user.Id.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                token = tokenHandler.WriteToken(createdToken);
+                return token;
+            }
+            return token;
         }
 
-        //public static string GenerateJwtTokenUserAccount(List<Account2UserModel> account2UserModels, IConfiguration configuration)
-        //{
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
-        //    var tokenDescriptor = new SecurityTokenDescriptor
-        //    {
-        //        Subject = new ClaimsIdentity(new[] {
-        //            new Claim("Id", user.Id.ToString()),
-        //        }),
-        //        Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
-        //        SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
-        //    };
-        //    var token = tokenHandler.CreateToken(tokenDescriptor);
-        //    return tokenHandler.WriteToken(token);
-        //}
-
-        public static UserModel ValidateJwtToken(string token, IConfiguration configuration)
+        public static async Task<UserModel> ValidateJwtToken(string token, IConfiguration configuration, IUserRepository userRepository)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
@@ -81,9 +88,18 @@ namespace LML.NPOManagement.Bll.Services
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 UserModel userModel = new UserModel();
                 userModel.Id = Convert.ToInt16(jwtToken.Claims.First(x => x.Type == "Id").Value);
-
-                // if validation is successful then return UserId from JWT token 
-
+                var accounts = await userRepository.GetUsersInfoAccount(userModel.Id);
+                if (accounts == null)
+                {
+                    return null;
+                }
+                // 1. GetAccountIdAndRoleIdFromToken 
+                // 2. GetAccountsToUserMapping 
+                //Validation Account/Role (401)
+                foreach (var account in accounts)
+                {
+                    userModel.Account2Users.Add(account);
+                }
                 return userModel;
             }
             catch (Exception exp)
@@ -94,3 +110,4 @@ namespace LML.NPOManagement.Bll.Services
         }
     }
 }
+

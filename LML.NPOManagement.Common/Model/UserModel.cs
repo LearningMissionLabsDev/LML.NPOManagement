@@ -9,7 +9,7 @@ namespace LML.NPOManagement.Common
         public string Password { get; set; } = null!;
         public int? StatusId { get; set; }
         public string Token { get;set; }
-        public virtual ICollection<Account2UserModel> Account2Users { get; } = new List<Account2UserModel>();
+        public virtual ICollection<Account2UserModel> Account2Users { get; set; } = new List<Account2UserModel>();
         public virtual ICollection<InvestorInformationModel> InvestorInformations { get; } = new List<InvestorInformationModel>();
         public virtual UserStatusModel? Status { get; set; }
         public virtual ICollection<UserIdeaModel> UserIdeas { get; } = new List<UserIdeaModel>();

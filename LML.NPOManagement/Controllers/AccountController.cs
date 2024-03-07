@@ -1,11 +1,16 @@
 ﻿using AutoMapper;
+using DotNetOpenAuth.InfoCard;
 using LML.NPOManagement.Bll.Interfaces;
+using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
+using Sustainsys.Saml2.Metadata;
+using System.Security.Claims;
+using AuthorizeAttribute = LML.NPOManagement.Bll.Services.AuthorizeAttribute;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -41,6 +46,7 @@ namespace LML.NPOManagement.Controllers
 
         // DONE
         [HttpGet]
+        [Authorize(2)]
         public async Task<ActionResult<List<AccountResponse>>> GetAccounts()
         {
             var accounts = await _accountService.GetAllAccounts();
@@ -143,27 +149,6 @@ namespace LML.NPOManagement.Controllers
             }
             return Ok(accounts);
         }
-
-        [HttpPost("login")]
-        public async Task<ActionResult<Account2UserModel>> Login([FromBody] Account2UserRequest account2UserRequest)
-        {
-            var user = HttpContext.Items["User"] as UserModel;
-
-            if (user == null)
-            {
-                return Unauthorized("User not logged in!");
-            }
-            account2UserRequest.UserId = user.Id;
-            var account2userModel = _mapper.Map<Account2UserRequest, Account2UserModel>(account2UserRequest);
-            var login = await _accountService.AccountLogin(account2userModel, _configuration);
-
-            if (login == null)
-            {
-                return Conflict();
-            }
-            return Ok(login);
-        }
-
 
         // DONE
         [HttpPost("addAccount")]
