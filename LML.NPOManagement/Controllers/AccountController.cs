@@ -46,7 +46,7 @@ namespace LML.NPOManagement.Controllers
 
         // DONE
         [HttpGet]
-        [Authorize(2)]
+        [Authorize]
         public async Task<ActionResult<List<AccountResponse>>> GetAccounts()
         {
             var accounts = await _accountService.GetAllAccounts();
@@ -69,6 +69,35 @@ namespace LML.NPOManagement.Controllers
             }
 
             return Ok(accountResponses);
+        }
+
+        [HttpGet("userProgress/{accountId}")]
+        [Authorize("Admin","AccountManager")]
+        public async Task<ActionResult<List<AccountUserActivityResponse>>> GetBeneficiariesProgress(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                return BadRequest();
+            }
+            var userActivities = await _accountService.GetBeneficiariesProgress(accountId);
+            if (userActivities == null)
+            {
+                return NotFound();
+            }
+            var accountUserResponses = new List<AccountUserActivityResponse>();
+
+            foreach (var userProgress in userActivities)
+            {
+                var newAccountUserResponse = new AccountUserActivityResponse()
+                {
+                    Id=userProgress.Id,
+                    Account2UserId = userProgress.Account2UserId,
+                    ActivityInfo = userProgress.ActivityInfo,
+                    DateCreated = userProgress.DateCreated,
+                };
+                accountUserResponses.Add(newAccountUserResponse);
+            }
+            return Ok(accountUserResponses);
         }
 
         // DONE

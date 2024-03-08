@@ -50,7 +50,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
-                cfg.CreateMap<UserTypeModel, UserTypeResponse>();
+                cfg.CreateMap<RequestedUserTypeModel, RequestedUserTypeResponse>();
                 cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();

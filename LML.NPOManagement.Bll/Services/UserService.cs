@@ -192,7 +192,7 @@ namespace LML.NPOManagement.Bll.Services
                 }
                 user.Password = null;
 
-                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration);
+                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration,_userRepository);
                 
                 return user;
             }
@@ -209,7 +209,7 @@ namespace LML.NPOManagement.Bll.Services
                 await _userRepository.AddUser(userModel);
 
                 var newUser = await _userRepository.GetUserByEmail(userModel.Email);
-                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration/*, _userRepository*/);
+                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration, _userRepository);
                 newUser.Password = null;
 
                 return newUser;

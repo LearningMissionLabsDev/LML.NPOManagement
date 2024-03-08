@@ -20,6 +20,8 @@ namespace LML.NPOManagement.Dal.Repositories
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<Account2User, Account2UserModel>();
                 cfg.CreateMap<Account2UserModel, Account2User>();
+                cfg.CreateMap<AccountUserActivityModel,AccountUserActivity>();
+                cfg.CreateMap<AccountUserActivity,AccountUserActivityModel>();
                 cfg.CreateMap<User,UserModel>();
             });
             _mapper = config.CreateMapper();
@@ -222,6 +224,21 @@ namespace LML.NPOManagement.Dal.Repositories
             account = await _dbContext.Accounts.Include(u => u.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
 
             return _mapper.Map<AccountModel>(account);
+        }
+
+        public async Task<List<AccountUserActivityModel>> GetBeneficiariesProgress(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                return null;
+            }
+            var userProgress = await _dbContext.AccountUserActivities.Where(acc => acc.Account2User.AccountId == accountId).ToListAsync();
+
+            if (userProgress.Count < 1)
+            {
+                return null;
+            }
+            return _mapper.Map<List<AccountUserActivityModel>>(userProgress);
         }
     }
 }

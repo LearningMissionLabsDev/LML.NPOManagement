@@ -6,6 +6,7 @@ using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using LML.NPOManagement.Middeware;
+using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +32,6 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvestorRepository, InvestorRepository>();
 builder.Services.AddScoped <NpomanagementContext>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,7 +43,6 @@ if (app.Environment.IsDevelopment())
 
 // Custom JWT AUTH Middleware
 app.UseMiddleware<JwtMiddleware>();
-
 app.UseHttpsRedirection();
 
 app.UseCors(x => x

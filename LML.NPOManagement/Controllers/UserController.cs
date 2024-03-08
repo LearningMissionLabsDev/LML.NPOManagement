@@ -331,11 +331,18 @@ namespace LML.NPOManagement.Controllers
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
             var user = await _userService.Login(userModel, _configuration);
             var existingAccount = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
+            var account = new Account2UserModel()
+            {
+                AccountId = existingAccount.AccountId,
+                UserId = user.Id,
+                AccountRoleId = existingAccount.AccountRoleId,
+                Token = user.Token,
+            };
             if (user != null)
             {
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
-                    return Ok(existingAccount);
+                    return Ok(account);
                 }
                 return BadRequest("Please check your email");
             }
@@ -360,7 +367,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("userInfoRegistration")]
-        [Authorize(1)]
+        [Authorize]
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -397,7 +404,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("group")]
-        [Authorize(1)]
+        [Authorize]
         public async Task<ActionResult<UsersGroupResponse>> AddGroup([FromBody] UsersGroupRequest usersGroupRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -422,7 +429,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("group/addUser")]
-        [Authorize(1)]
+        [Authorize]
         public async Task<ActionResult> AddUserToGroup([FromBody] AddUserToGroupRequest addUserToGroupRequest)
         {
             if (addUserToGroupRequest.UserId <= 0 || addUserToGroupRequest.GroupId <= 0)
@@ -439,7 +446,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut]
-        [Authorize(1)]
+        [Authorize]
         public async Task<ActionResult> Put([FromBody] UserRequest userRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;

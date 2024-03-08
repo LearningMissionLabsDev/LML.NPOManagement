@@ -27,7 +27,7 @@ namespace LML.NPOManagement.Bll.Services
             return _signingKey;
         }
 
-        public static string GenerateJwtToken(UserModel user, IConfiguration configuration)
+        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository)
         {
             string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
