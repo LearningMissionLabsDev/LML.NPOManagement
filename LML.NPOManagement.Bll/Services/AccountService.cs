@@ -179,19 +179,19 @@ namespace LML.NPOManagement.Bll.Services
             return true;
         }
 
-        public async Task<List<AccountUserActivityModel>> GetBeneficiariesProgress(int accountId)
+        public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId)
         {
             if (accountId <= 0)
             {
                 return null;
             }
-            var userProgresses = await _accountRepository.GetBeneficiariesProgress(accountId);
-            
+            var userProgresses = await _accountRepository.GetAccountRoleProgress(accountId, accountRoleId);
+
             if (userProgresses == null)
             {
                 return null;
             }
-           var beneficiaries = userProgresses.Where(ben => ben.Account2UserModel.AccountRoleId == (int)UserAccountRoleEnum.Beneficiary).ToList();
+            var beneficiaries = userProgresses.Where(ben => ben.Account2UserModel.AccountRoleId == accountRoleId).ToList();
             if (beneficiaries == null || !beneficiaries.Any())
             {
                 return null;

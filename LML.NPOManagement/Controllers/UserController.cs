@@ -8,6 +8,7 @@ using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
+using System.Net.Http;
 
 namespace LML.NPOManagement.Controllers
 {
@@ -264,7 +265,7 @@ namespace LML.NPOManagement.Controllers
             ideaModel.UserId = user.Id;
 
             var idea = await _userService.AddUserIdea(ideaModel);
-            if(idea == null)
+            if (idea == null)
             {
                 return Conflict();
             }
@@ -324,31 +325,44 @@ namespace LML.NPOManagement.Controllers
             return Ok(searchResponses);
         }
 
-        [HttpPost("login/{accountId}")]
-        //[Authorize(3)]
-        public async Task<ActionResult<UserModel>> Login(int accountId, [FromBody] LoginRequest loginRequest)
+        [HttpPost("login")]
+        public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
             var user = await _userService.Login(userModel, _configuration);
-            var existingAccount = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
-            var account = new Account2UserModel()
-            {
-                AccountId = existingAccount.AccountId,
-                UserId = user.Id,
-                AccountRoleId = existingAccount.AccountRoleId,
-                Token = user.Token,
-            };
+
             if (user != null)
             {
+                var accounts = user.Account2Users.ToList();
+                var userResponse = new UserResponse()
+                {
+                    Id = user.Id,
+                    Email = userModel.Email,
+                    UserAccounts = accounts.Select(x => new AccountMappingResponse() { AccountId = x.AccountId, AccountName = x.Account?.Name, AccountRoleId = x.AccountRoleId }).ToList()
+                };
+                //var httpClient = this.HttpContext.Response.Headers.Add
+                //httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.Token);
+
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
-                    return Ok(account);
+                    HttpContext.Response.Headers.Add("Authorization", user.Token);
+                    return Ok(userResponse);
                 }
-                return BadRequest("Please check your email");
+                return Conflict();
             }
             return Unauthorized(401);
         }
+        //public void SetAuthorizationHeader(string token)
+        //{
+        //    // Clears any existing Authorization header
+        //    HttpClient _httpClient = new HttpClient();
+        //    _httpClient.DefaultRequestHeaders.Authorization = null;
 
+        //    if (!string.IsNullOrWhiteSpace(token))
+        //    {
+        //        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //    }
+        //}
         [HttpPost("registration")]
         public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
         {

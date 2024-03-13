@@ -26,6 +26,8 @@ namespace LML.NPOManagement.Dal.Repositories
                 cfg.CreateMap<UserIdeaModel, UserIdea>();
                 cfg.CreateMap<Account2User, Account2UserModel>();
                 cfg.CreateMap<Account2UserModel, Account2User>();
+                cfg.CreateMap<AccountModel, Account>();
+                cfg.CreateMap<Account, AccountModel>();
             });
             _mapper = config.CreateMapper();
             _dbContext = context;
@@ -483,9 +485,9 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).ToListAsync();
+            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).Include(acc => acc.Account).ToListAsync();
 
-            if (!account2user.Any())
+            if (account2user == null || !account2user.Any())
             {
                 return null;
             }

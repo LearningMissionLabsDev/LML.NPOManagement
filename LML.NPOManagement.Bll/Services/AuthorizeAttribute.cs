@@ -35,7 +35,7 @@ namespace LML.NPOManagement.Bll.Services
             }
             else if (!rol.Any(role => user.Account2Users.Any(account => account.AccountRoleId == (int)role)))
             {
-                context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                context.Result = new JsonResult(new { message = "Access denied" }) { StatusCode = StatusCodes.Status403Forbidden };
             }
         }
     }

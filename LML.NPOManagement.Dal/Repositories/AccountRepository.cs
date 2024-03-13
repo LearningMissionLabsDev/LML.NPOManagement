@@ -20,9 +20,9 @@ namespace LML.NPOManagement.Dal.Repositories
                 cfg.CreateMap<Account, AccountModel>();
                 cfg.CreateMap<Account2User, Account2UserModel>();
                 cfg.CreateMap<Account2UserModel, Account2User>();
-                cfg.CreateMap<AccountUserActivityModel,AccountUserActivity>();
-                cfg.CreateMap<AccountUserActivity,AccountUserActivityModel>();
-                cfg.CreateMap<User,UserModel>();
+                cfg.CreateMap<AccountUserActivityModel, AccountUserActivity>();
+                cfg.CreateMap<AccountUserActivity, AccountUserActivityModel>();
+                cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
             _dbContext = context;
@@ -37,7 +37,7 @@ namespace LML.NPOManagement.Dal.Repositories
             var account = await _dbContext.Accounts.Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
 
             if (account == null)
-            {                
+            {
                 return null;
             }
             return _mapper.Map<AccountModel>(account);
@@ -72,7 +72,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 user.Password = null;
             }
@@ -86,12 +86,12 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
             var account = _mapper.Map<Account>(accountModel);
-            
+
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
 
             var newAccount = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).Where(acc => acc.Id == account.Id).FirstOrDefaultAsync();
-           
+
             if (newAccount == null)
             {
                 return null;
@@ -104,7 +104,7 @@ namespace LML.NPOManagement.Dal.Repositories
             };
             newAccount.Account2Users.Add(creatorUser);
             await _dbContext.SaveChangesAsync();
-            
+
             return _mapper.Map<AccountModel>(newAccount);
         }
 
@@ -120,7 +120,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-                    
+
             if (accountModel.StatusId == (int)AccountStatusEnum.Deleted)
             {
                 return null;
@@ -157,13 +157,13 @@ namespace LML.NPOManagement.Dal.Repositories
 
         public async Task<List<AccountModel>> GetAccountsByName(string accountName)
         {
-            if(string.IsNullOrEmpty(accountName))
+            if (string.IsNullOrEmpty(accountName))
             {
                 return null;
             }
             var accounts = await _dbContext.Accounts.Where(acc => acc.Name.Contains(accountName)).ToListAsync();
 
-            if(accounts.Count < 1)
+            if (accounts.Count < 1)
             {
                 return null;
             }
@@ -172,11 +172,11 @@ namespace LML.NPOManagement.Dal.Repositories
 
         public async Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRole)
         {
-            if(accountId <= 0 || userId <= 0)
+            if (accountId <= 0 || userId <= 0)
             {
                 return false;
             }
-            var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);           
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
             var user = await _dbContext.Users.FirstOrDefaultAsync(us => us.Id == userId);
 
             if (account == null || user == null)
@@ -197,7 +197,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 await _dbContext.SaveChangesAsync();
 
                 return true;
-            }     
+            }
             return false;
         }
 
@@ -226,19 +226,41 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<AccountModel>(account);
         }
 
-        public async Task<List<AccountUserActivityModel>> GetBeneficiariesProgress(int accountId)
+        public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId)
         {
             if (accountId <= 0)
             {
                 return null;
             }
-            var userProgress = await _dbContext.AccountUserActivities.Where(acc => acc.Account2User.AccountId == accountId).ToListAsync();
+            var userProgress = await _dbContext.AccountUserActivities.Where(acc => acc.Account2User.AccountId == accountId).Include(acc2user => acc2user.Account2User).ToListAsync();
 
             if (userProgress.Count < 1)
             {
                 return null;
             }
-            return _mapper.Map<List<AccountUserActivityModel>>(userProgress);
+            var activityMapping = userProgress.Select(map => new AccountUserActivityModel
+            {
+                Account2UserId = map.Account2UserId,
+                Account2UserModel = _mapper.Map<Account2UserModel>(map.Account2User),
+                ActivityInfo = map.ActivityInfo,
+                DateCreated = map.DateCreated,
+                Id = map.Id
+            }).ToList();
+
+            return activityMapping;
+            //var activityMapping = new List<AccountUserActivityModel>();
+            //foreach (var map in userProgress)
+            //{
+            //    var userActivity = new AccountUserActivityModel()
+            //    {
+            //        Account2UserId = map.Account2UserId,
+            //        Account2UserModel = _mapper.Map<Account2UserModel>(map.Account2User),
+            //        ActivityInfo = map.ActivityInfo,
+            //        DateCreated = map.DateCreated,
+            //        Id = map.Id
+            //    };
+            //    activityMapping.Add(userActivity);
+            //}
         }
     }
 }

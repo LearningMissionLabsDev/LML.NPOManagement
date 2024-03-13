@@ -191,7 +191,7 @@ namespace LML.NPOManagement.Bll.Services
                     return null;
                 }
                 user.Password = null;
-
+                user.Account2Users = accounts;
                 user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration,_userRepository);
                 
                 return user;

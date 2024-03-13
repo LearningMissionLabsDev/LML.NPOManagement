@@ -6,10 +6,7 @@ using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sustainsys.Saml2.Metadata;
-using System.Security.Claims;
 using AuthorizeAttribute = LML.NPOManagement.Bll.Services.AuthorizeAttribute;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -72,14 +69,20 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("userProgress/{accountId}")]
-        [Authorize("Admin","AccountManager")]
-        public async Task<ActionResult<List<AccountUserActivityResponse>>> GetBeneficiariesProgress(int accountId)
+        [Authorize("Admin", "AccountManager")]
+        public async Task<ActionResult<List<AccountUserActivityResponse>>> GetAccountRoleProgress(int accountId)
         {
-            if (accountId <= 0)
+            var user = HttpContext.Items["User"] as UserModel;
+            if (user == null)
             {
-                return BadRequest();
+                return Unauthorized();
             }
-            var userActivities = await _accountService.GetBeneficiariesProgress(accountId);
+            var account = user.Account2Users.FirstOrDefault(us => us.AccountId == accountId);
+            if (account == null)
+            {
+                return StatusCode(500, "Error: No accounts found for the user.");
+            }
+            var userActivities = await _accountService.GetAccountRoleProgress(account.AccountId, (int)UserAccountRoleEnum.Beneficiary);
             if (userActivities == null)
             {
                 return NotFound();
@@ -90,7 +93,7 @@ namespace LML.NPOManagement.Controllers
             {
                 var newAccountUserResponse = new AccountUserActivityResponse()
                 {
-                    Id=userProgress.Id,
+                    Id = userProgress.Id,
                     Account2UserId = userProgress.Account2UserId,
                     ActivityInfo = userProgress.ActivityInfo,
                     DateCreated = userProgress.DateCreated,

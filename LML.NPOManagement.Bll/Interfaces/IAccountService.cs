@@ -9,7 +9,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<List<AccountModel>> GetAllAccounts();
         Task<AccountModel> GetAccountById(int accountId);
         Task<List<AccountModel>> GetAccountsByName(string name);
-        Task<List<AccountUserActivityModel>> GetBeneficiariesProgress(int accountId);
+        Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId);
         Task<List<UserModel>> GetUsersByAccount(int accountId);
         Task<AccountModel> AddAccount(AccountModel accountModel);
         Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRoleEnum);

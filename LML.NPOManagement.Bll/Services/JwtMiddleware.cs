@@ -2,17 +2,16 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 
 namespace LML.NPOManagement.Bll.Services
 {
     public class JwtMiddleware
     {
         private readonly RequestDelegate _next;
-        //private IUserRepository _userRepository;
 
-        public JwtMiddleware(/*IUserRepository repository, */RequestDelegate next) // <- error this
+        public JwtMiddleware(RequestDelegate next) // <- error this
         {
-            //_userRepository = repository;
             _next = next;
         }
 
@@ -25,12 +24,15 @@ namespace LML.NPOManagement.Bll.Services
             }
             await _next(context);
         }
+        //--------------------
 
+        //--------------------
         private async Task AttachAccountToContext(HttpContext context, string token, IConfiguration configuration,IUserRepository userRepository)
         {
             try
             {
                 var user = await TokenCreationHelper.ValidateJwtToken(token, configuration, userRepository);
+                
                 context.Items["User"] = user;
             }
             catch
