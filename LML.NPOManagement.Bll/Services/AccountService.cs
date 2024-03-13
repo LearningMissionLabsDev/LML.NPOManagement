@@ -86,6 +86,25 @@ namespace LML.NPOManagement.Bll.Services
             return usersByAccount;
         }
 
+        public async Task<AccountModel> AccountLogin(int accountId, IConfiguration configuration)
+        {
+            if (accountId <=0)
+            {
+                return null;
+            }
+
+            var account = await _accountRepository.GetAccountById(accountId);
+
+            if(account == null)
+            {
+                return null;
+            }
+            
+            account.Token = TokenCreationHelper.GenerateJwtTokenAccount(account, configuration);
+            
+            return account;
+        }
+
         public async Task<AccountModel> AddAccount(AccountModel accountModel)
         {
             if (accountModel == null || string.IsNullOrEmpty(accountModel.Name))

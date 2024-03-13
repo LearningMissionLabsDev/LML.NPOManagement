@@ -18,22 +18,25 @@ namespace LML.NPOManagement.Bll.Services
         public async Task Invoke(HttpContext context, IConfiguration configuration, IUserRepository userRepository)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            var accountToken = context.Request.Headers["AccountAuthorization"].FirstOrDefault()?.Split(" ").Last();
             if (token != null)
             {
-                await AttachAccountToContext(context, token, configuration, userRepository);
+                await AttachAccountToContext(context, token, accountToken, configuration, userRepository);
             }
             await _next(context);
         }
         //--------------------
 
         //--------------------
-        private async Task AttachAccountToContext(HttpContext context, string token, IConfiguration configuration,IUserRepository userRepository)
+        private async Task AttachAccountToContext(HttpContext context, string token, string accountToken, IConfiguration configuration, IUserRepository userRepository)
         {
             try
             {
                 var user = await TokenCreationHelper.ValidateJwtToken(token, configuration, userRepository);
-                
+                var account = await TokenCreationHelper.ValidateJwtTokenAccount(accountToken, configuration);
+
                 context.Items["User"] = user;
+                context.Items["Account"] = account;
             }
             catch
             {

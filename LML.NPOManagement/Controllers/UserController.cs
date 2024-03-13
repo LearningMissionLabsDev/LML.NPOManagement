@@ -340,9 +340,7 @@ namespace LML.NPOManagement.Controllers
                     Email = userModel.Email,
                     UserAccounts = accounts.Select(x => new AccountMappingResponse() { AccountId = x.AccountId, AccountName = x.Account?.Name, AccountRoleId = x.AccountRoleId }).ToList()
                 };
-                //var httpClient = this.HttpContext.Response.Headers.Add
-                //httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.Token);
-
+               
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
                     HttpContext.Response.Headers.Add("Authorization", user.Token);
@@ -352,17 +350,7 @@ namespace LML.NPOManagement.Controllers
             }
             return Unauthorized(401);
         }
-        //public void SetAuthorizationHeader(string token)
-        //{
-        //    // Clears any existing Authorization header
-        //    HttpClient _httpClient = new HttpClient();
-        //    _httpClient.DefaultRequestHeaders.Authorization = null;
-
-        //    if (!string.IsNullOrWhiteSpace(token))
-        //    {
-        //        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-        //    }
-        //}
+       
         [HttpPost("registration")]
         public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
         {
