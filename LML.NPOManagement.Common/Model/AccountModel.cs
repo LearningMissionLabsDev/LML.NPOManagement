@@ -14,7 +14,6 @@ namespace LML.NPOManagement.Common.Model
         public string Name { get; set; } = null!;
         public DateTime DateCreated { get; set; }
         public string? Description { get; set; }
-        public string Token { get; set; }
         public virtual ICollection<Account2UserModel> Account2Users { get; } = new List<Account2UserModel>();
         public virtual UserModel Creator { get; set; } = null!;
         public virtual AccountStatusModel Status { get; set; } = null!;

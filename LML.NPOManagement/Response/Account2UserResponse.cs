@@ -1,6 +1,6 @@
-﻿namespace LML.NPOManagement.Request
+﻿namespace LML.NPOManagement.Response
 {
-    public class Account2UserRequest
+    public class Account2UserResponse
     {
         public int AccountId { get; set; }
         public int UserId { get; set; }

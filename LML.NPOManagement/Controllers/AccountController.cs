@@ -72,12 +72,17 @@ namespace LML.NPOManagement.Controllers
         [Authorize("Admin", "AccountManager")]
         public async Task<ActionResult<List<AccountUserActivityResponse>>> GetAccountRoleProgress(int accountRoleId)
         {
-            var account = HttpContext.Items["Account"] as AccountModel;
+            if (accountRoleId < 1 || accountRoleId > 3)
+            {
+                return BadRequest();
+            }
+            var account = HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
             {
                 return Unauthorized();
             }
-            var userActivities = await _accountService.GetAccountRoleProgress(account.Id, accountRoleId);
+            var userActivities = await _accountService.GetAccountRoleProgress(account.AccountId, accountRoleId);
+
             if (userActivities == null)
             {
                 return NotFound();
@@ -177,8 +182,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(accounts);
         }
 
-        [HttpPost("login/{accountId}")]
-        public async Task<ActionResult<Account2UserModel>> Login(int accountId)
+        [HttpPost("login")]
+        public async Task<ActionResult<Account2UserResponse>> Login([FromQuery] int accountId)
         {
             var user = HttpContext.Items["User"] as UserModel;
 
@@ -186,18 +191,32 @@ namespace LML.NPOManagement.Controllers
             {
                 return Unauthorized("User not logged in!");
             }
-            var account = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);  
-            if(account == null)
+            var account = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
+            if (account == null)
             {
-                return StatusCode(500,"Account Not Found");
+                return StatusCode(500, "Account Not Found");
             }
-            var login = await _accountService.AccountLogin(account.AccountId, _configuration);
+
+            var account2user = new Account2UserModel()
+            {
+                AccountId = account.AccountId,
+                UserId = account.UserId,
+                AccountRoleId = account.AccountRoleId
+            };
+
+            var login = await _accountService.AccountLogin(account2user);
 
             if (login == null)
             {
                 return Conflict();
             }
-            return Ok(login);
+            var accountResponse = new Account2UserResponse()
+            {
+                AccountId = login.AccountId,
+                UserId = login.UserId,
+                AccountRoleId = login.AccountRoleId
+            };
+            return Ok(accountResponse);
         }
 
         // DONE

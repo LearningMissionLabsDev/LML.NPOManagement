@@ -13,13 +13,16 @@ namespace LML.NPOManagement.Bll.Services
 {
     public class AccountService : IAccountService
     {
+        private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepository;
         private readonly IUserRepository _userRepository;
 
-        public AccountService(IAccountRepository accountRepository, IUserRepository userRepository)
+        public AccountService(IAccountRepository accountRepository, IUserRepository userRepository, IConfiguration configuration)
         {
+
             _accountRepository = accountRepository;
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
         public async Task<AccountModel> GetAccountById(int accountId)
@@ -86,23 +89,22 @@ namespace LML.NPOManagement.Bll.Services
             return usersByAccount;
         }
 
-        public async Task<AccountModel> AccountLogin(int accountId, IConfiguration configuration)
+        public async Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel)
         {
-            if (accountId <=0)
+
+            var account = await _userRepository.GetUsersInfoAccount(account2UserModel.UserId);
+
+            if (account == null)
             {
                 return null;
             }
+            var account2user = account.FirstOrDefault(ac => ac.AccountId == account2UserModel.AccountId);
 
-            var account = await _accountRepository.GetAccountById(accountId);
-
-            if(account == null)
+            if (account2user == null)
             {
                 return null;
             }
-            
-            account.Token = TokenCreationHelper.GenerateJwtTokenAccount(account, configuration);
-            
-            return account;
+            return account2user;
         }
 
         public async Task<AccountModel> AddAccount(AccountModel accountModel)
@@ -210,12 +212,12 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var beneficiaries = userProgresses.Where(ben => ben.Account2UserModel.AccountRoleId == accountRoleId).ToList();
-            if (beneficiaries == null || !beneficiaries.Any())
+            var accountUserActivities = userProgresses.Where(ben => ben.Account2UserModel.AccountRoleId == accountRoleId).ToList();
+            if (accountUserActivities == null || !accountUserActivities.Any())
             {
                 return null;
             }
-            return beneficiaries;
+            return accountUserActivities;
         }
     }
 }

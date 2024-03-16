@@ -248,19 +248,6 @@ namespace LML.NPOManagement.Dal.Repositories
             }).ToList();
 
             return activityMapping;
-            //var activityMapping = new List<AccountUserActivityModel>();
-            //foreach (var map in userProgress)
-            //{
-            //    var userActivity = new AccountUserActivityModel()
-            //    {
-            //        Account2UserId = map.Account2UserId,
-            //        Account2UserModel = _mapper.Map<Account2UserModel>(map.Account2User),
-            //        ActivityInfo = map.ActivityInfo,
-            //        DateCreated = map.DateCreated,
-            //        Id = map.Id
-            //    };
-            //    activityMapping.Add(userActivity);
-            //}
         }
     }
 }
