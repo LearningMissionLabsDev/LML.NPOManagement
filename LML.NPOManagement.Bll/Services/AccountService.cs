@@ -123,13 +123,13 @@ namespace LML.NPOManagement.Bll.Services
             return account;
         }
 
-        public async Task<AccountModel> ModifyAccount(AccountModel accountModel, int accountId)
+        public async Task<AccountModel> ModifyAccount(AccountModel accountModel)
         {
-            if (accountModel == null || accountId <= 0)
+            if (accountModel == null)
             {
                 return null;
             }
-            var account = await _accountRepository.ModifyAccount(accountModel, accountId);
+            var account = await _accountRepository.ModifyAccount(accountModel);
 
             if (account == null)
             {
@@ -138,19 +138,18 @@ namespace LML.NPOManagement.Bll.Services
             return account;
         }
 
-        public async Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRoleEnum)
+        public async Task<bool> AddUserToAccount(Account2UserModel account2UserModel)
         {
-            if (accountId <= 0 || userId <= 0)
+            if (account2UserModel == null)
             {
                 return false;
             }
-            var account = await _accountRepository.GetAccountById(accountId);
-            var user = await _userRepository.GetUserById(userId);
-            if (account == null || user == null)
+            var account = await _accountRepository.GetAccountById(account2UserModel.AccountId);
+            if (account == null)
             {
                 return false;
             }
-            var result = await _accountRepository.AddUserToAccount(accountId, userId, userAccountRoleEnum);
+            var result = await _accountRepository.AddUserToAccount(account2UserModel);
 
             if (!result)
             {

@@ -11,8 +11,8 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task<List<UserModel>> GetUsersByAccount(int userId);
         Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId);
         Task<AccountModel> AddAccount(AccountModel accountModel);
-        Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRole);
-        Task<AccountModel> ModifyAccount(AccountModel accountModel, int id);     
+        Task<bool> AddUserToAccount(Account2UserModel account2UserModel);
+        Task<AccountModel> ModifyAccount(AccountModel accountModel);     
         Task<AccountModel> RemoveUserFromAccount(int accountId, int userId);
         Task<bool> DeleteAccount(int accountId);       
         

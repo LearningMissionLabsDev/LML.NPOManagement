@@ -108,13 +108,13 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<AccountModel>(newAccount);
         }
 
-        public async Task<AccountModel> ModifyAccount(AccountModel accountModel, int accountId)
+        public async Task<AccountModel> ModifyAccount(AccountModel accountModel)
         {
-            if (accountModel == null || accountId <= 0)
+            if (accountModel == null)
             {
                 return null;
             }
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
+            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountModel.Id).FirstOrDefaultAsync();
 
             if (account == null)
             {
@@ -170,14 +170,14 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<List<AccountModel>>(accounts);
         }
 
-        public async Task<bool> AddUserToAccount(int accountId, int userId, int userAccountRole)
+        public async Task<bool> AddUserToAccount(Account2UserModel account2UserModel)
         {
-            if (accountId <= 0 || userId <= 0)
+            if (account2UserModel == null)
             {
                 return false;
             }
-            var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId);
-            var user = await _dbContext.Users.FirstOrDefaultAsync(us => us.Id == userId);
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == account2UserModel.AccountId);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(us => us.Id == account2UserModel.UserId);
 
             if (account == null || user == null)
             {
@@ -189,9 +189,9 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 var accountUser = new Account2User()
                 {
-                    UserId = userId,
-                    AccountId = accountId,
-                    AccountRoleId = userAccountRole
+                    AccountId = account2UserModel.AccountId,
+                    UserId = account2UserModel.UserId,
+                    AccountRoleId = account2UserModel.AccountRoleId
                 };
                 account.Account2Users.Add(accountUser);
                 await _dbContext.SaveChangesAsync();
@@ -218,6 +218,10 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+            var userActivity = userToRemove.AccountUserActivities.ToList();
+            userActivity.Clear();
+            await _dbContext.SaveChangesAsync();
+
             account.Account2Users.Remove(userToRemove);
             await _dbContext.SaveChangesAsync();
 

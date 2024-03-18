@@ -1,4 +1,5 @@
-﻿using LML.NPOManagement.Dal.Repositories.Interfaces;
+﻿using LML.NPOManagement.Common;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,9 +23,12 @@ namespace LML.NPOManagement.Bll.Services
             if (token != null)
             {
                 await AttachAccountToContext(context, token, configuration, userRepository);
-
-                int.TryParse(context.Request.Query["accountId"], out int accountId);
-                await SetAccountAndRoleContext(context, accountId, token, configuration, userRepository);
+                var user = context.Items["User"] as UserModel;
+                if (user?.Account2Users != null)
+                {
+                    int.TryParse(context.Request.Query["accountId"], out int accountId);
+                    await SetAccountAndRoleContext(context, accountId, token, configuration, userRepository);
+                }
             }
             await _next(context);
         }
@@ -53,7 +57,7 @@ namespace LML.NPOManagement.Bll.Services
                     var account = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
 
                     context.Items["Account"] = account;
-                }              
+                }
             }
             catch
             {
