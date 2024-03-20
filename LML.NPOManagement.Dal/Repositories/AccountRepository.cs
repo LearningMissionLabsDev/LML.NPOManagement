@@ -140,13 +140,17 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return false;
             }
-            var account = await _dbContext.Accounts.Include(us => us.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
+            var account = await _dbContext.Accounts.Include(us => us.Account2Users).ThenInclude(acc => acc.AccountUserActivities).FirstOrDefaultAsync(acc => acc.Id == accountId);
 
             if (account == null)
             {
                 return false;
             }
-            account.Account2Users.Clear();
+            var activity = account.Account2Users.SelectMany(act => act.AccountUserActivities).ToList();
+             _dbContext.AccountUserActivities.RemoveRange(activity);
+            await _dbContext.SaveChangesAsync();
+
+            _dbContext.Account2Users.RemoveRange(account.Account2Users);
             await _dbContext.SaveChangesAsync();
 
             account.StatusId = (int)AccountStatusEnum.Deleted;
@@ -176,14 +180,14 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return false;
             }
-            var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == account2UserModel.AccountId);
+            var account = await _dbContext.Accounts.Include(acc => acc.Account2Users).FirstOrDefaultAsync(acc => acc.Id == account2UserModel.AccountId);
             var user = await _dbContext.Users.FirstOrDefaultAsync(us => us.Id == account2UserModel.UserId);
 
             if (account == null || user == null)
             {
                 return false;
             }
-            var availableUser = await _dbContext.Account2Users.FirstOrDefaultAsync(us => us.UserId == user.Id);
+            var availableUser = account.Account2Users.FirstOrDefault(us => us.UserId == user.Id);
             // Update User Role
             if (availableUser == null)
             {
@@ -207,25 +211,20 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
-            if (account == null)
+
+            var account2user = await _dbContext.Account2Users.Include(act => act.AccountUserActivities).FirstOrDefaultAsync(_ => _.AccountId == accountId && _.UserId == userId);
+            if (account2user == null)
             {
                 return null;
             }
-            var userToRemove = account.Account2Users.FirstOrDefault(us => us.UserId == userId);
 
-            if (userToRemove == null)
-            {
-                return null;
-            }
-            var userActivity = userToRemove.AccountUserActivities.ToList();
-            userActivity.Clear();
+            _dbContext.AccountUserActivities.RemoveRange(account2user.AccountUserActivities);
             await _dbContext.SaveChangesAsync();
 
-            account.Account2Users.Remove(userToRemove);
+            _dbContext.Account2Users.Remove(account2user);
             await _dbContext.SaveChangesAsync();
 
-            account = await _dbContext.Accounts.Include(u => u.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
+            var account = await _dbContext.Accounts.Include(u => u.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
 
             return _mapper.Map<AccountModel>(account);
         }

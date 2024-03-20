@@ -1,4 +1,5 @@
-﻿using LML.NPOManagement.Dal.Models;
+﻿using LML.NPOManagement.Common;
+using LML.NPOManagement.Dal.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
@@ -8,5 +9,6 @@ namespace LML.NPOManagement.Request
         [Required]
         public string Name { get; set; } = null!;
         public string? Description { get; set; }  
+        public AccountStatusEnum StatusEnum { get; set; }  
     }
 }

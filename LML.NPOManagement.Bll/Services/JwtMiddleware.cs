@@ -24,7 +24,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 await AttachAccountToContext(context, token, configuration, userRepository);
                 var user = context.Items["User"] as UserModel;
-                if (user?.Account2Users != null)
+                if (user?.Account2Users != null /*SysAdmin check*/)
                 {
                     int.TryParse(context.Request.Query["accountId"], out int accountId);
                     await SetAccountAndRoleContext(context, accountId, token, configuration, userRepository);

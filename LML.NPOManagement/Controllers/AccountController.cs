@@ -33,7 +33,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserIdeaRequest, UserIdeaModel>();
                 cfg.CreateMap<UserIdeaModel, UserIdeaResponse>();
                 cfg.CreateMap<AddUserToAccountRequest, Account2UserModel>();
-                cfg.CreateMap<Account2UserModel,Account2UserResponse>();
+                cfg.CreateMap<Account2UserModel, Account2UserResponse>();
             });
             _mapper = config.CreateMapper();
             _configuration = configuration;
@@ -187,15 +187,15 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<Account2UserResponse>> Login([FromQuery] int accountId)
+        public async Task<ActionResult<Account2UserResponse>> Login()
         {
             var user = HttpContext.Items["User"] as UserModel;
+            var account = HttpContext.Items["Account"] as Account2UserModel;
 
             if (user == null)
             {
                 return Unauthorized("User not logged in!");
             }
-            var account = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
             if (account == null)
             {
                 return StatusCode(403, "Access denied");
@@ -256,16 +256,20 @@ namespace LML.NPOManagement.Controllers
         [HttpPost("addUser")]
         public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest addUserToAccountRequest)
         {
-            var user = HttpContext.Items["User"] as UserModel;
-            if (user == null)
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
             {
-                return Unauthorized();
+                return NotFound("Access denied");
             }
-            var account2User = _mapper.Map<Account2UserModel>(addUserToAccountRequest);
-            account2User.UserId = user.Id;
-            var account = await _accountService.AddUserToAccount(account2User);
+            var account2User = new Account2UserModel()
+            {
+                AccountId = account.AccountId,
+                UserId = addUserToAccountRequest.UserId,
+                AccountRoleId = (int)addUserToAccountRequest.UserAccountRoleEnum
+            };
+            var result = await _accountService.AddUserToAccount(account2User);
 
-            if (!account)
+            if (!result)
             {
                 return Conflict();
             }
@@ -279,10 +283,15 @@ namespace LML.NPOManagement.Controllers
             var account = HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
             {
-                return StatusCode(403,"Access denied");
+                return StatusCode(403, "Access denied");
             }
-            var accountModel = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
-            accountModel.Id = account.AccountId;
+            var accountModel = new AccountModel()
+            {
+                Id = account.AccountId,
+                Name = accountRequest.Name,
+                Description = accountRequest.Description,
+                StatusId = (int)accountRequest.StatusEnum
+            };
             var modifyAccount = await _accountService.ModifyAccount(accountModel);
 
             if (modifyAccount == null)
@@ -311,7 +320,7 @@ namespace LML.NPOManagement.Controllers
             var account = HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
             {
-                return StatusCode(403,"Access denied");
+                return StatusCode(403, "Access denied");
             }
             var user = await _accountService.RemoveUserFromAccount(account.AccountId, userId);
 
