@@ -5,6 +5,7 @@ namespace LML.NPOManagement.Common.Model;
 
 public class Account2UserModel
 {
+    public int Id { get; set; }
     public int AccountId { get; set; }
     public int UserId { get; set; }
     public int AccountRoleId { get; set; }

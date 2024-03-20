@@ -14,6 +14,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel);
         Task<AccountModel> AddAccount(AccountModel accountModel);
         Task<bool> AddUserToAccount(Account2UserModel account2UserModel);
+        Task<AccountUserActivityModel> AddAccountUserActivityProgress(AccountUserActivityModel accountUserActivityModel);
         Task<AccountModel> ModifyAccount(AccountModel accountModel);
         Task<bool> RemoveUserFromAccount(int accountId, int userId);
         Task<bool> DeleteAccount(int accountId);

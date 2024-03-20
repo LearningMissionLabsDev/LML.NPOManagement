@@ -252,6 +252,25 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountResponse);
         }
 
+        [HttpPost("addUserActivity")]
+        public async Task<ActionResult<AccountUserActivityResponse>> AddAccountUserActivityProgress([FromBody] AccountUserActivityRequest accountUserActivityRequest)
+        {
+            var activityModel = _mapper.Map<AccountUserActivityModel>(accountUserActivityRequest);
+            var activityUser = await _accountService.AddAccountUserActivityProgress(activityModel);
+            if (activityUser == null)
+            {
+                return Conflict();
+            }
+            var activityResponse = new AccountUserActivityResponse()
+            {
+                Id = activityUser.Id,
+                Account2UserId = activityUser.Account2UserId,
+                ActivityInfo = activityUser.ActivityInfo,
+                DateCreated = activityUser.DateCreated
+            };
+            return Ok(activityResponse);
+        }
+
         // DONE
         [HttpPost("addUser")]
         public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest addUserToAccountRequest)

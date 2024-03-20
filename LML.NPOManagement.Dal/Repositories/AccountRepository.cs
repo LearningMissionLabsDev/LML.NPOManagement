@@ -79,6 +79,18 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<List<UserModel>>(users);
         }
 
+        public async Task<List<Account2UserModel>> GetAccount2Users()
+        {
+            var account2users = await _dbContext.Account2Users.ToListAsync();
+            if (account2users == null || !account2users.Any())
+            {
+                return null;
+            }
+            var account2usermodel = _mapper.Map<List<Account2UserModel>>(account2users);
+
+            return account2usermodel;
+        }
+
         public async Task<AccountModel> AddAccount(AccountModel accountModel)
         {
             if (accountModel == null || string.IsNullOrEmpty(accountModel.Name))
@@ -147,7 +159,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 return false;
             }
             var activity = account.Account2Users.SelectMany(act => act.AccountUserActivities).ToList();
-             _dbContext.AccountUserActivities.RemoveRange(activity);
+            _dbContext.AccountUserActivities.RemoveRange(activity);
             await _dbContext.SaveChangesAsync();
 
             _dbContext.Account2Users.RemoveRange(account.Account2Users);
@@ -251,6 +263,33 @@ namespace LML.NPOManagement.Dal.Repositories
             }).ToList();
 
             return activityMapping;
+        }
+
+        public async Task<AccountUserActivityModel> AddAccountUserActivityProgress(AccountUserActivityModel accountUserActivityModel)
+        {
+            var userActivity = new AccountUserActivity()
+            {
+                Id = accountUserActivityModel.Id,
+                Account2UserId = accountUserActivityModel.Account2UserId,
+                DateCreated = accountUserActivityModel.DateCreated,
+                ActivityInfo = accountUserActivityModel.ActivityInfo
+            };
+            await _dbContext.AccountUserActivities.AddAsync(userActivity);
+            await _dbContext.SaveChangesAsync();
+            var activity = await _dbContext.AccountUserActivities.FirstOrDefaultAsync(act => act.Id == userActivity.Id);
+            if (activity == null) 
+            { 
+                return null; 
+            }
+            var userActivityModel = new AccountUserActivityModel()
+            {
+                Id = activity.Id,
+                Account2UserId = activity.Account2UserId,
+                ActivityInfo = activity.ActivityInfo,
+                DateCreated = activity.DateCreated
+            };
+
+            return userActivityModel;
         }
     }
 }

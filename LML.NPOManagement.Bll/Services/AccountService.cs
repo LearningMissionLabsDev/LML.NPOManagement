@@ -7,6 +7,7 @@ using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using System.Text.RegularExpressions;
 
 namespace LML.NPOManagement.Bll.Services
@@ -217,6 +218,24 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
             return accountUserActivities;
+        }
+
+        public async Task<AccountUserActivityModel> AddAccountUserActivityProgress(AccountUserActivityModel accountUserActivityModel)
+        {
+            var account2User = await _accountRepository.GetAccount2Users();
+            var account2UserCheck =  account2User.FirstOrDefault(acc => acc.Id == accountUserActivityModel.Account2UserId);
+            if(account2UserCheck == null)
+            {
+                return null;
+            }
+            var activityUser = await _accountRepository.AddAccountUserActivityProgress(accountUserActivityModel);
+            if (activityUser == null)
+            {
+                return null;
+            }
+
+            return activityUser;
+
         }
     }
 }
