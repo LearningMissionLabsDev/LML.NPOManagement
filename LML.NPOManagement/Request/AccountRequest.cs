@@ -8,7 +8,8 @@ namespace LML.NPOManagement.Request
     {
         [Required]
         public string Name { get; set; } = null!;
-        public string? Description { get; set; }  
+        public string? Description { get; set; }
+        [Range(1,3)]
         public AccountStatusEnum StatusEnum { get; set; }  
     }
 }

@@ -24,7 +24,6 @@ namespace LML.NPOManagement.Controllers
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountRequest, AccountModel>();
-                cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AttachmentRequest, AttachmentModel>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
                 cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
@@ -34,7 +33,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
-                cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();

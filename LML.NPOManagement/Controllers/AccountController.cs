@@ -26,14 +26,14 @@ namespace LML.NPOManagement.Controllers
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountRequest, AccountModel>();
-                cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
-                cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
                 cfg.CreateMap<UserIdeaRequest, UserIdeaModel>();
                 cfg.CreateMap<UserIdeaModel, UserIdeaResponse>();
                 cfg.CreateMap<AddUserToAccountRequest, Account2UserModel>();
                 cfg.CreateMap<Account2UserModel, Account2UserResponse>();
+                cfg.CreateMap<AccountUserActivityRequest, AccountUserActivityModel>();
+                cfg.CreateMap<AccountUserActivityModel,AccountUserActivityResponse>();
             });
             _mapper = config.CreateMapper();
             _configuration = configuration;
@@ -69,7 +69,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("userProgress/{accountRoleId}")]
-        //[Authorize("Admin", "AccountManager")]
+        [Authorize("Admin", "AccountManager")]
         public async Task<ActionResult<List<AccountUserActivityResponse>>> GetAccountRoleProgress(int accountRoleId)
         {
             if (accountRoleId < 1 || accountRoleId > 3)
@@ -127,7 +127,7 @@ namespace LML.NPOManagement.Controllers
             };
             return Ok(accountResponse);
         }
-
+        //???
         [HttpGet("users")]
         public async Task<ActionResult<List<UserResponse>>> GetUsersByAccount()
         {
@@ -186,6 +186,7 @@ namespace LML.NPOManagement.Controllers
             return Ok(accounts);
         }
 
+        //Done
         [HttpPost("login")]
         public async Task<ActionResult<Account2UserResponse>> Login()
         {
@@ -225,7 +226,7 @@ namespace LML.NPOManagement.Controllers
 
         // DONE
         [HttpPost("addAccount")]
-        public async Task<ActionResult<AccountResponse>> AddACcount([FromBody] AccountRequest accountRequest)
+        public async Task<ActionResult<AccountResponse>> AddAccount([FromBody] AccountRequest accountRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
             if (user == null)
@@ -255,6 +256,11 @@ namespace LML.NPOManagement.Controllers
         [HttpPost("addUserActivity")]
         public async Task<ActionResult<AccountUserActivityResponse>> AddAccountUserActivityProgress([FromBody] AccountUserActivityRequest accountUserActivityRequest)
         {
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return StatusCode(403, "Access denied");
+            }
             var activityModel = _mapper.Map<AccountUserActivityModel>(accountUserActivityRequest);
             var activityUser = await _accountService.AddAccountUserActivityProgress(activityModel);
             if (activityUser == null)
