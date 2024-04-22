@@ -2,6 +2,7 @@
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 
@@ -185,13 +186,11 @@ namespace LML.NPOManagement.Bll.Services
             if (user != null && BC.Verify(userModel.Password, user.Password))
             {
                 var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
-
-                if (accounts == null)
+                if(accounts != null)
                 {
-                    return null;
+                    user.Account2Users = accounts;
                 }
                 user.Password = null;
-                user.Account2Users = accounts;
                 user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration,_userRepository);
                 
                 return user;

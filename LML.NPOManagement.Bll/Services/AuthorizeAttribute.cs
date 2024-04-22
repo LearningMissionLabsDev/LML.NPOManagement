@@ -11,29 +11,29 @@ namespace LML.NPOManagement.Bll.Services
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
-        private readonly string[] _roles;
+        private readonly int _role;
         public AuthorizeAttribute()
         {
         }
-        public AuthorizeAttribute(params string[] roles)
+        public AuthorizeAttribute(int role)
         {
-            _roles = roles;
+            _role = role;
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var user = context.HttpContext.Items["User"] as UserModel;
-            var rol = new List<UserAccountRoleEnum>();
-       
-            for (int i = 0; i < _roles.Length; i++)
-            {
-              var userRole = (UserAccountRoleEnum)Enum.Parse(typeof(UserAccountRoleEnum), _roles[i]);
-                rol.Add(userRole);
-            }
             if (user == null)
             {
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
             }
-            else if (!rol.Any(role => user.Account2Users.Any(account => account.AccountRoleId == (int)role)))
+            var account = context.HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                context.Result = new JsonResult(new { message = "Access denied" }) { StatusCode = StatusCodes.Status403Forbidden };
+            }
+            var userRole = account?.AccountRoleId;
+
+            if ((userRole & _role) != userRole)
             {
                 context.Result = new JsonResult(new { message = "Access denied" }) { StatusCode = StatusCodes.Status403Forbidden };
             }

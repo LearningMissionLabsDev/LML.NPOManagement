@@ -1,7 +1,9 @@
 ﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
@@ -30,14 +32,45 @@ namespace LML.NPOManagement.Bll.Services
             string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
-            if (user.Account2Users.Count == 1)
+            var adminAccount = user.Account2Users.FirstOrDefault(acc => acc.AccountId == 1);
+            int currentRoleId = -1;
+
+            if (adminAccount != null)
+            {
+                if (adminAccount.AccountRoleId == (int)UserAccountRoleEnum.Admin)
+                {
+                    adminAccount.AccountRoleId = (int)UserAccountRoleEnum.SysAdmin;
+                }
+                currentRoleId = adminAccount.AccountRoleId;
+            }
+
+            if (user.Account2Users.Count == 0)
             {
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
-                    new Claim("AccountId",user.Account2Users.First().AccountId.ToString()),
-                    new Claim("AccountRoleId",user.Account2Users.First().AccountRoleId.ToString())
+                }),
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                token = tokenHandler.WriteToken(createdToken);
+                return token;
+            }
+            else if (user.Account2Users.Count == 1)
+            {
+                var roleId = user.Account2Users.First().AccountRoleId;
+                if(currentRoleId == -1)
+                {
+                    currentRoleId = roleId;
+                }
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] {
+                    new Claim("Id", user.Id.ToString()),
+                    new Claim("AccountId", user.Account2Users.First().AccountId.ToString()),
+                    new Claim("AccountRoleId", currentRoleId.ToString())
                 }),
                     Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
                     SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
@@ -88,12 +121,14 @@ namespace LML.NPOManagement.Bll.Services
                 var accounts = await userRepository.GetUsersInfoAccount(userModel.Id);
                 if (accounts == null)
                 {
-                    return null;
+                    return userModel;
                 }
-
-                foreach (var account in accounts)
+                else
                 {
-                    userModel.Account2Users.Add(account);
+                    foreach (var account in accounts)
+                    {
+                        userModel.Account2Users.Add(account);
+                    }
                 }
                 return userModel;
             }

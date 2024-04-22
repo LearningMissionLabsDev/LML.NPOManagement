@@ -70,8 +70,18 @@ public partial class NpomanagementContext : DbContext
             entity.Property(e => e.DateCreated)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Description).HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(250);
+            entity.Property(e => e.IsVisible)
+                .IsRequired()
+                .HasDefaultValueSql("((1))")
+                .HasComment("If set to True, this account will be browsable by the newly registered user");
+            entity.Property(e => e.MaxCapacity)
+                .HasDefaultValueSql("((0))")
+                .HasComment("This is optional field to set maximum numbers of members for this account. if zero or null then membership is unlimited.");
             entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.OnboardingLink)
+                .HasMaxLength(250)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.Creator).WithMany(p => p.Accounts)
                 .HasForeignKey(d => d.CreatorId)
@@ -314,6 +324,7 @@ public partial class NpomanagementContext : DbContext
         {
             entity.ToTable("UserAccountRole");
 
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Description)
                 .HasMaxLength(50)
                 .IsUnicode(false);

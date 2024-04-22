@@ -69,7 +69,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("userProgress/{accountRoleId}")]
-        [Authorize("Admin", "AccountManager")]
+        [Authorize((int)UserAccountRoleEnum.SysAdmin | (int)UserAccountRoleEnum.Admin)]
         public async Task<ActionResult<List<AccountUserActivityResponse>>> GetAccountRoleProgress(int accountRoleId)
         {
             if (accountRoleId < 1 || accountRoleId > 3)

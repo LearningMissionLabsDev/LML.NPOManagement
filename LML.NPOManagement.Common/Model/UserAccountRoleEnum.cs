@@ -3,8 +3,9 @@
     [Flags]
     public enum UserAccountRoleEnum
     {
-        Admin = 1 << 0,
-        AccountManager = 1 << 1,
-        Beneficiary = Admin | AccountManager
+        SysAdmin = 1,
+        Admin = 2,
+        AccountManager = 4,
+        Beneficiary = 8
     }
 }
