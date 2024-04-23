@@ -51,6 +51,7 @@ app.UseHttpsRedirection();
 app.UseCors(x => x
                 .AllowAnyMethod()
                 .AllowAnyHeader()
+                .WithExposedHeaders("Authorization")
                 .SetIsOriginAllowed(origin => true) // allow any origin
                 .AllowCredentials()); // allow credentials
 
