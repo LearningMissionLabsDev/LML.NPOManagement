@@ -66,7 +66,7 @@ namespace LML.NPOManagement.Dal.Repositories
         {
             var users = await _dbContext.Users.ToListAsync();
 
-            if (users.Count < 1)
+            if (!users.Any())
             {
                 return null;
             }
@@ -96,7 +96,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var investor = await _dbContext.InvestorInformations.Where(inv => inv.InvestorTierId == investorTierId).FirstOrDefaultAsync();
+            var investor = await _dbContext.InvestorInformations.Include(us => us.User).Where(inv => inv.InvestorTierId == investorTierId).FirstOrDefaultAsync();
             if (investor == null)
             {
                 return null;
@@ -107,8 +107,17 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-
-            return _mapper.Map<List<UserModel>>(users);
+            var models = new List<UserModel>();
+            foreach (var user in users)
+            {
+                var model = new UserModel()
+                {
+                    Email = user.Email,
+                    StatusId = user.StatusId,
+                };
+                models.Add(model);
+            }
+            return models;
         }
 
         public async Task<List<UserIdeaModel>> GetAllIdea()
@@ -291,7 +300,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
             return newUsersGroup;
         }
-
+        
         public async Task AddUser(UserModel userModel)
         {
             if (userModel != null)
