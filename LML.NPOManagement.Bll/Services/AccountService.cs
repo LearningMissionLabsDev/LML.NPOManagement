@@ -2,13 +2,8 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal.Models;
-using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
-using System.Text.RegularExpressions;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -20,7 +15,6 @@ namespace LML.NPOManagement.Bll.Services
 
         public AccountService(IAccountRepository accountRepository, IUserRepository userRepository, IConfiguration configuration)
         {
-
             _accountRepository = accountRepository;
             _userRepository = userRepository;
             _configuration = configuration;
@@ -32,19 +26,19 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var accountModel = await _accountRepository.GetAccountById(accountId);
 
+            var accountModel = await _accountRepository.GetAccountById(accountId);
             if (accountModel == null)
             {
                 return null;
             }
+
             return accountModel;
         }
 
         public async Task<List<AccountModel>> GetAllAccounts()
         {
             var accounts = await _accountRepository.GetAllAccounts();
-
             if (accounts == null)
             {
                 return null;
@@ -59,12 +53,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var accounts = await _accountRepository.GetAccountsByName(accountName);
 
+            var accounts = await _accountRepository.GetAccountsByName(accountName);
             if (accounts == null)
             {
                 return null;
             }
+
             return accounts;
         }
 
@@ -74,14 +69,14 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var account = await _accountRepository.GetAccountById(accountId);
 
+            var account = await _accountRepository.GetAccountById(accountId);
             if (account == null)
             {
                 return null;
             }
-            var usersByAccount = await _accountRepository.GetUsersByAccount(accountId);
 
+            var usersByAccount = await _accountRepository.GetUsersByAccount(accountId);
             if (usersByAccount == null)
             {
                 return null;
@@ -92,19 +87,18 @@ namespace LML.NPOManagement.Bll.Services
 
         public async Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel)
         {
-
             var account = await _userRepository.GetUsersInfoAccount(account2UserModel.UserId);
-
             if (account == null)
             {
                 return null;
             }
-            var account2user = account.FirstOrDefault(ac => ac.AccountId == account2UserModel.AccountId);
 
+            var account2user = account.FirstOrDefault(ac => ac.AccountId == account2UserModel.AccountId);
             if (account2user == null)
             {
                 return null;
             }
+
             return account2user;
         }
 
@@ -114,13 +108,14 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            accountModel.StatusId = (int)AccountStatusEnum.Active;
-            var account = await _accountRepository.AddAccount(accountModel);
 
+            var account = await _accountRepository.AddAccount(accountModel);
             if (account == null)
             {
                 return null;
             }
+
+            account.StatusId = (int)AccountStatusEnum.Active;
             return account;
         }
 
@@ -130,8 +125,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var account = await _accountRepository.ModifyAccount(accountModel);
 
+            var account = await _accountRepository.ModifyAccount(accountModel);
             if (account == null)
             {
                 return null;
@@ -145,18 +140,15 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return false;
             }
+
             var account = await _accountRepository.GetAccountById(account2UserModel.AccountId);
             if (account == null)
             {
                 return false;
             }
-            var result = await _accountRepository.AddUserToAccount(account2UserModel);
 
-            if (!result)
-            {
-                return false;
-            }
-            return true;
+            var result = await _accountRepository.AddUserToAccount(account2UserModel);
+            return result;
         }
 
         public async Task<bool> RemoveUserFromAccount(int accountId, int userId)
@@ -165,23 +157,26 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return false;
             }
+
             var account = await _accountRepository.GetAccountById(accountId);
             var user = await _userRepository.GetUserById(userId);
             if (account == null || user == null)
             {
                 return false;
             }
-            var accountModel = await _accountRepository.RemoveUserFromAccount(accountId, userId);
 
+            var accountModel = await _accountRepository.RemoveUserFromAccount(accountId, userId);
             if (accountModel == null)
             {
                 return false;
             }
+
             var deletedUser = accountModel.Account2Users.Select(us => us.User).FirstOrDefault(us => us.Id == userId);
             if (deletedUser == null)
             {
                 return true;
             }
+
             return false;
         }
 
@@ -191,13 +186,9 @@ namespace LML.NPOManagement.Bll.Services
             {
                 throw new ArgumentException("Account Not Valid");
             }
-            var account = await _accountRepository.DeleteAccount(accountId);
 
-            if (!account)
-            {
-                return false;
-            }
-            return true;
+            var account = await _accountRepository.DeleteAccount(accountId);
+            return account;
         }
 
         public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId)
@@ -206,28 +197,36 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var userProgresses = await _accountRepository.GetAccountRoleProgress(accountId, accountRoleId);
 
+            var userProgresses = await _accountRepository.GetAccountRoleProgress(accountId, accountRoleId);
             if (userProgresses == null)
             {
                 return null;
             }
+
             var accountUserActivities = userProgresses.Where(ben => ben.Account2UserModel.AccountRoleId == accountRoleId).ToList();
             if (accountUserActivities == null || !accountUserActivities.Any())
             {
                 return null;
             }
+
             return accountUserActivities;
         }
 
         public async Task<AccountUserActivityModel> AddAccountUserActivityProgress(AccountUserActivityModel accountUserActivityModel)
         {
             var account2User = await _accountRepository.GetAccount2Users();
+            if (account2User == null)
+            {
+                return null;
+            }
+
             var account2UserCheck =  account2User.FirstOrDefault(acc => acc.Id == accountUserActivityModel.Account2UserId);
             if(account2UserCheck == null)
             {
                 return null;
             }
+
             var activityUser = await _accountRepository.AddAccountUserActivityProgress(accountUserActivityModel);
             if (activityUser == null)
             {
@@ -235,7 +234,6 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             return activityUser;
-
         }
     }
 }

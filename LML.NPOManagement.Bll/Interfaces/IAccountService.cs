@@ -1,6 +1,5 @@
 ﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
