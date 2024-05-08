@@ -18,17 +18,17 @@ namespace LML.NPOManagement.Controllers
     {
         private IMapper _mapper;
         private INotificationService _notificationService;
+        private IAccountService _accountService;
         private IUserService _userService;
         private IAmazonS3 _s3Client;
         private IConfiguration _configuration;
 
-        public NotificationController(INotificationService notificationService, IUserService userService,
+        public NotificationController(INotificationService notificationService, IUserService userService, IAccountService accountService,
                                       IAmazonS3 s3Client, IConfiguration configuration)
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountRequest, AccountModel>();
-                cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
                 cfg.CreateMap<AttachmentRequest, AttachmentModel>();
                 cfg.CreateMap<DonationRequest, DonationModel>();
                 cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
@@ -38,7 +38,6 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
                 cfg.CreateMap<UserRequest, UserModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
-                cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
                 cfg.CreateMap<AttachmentModel, AttachmentResponse>();
                 cfg.CreateMap<DonationModel, DonationResponse>();
                 cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
@@ -49,11 +48,12 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<UserInformationModel, UserInformationResponse>();
                 cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
-                cfg.CreateMap<UserTypeModel, UserTypeResponse>();
+                cfg.CreateMap<RequestedUserTypeModel, RequestedUserTypeResponse>();
                 cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();
-            _notificationService = notificationService;            
+            _notificationService = notificationService;  
+            _accountService = accountService;
             _userService = userService;
             _s3Client = s3Client;
             _configuration = configuration;
@@ -130,7 +130,7 @@ namespace LML.NPOManagement.Controllers
                     return Ok();
                 case NotificationTypeEnum.ByAccounts:
 
-                    var userByAccounts = await _userService.GetUsersByAccount(id);
+                    var userByAccounts = await _accountService.GetUsersByAccount(id);
                     //_notificationService.SendNotifications(userByAccounts, modifyNotification);
                     return Ok();
 

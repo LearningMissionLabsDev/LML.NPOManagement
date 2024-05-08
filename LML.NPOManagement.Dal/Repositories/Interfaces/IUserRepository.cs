@@ -1,8 +1,5 @@
 ﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Dal.Repositories.Interfaces
 {
@@ -10,15 +7,16 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
     {
         Task<List<UserModel>> GetAllUsers();
         Task<List<UserModel>> GetUsersByInvestorTier(int userId);
-        Task<List<UserModel>> GetUsersByAccount(int userId);
         Task<UserModel> GetUserById(int userId);
-        Task<List<UserInformationModel>> GetUsersByName(UserInformationModel name);
+        Task<List<UserIdeaModel>> GetAllIdea();
+        Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId, int statusId);
         Task<bool> ModifyUserInfo(UserInformationModel userInformation, int userId);
-        Task UpdateUserStatus(int userId, StatusEnumModel status);
+        Task<UserModel> UpdateUserStatus(int userId, StatusEnumModel status);
         Task UpdateGroupStatus(int userId, GroupStatusEnum status);
-        Task DeleteUserFromGroup(int userId, int groupId);
-        Task DeleteGroup(int groupId);
+        Task<UsersGroupModel> DeleteUserFromGroup(int userId, int groupId);
+        Task<bool> DeleteGroup(int groupId);
+        Task<List<Account2UserModel>> GetUsersInfoAccount(int userId);
         Task<UserModel> GetUserByEmail(string email);
         Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> AddGroup(UsersGroupModel groupModel);

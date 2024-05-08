@@ -1,9 +1,8 @@
 ﻿namespace LML.NPOManagement.Common
 {
-    public enum UserTypeEnum
+    public enum RequestedUserTypeEnum
     {
-        Admin=1,
-        AccountManager,
+        AccountManager=1,
         Beneficiary,        
         Investor,
     }

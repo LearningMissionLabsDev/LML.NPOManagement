@@ -2,10 +2,6 @@
 {
     public class AttachmentModel
     {
-        public AttachmentModel()
-        {
-            Notifications = new HashSet<NotificationModel>();
-        }
         public int Id { get; set; }
         public int NotificationId { get; set; }
         public byte[] AttachmentData { get; set; } = null!;

@@ -5,12 +5,17 @@ namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IAccountService
     {
-        Task <List<AccountModel>> GetAllAccounts();
-        Task<AccountModel> GetAccountById(int id);
-        Task <AccountModel> AddAccount(AccountModel accountModel);
-        Task<AccountModel> ModifyAccount(AccountModel accountModel, int id);
-        public void DeleteAccount(int id);
-        Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
-        Task<List<UserIdeaModel>> GetAllIdea();
+        Task<List<AccountModel>> GetAllAccounts();
+        Task<AccountModel> GetAccountById(int accountId);
+        Task<List<AccountModel>> GetAccountsByName(string name);
+        Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId);
+        Task<List<UserModel>> GetUsersByAccount(int accountId);
+        Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel);
+        Task<AccountModel> AddAccount(AccountModel accountModel);
+        Task<bool> AddUserToAccount(Account2UserModel account2UserModel);
+        Task<AccountUserActivityModel> AddAccountUserActivityProgress(AccountUserActivityModel accountUserActivityModel);
+        Task<AccountModel> ModifyAccount(AccountModel accountModel);
+        Task<bool> RemoveUserFromAccount(int accountId, int userId);
+        Task<bool> DeleteAccount(int accountId);
     }
 }

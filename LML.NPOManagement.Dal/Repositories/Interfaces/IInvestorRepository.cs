@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Common;
-using LML.NPOManagement.Dal.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LML.NPOManagement.Common.Model;
 
 namespace LML.NPOManagement.Dal.Repositories.Interfaces
 {

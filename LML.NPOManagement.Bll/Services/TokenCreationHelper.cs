@@ -1,6 +1,11 @@
 ﻿using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
+using LML.NPOManagement.Dal.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -21,23 +26,76 @@ namespace LML.NPOManagement.Bll.Services
 
             return _signingKey;
         }
-        public static string GenerateJwtToken(UserModel user, IConfiguration configuration)
+
+        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository)
         {
+            string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var adminAccount = user.Account2Users.FirstOrDefault(acc => acc.AccountId == 1);
+            int currentRoleId = -1;
+
+            if (adminAccount != null)
             {
-                Subject = new ClaimsIdentity(new[] {
+                if (adminAccount.AccountRoleId == (int)UserAccountRoleEnum.Admin)
+                {
+                    adminAccount.AccountRoleId = (int)UserAccountRoleEnum.SysAdmin;
+                }
+                currentRoleId = adminAccount.AccountRoleId;
+            }
+
+            if (user.Account2Users.Count == 0)
+            {
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
-                SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                token = tokenHandler.WriteToken(createdToken);
+                return token;
+            }
+            else if (user.Account2Users.Count == 1)
+            {
+                var roleId = user.Account2Users.First().AccountRoleId;
+                if(currentRoleId == -1)
+                {
+                    currentRoleId = roleId;
+                }
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] {
+                    new Claim("Id", user.Id.ToString()),
+                    new Claim("AccountId", user.Account2Users.First().AccountId.ToString()),
+                    new Claim("AccountRoleId", currentRoleId.ToString())
+                }),
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                token = tokenHandler.WriteToken(createdToken);
+                return token;
+            }
+            else if (user.Account2Users.Count > 1)
+            {
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] {
+                        new Claim("Id", user.Id.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
+                token = tokenHandler.WriteToken(createdToken);
+            }
+            return token;
         }
 
-        public static UserModel ValidateJwtToken(string token, IConfiguration configuration)
+        public static async Task<UserModel> ValidateJwtToken(string token, IConfiguration configuration, IUserRepository userRepository)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:SecretKey").Value);
@@ -60,9 +118,18 @@ namespace LML.NPOManagement.Bll.Services
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 UserModel userModel = new UserModel();
                 userModel.Id = Convert.ToInt16(jwtToken.Claims.First(x => x.Type == "Id").Value);
-
-                // if validation is successful then return UserId from JWT token 
-
+                var accounts = await userRepository.GetUsersInfoAccount(userModel.Id);
+                if (accounts == null)
+                {
+                    return userModel;
+                }
+                else
+                {
+                    foreach (var account in accounts)
+                    {
+                        userModel.Account2Users.Add(account);
+                    }
+                }
                 return userModel;
             }
             catch (Exception exp)
@@ -73,3 +140,5 @@ namespace LML.NPOManagement.Bll.Services
         }
     }
 }
+
+

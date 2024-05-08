@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using LML.NPOManagement.Bll.Interfaces;
+﻿using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal.Models;
-using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 
@@ -14,18 +10,11 @@ namespace LML.NPOManagement.Bll.Services
 {
     public class UserService : IUserService
     {
-        IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IInvestorRepository _investorRepository;
 
         public UserService(IUserRepository userRepository, IInvestorRepository investorRepository)
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<User, UserModel>();
-                cfg.CreateMap<UserModel, User>();
-            });
-            _mapper = config.CreateMapper();
             _userRepository = userRepository;
             _investorRepository = investorRepository;
         }
@@ -36,7 +25,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var newUser = TokenCreationHelper.ValidateJwtToken(token, configuration);
+            var newUser = await TokenCreationHelper.ValidateJwtToken(token, configuration, _userRepository);
 
             if (newUser == null)
             {
@@ -44,17 +33,23 @@ namespace LML.NPOManagement.Bll.Services
             }
             await _userRepository.UpdateUserStatus(newUser.Id, StatusEnumModel.Active);
             newUser.StatusId = (int)StatusEnumModel.Active;
-
+            
             return newUser;
         }
 
-        public async Task DeleteUser(int userId)
+        public async Task<UserModel> DeleteUser(int userId)
         {
-            if(userId == 0)
+            if (userId <= 0)
             {
                 throw new ArgumentException("Invalid user");
             }
-            await _userRepository.UpdateUserStatus(userId, StatusEnumModel.Deleted);
+            var user = await _userRepository.UpdateUserStatus(userId, StatusEnumModel.Deleted);
+
+            if (user == null)
+            {
+                return null;
+            }
+            return user;
         }
 
         public async Task<List<UserModel>> GetAllUsers()
@@ -69,13 +64,31 @@ namespace LML.NPOManagement.Bll.Services
             return userModel;
         }
 
-        public async Task DeleteUserFromGroup(int userId, int groupId)
+        public async Task<bool> DeleteUserFromGroup(int userId, int groupId)
         {
-            await _userRepository.DeleteUserFromGroup(userId, groupId);
+            if (userId <= 0 || groupId <= 0)
+            {
+                return false;
+            }
+            var group = await _userRepository.DeleteUserFromGroup(userId, groupId);
+
+            if (group == null)
+            {
+                return false;
+            }
+            if (group.Users.FirstOrDefault(user => user.Id == userId) == null)
+            {
+                return true;
+            }
+            return false;
         }
 
         public async Task<UserModel> GetUserById(int userId)
         {
+            if (userId <= 0)
+            {
+                return null;
+            }
             var userModel = await _userRepository.GetUserById(userId);
 
             if (userModel == null)
@@ -98,30 +111,6 @@ namespace LML.NPOManagement.Bll.Services
             return userModel;
         }
 
-        public async Task<List<UserInformationModel>> GetUsersByName(UserInformationModel userInfo)
-        {
-            var userModel = await _userRepository.GetUsersByName(userInfo);
-
-            if (userModel == null)
-            {
-                return null;
-            }
-
-            return userModel;
-        }
-
-        public async Task<List<UserModel>> GetUsersByAccount(int userId)
-        {
-            var usersByAccount = await _userRepository.GetUsersByAccount(userId);
-
-            if (usersByAccount == null)
-            {
-                return null;
-            }
-
-            return usersByAccount;
-        }
-
         public async Task<List<UserModel>> GetUsersByInvestorTier(int userId)
         {
             var userModel = await _userRepository.GetUsersByInvestorTier(userId);
@@ -132,6 +121,17 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             return userModel;
+        }
+
+        public async Task<List<UserIdeaModel>> GetAllIdea()
+        {
+            var ideas = await _userRepository.GetAllIdea();
+
+            if (ideas == null)
+            {
+                return null;
+            }
+            return ideas;
         }
 
         public async Task<UserModel> ModifyUserCredentials(string email, string password, int userId)
@@ -185,9 +185,14 @@ namespace LML.NPOManagement.Bll.Services
 
             if (user != null && BC.Verify(userModel.Password, user.Password))
             {
+                var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
+                if(accounts != null)
+                {
+                    user.Account2Users = accounts;
+                }
                 user.Password = null;
-                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration);
-
+                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration,_userRepository);
+                
                 return user;
             }
             return null;
@@ -203,7 +208,7 @@ namespace LML.NPOManagement.Bll.Services
                 await _userRepository.AddUser(userModel);
 
                 var newUser = await _userRepository.GetUserByEmail(userModel.Email);
-                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration);
+                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration, _userRepository);
                 newUser.Password = null;
 
                 return newUser;
@@ -219,7 +224,7 @@ namespace LML.NPOManagement.Bll.Services
         {
             await _userRepository.AddUserInformation(userInformationModel);
 
-            if (userInformationModel.UserTypeEnum == UserTypeEnum.Investor)
+            if (userInformationModel.RequestedUserTypeEnum == RequestedUserTypeEnum.Investor)
             {
                 await _investorRepository.AddInvestor(userInformationModel);
             }
@@ -262,7 +267,6 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-
             return usersGroup;
         }
 
@@ -342,14 +346,19 @@ namespace LML.NPOManagement.Bll.Services
             return groups;
         }
 
-        public async Task DeleteGroup(int groupId)
+        public async Task<bool> DeleteGroup(int groupId)
         {
             if (groupId <= 0)
             {
                 throw new ArgumentException("Group not found");
             }
+            var group = await _userRepository.DeleteGroup(groupId);
 
-            await _userRepository.DeleteGroup(groupId);
+            if (!group)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<bool> AddUserToGroup(int userId, int groupId)
@@ -360,7 +369,22 @@ namespace LML.NPOManagement.Bll.Services
             }
             var user = await _userRepository.AddUserToGroup(userId, groupId);
 
-            return user;
+            if (!user)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
+        {
+            var idea = await _userRepository.AddUserIdea(userIdeaModel);
+
+            if (idea == null)
+            {
+                return null;
+            }
+            return idea;
         }
     }
 }

@@ -1,17 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LML.NPOManagement.Common;
+using LML.NPOManagement.Dal.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
 {
     public class AccountRequest
     {
         [Required]
-        [StringLength(50)]
-        public string Name { get; set; }
-
-        [StringLength (int.MaxValue)]
-        public string Description { get; set; }
-
-        [StringLength (50)]
-        public string Status { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
+        [Range(1,3)]
+        public AccountStatusEnum StatusEnum { get; set; }  
     }
 }

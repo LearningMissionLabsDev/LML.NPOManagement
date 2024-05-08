@@ -2,125 +2,238 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal;
-using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Bll.Services
 {
     public class AccountService : IAccountService
     {
-        private IMapper _mapper;
-        //private readonly IAccountRepository _accountRepository;
-        private readonly NpomanagementContext _dbContext;
+        private readonly IConfiguration _configuration;
+        private readonly IAccountRepository _accountRepository;
+        private readonly IUserRepository _userRepository;
 
-        public AccountService(/*IAccountRepository accountRepository*/)
+        public AccountService(IAccountRepository accountRepository, IUserRepository userRepository, IConfiguration configuration)
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<AccountProgress, AccountProgressModel>();
-                cfg.CreateMap<Attachment, AttachmentModel>();
-                cfg.CreateMap<Donation, DonationModel>();
-                cfg.CreateMap<Account, AccountModel>();
-                cfg.CreateMap<InvestorInformation, InvestorInformationModel>();
-                cfg.CreateMap<InventoryType, InventoryTypeModel>();
-                cfg.CreateMap<Notification, NotificationModel>();
-                cfg.CreateMap<UserInformation, UserInformationModel>();
-                cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<AccountProgressModel, AccountProgress>();
-                cfg.CreateMap<AttachmentModel, Attachment>();
-                cfg.CreateMap<DonationModel, Donation>();
-                cfg.CreateMap<AccountModel, Account>();
-                cfg.CreateMap<InvestorInformationModel, InvestorInformation>();
-                cfg.CreateMap<InventoryTypeModel, InventoryType>();
-                cfg.CreateMap<NotificationModel, Notification>();
-                cfg.CreateMap<UserInformationModel, UserInformation>();
-                cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserTypeModel, UserType>();
-                cfg.CreateMap<UserIdeaModel, UserIdea>();
-                cfg.CreateMap<UserIdea, UserIdeaModel>();
-            });
-            _mapper = config.CreateMapper();
-            //_accountRepository = accountRepository;
+            _accountRepository = accountRepository;
+            _userRepository = userRepository;
+            _configuration = configuration;
         }
 
-        public async Task <AccountModel> AddAccount(AccountModel accountModel)
+        public async Task<AccountModel> GetAccountById(int accountId)
         {
-            var account = _mapper.Map<AccountModel, Account>(accountModel);
-            await _dbContext.Accounts.AddAsync(account);
-            await _dbContext.SaveChangesAsync();
-            return accountModel;
-        }
-
-        public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
-        {
-            var idea =_mapper.Map<UserIdeaModel,UserIdea>(userIdeaModel);
-            await _dbContext.UserIdeas.AddAsync(idea);
-            _dbContext.SaveChanges();
-            return userIdeaModel;
-        }
-        public async Task<List<UserIdeaModel>> GetAllIdea()
-        {
-            var ideas = await _dbContext.UserIdeas.ToListAsync();
-            if(ideas.Count == 0)
+            if (accountId <= 0)
             {
                 return null;
             }
-            List<UserIdeaModel> userIdeaModels = new List<UserIdeaModel>();
-            foreach (var idea in ideas)
-            {
-                var ideaModel = _mapper.Map<UserIdea, UserIdeaModel>(idea);
-                userIdeaModels.Add(ideaModel);
-            }
-            return userIdeaModels;
-        }
 
-        public void DeleteAccount(int id)
-        {
-            var delatAccount = _dbContext.Accounts.Where(da => da.Id == id).FirstOrDefault();
-            if (delatAccount != null)
+            var accountModel = await _accountRepository.GetAccountById(accountId);
+            if (accountModel == null)
             {
-                _dbContext.SaveChanges();
+                return null;
             }
-        }
 
-        public async Task<AccountModel> GetAccountById(int id)
-        {
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == id).FirstOrDefaultAsync();
-            if (account != null)
-            {
-                var accountModel = _mapper.Map<Account, AccountModel>(account);
-                return accountModel;
-            }
-            return null;          
+            return accountModel;
         }
 
         public async Task<List<AccountModel>> GetAllAccounts()
         {
-            List<AccountModel> accountModels = new List<AccountModel>();
-            var accounts = await _dbContext.Accounts.ToListAsync();
-            foreach (var account in accounts)
+            var accounts = await _accountRepository.GetAllAccounts();
+            if (accounts == null)
             {
-                var accountModel = _mapper.Map<Account, AccountModel>(account);
-                accountModels.Add(accountModel);
+                return null;
             }
-            return accountModels;
+
+            return accounts;
         }
-        public async Task <AccountModel> ModifyAccount(AccountModel accountModel, int id)
+
+        public async Task<List<AccountModel>> GetAccountsByName(string accountName)
         {
-            var account = await _dbContext.Accounts.Where(a => a.Id == id).FirstOrDefaultAsync();
+            if (string.IsNullOrEmpty(accountName))
+            {
+                return null;
+            }
+
+            var accounts = await _accountRepository.GetAccountsByName(accountName);
+            if (accounts == null)
+            {
+                return null;
+            }
+
+            return accounts;
+        }
+
+        public async Task<List<UserModel>> GetUsersByAccount(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                return null;
+            }
+
+            var account = await _accountRepository.GetAccountById(accountId);
             if (account == null)
             {
-               return null;
+                return null;
             }
-            account.Description = accountModel.Description;
-            account.Name = accountModel.Name;
-            //account.Status=accountModel.Status;
-            await _dbContext.SaveChangesAsync();
-            var newAccount = _mapper.Map<Account, AccountModel>(account);
-            return newAccount;
+
+            var usersByAccount = await _accountRepository.GetUsersByAccount(accountId);
+            if (usersByAccount == null)
+            {
+                return null;
+            }
+
+            return usersByAccount;
+        }
+
+        public async Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel)
+        {
+            var account = await _userRepository.GetUsersInfoAccount(account2UserModel.UserId);
+            if (account == null)
+            {
+                return null;
+            }
+
+            var account2user = account.FirstOrDefault(ac => ac.AccountId == account2UserModel.AccountId);
+            if (account2user == null)
+            {
+                return null;
+            }
+
+            return account2user;
+        }
+
+        public async Task<AccountModel> AddAccount(AccountModel accountModel)
+        {
+            if (accountModel == null || string.IsNullOrEmpty(accountModel.Name))
+            {
+                return null;
+            }
+
+            var account = await _accountRepository.AddAccount(accountModel);
+            if (account == null)
+            {
+                return null;
+            }
+
+            account.StatusId = (int)AccountStatusEnum.Active;
+            return account;
+        }
+
+        public async Task<AccountModel> ModifyAccount(AccountModel accountModel)
+        {
+            if (accountModel == null)
+            {
+                return null;
+            }
+
+            var account = await _accountRepository.ModifyAccount(accountModel);
+            if (account == null)
+            {
+                return null;
+            }
+            return account;
+        }
+
+        public async Task<bool> AddUserToAccount(Account2UserModel account2UserModel)
+        {
+            if (account2UserModel == null)
+            {
+                return false;
+            }
+
+            var account = await _accountRepository.GetAccountById(account2UserModel.AccountId);
+            if (account == null)
+            {
+                return false;
+            }
+
+            var result = await _accountRepository.AddUserToAccount(account2UserModel);
+            return result;
+        }
+
+        public async Task<bool> RemoveUserFromAccount(int accountId, int userId)
+        {
+            if (accountId <= 0 || userId <= 0)
+            {
+                return false;
+            }
+
+            var account = await _accountRepository.GetAccountById(accountId);
+            var user = await _userRepository.GetUserById(userId);
+            if (account == null || user == null)
+            {
+                return false;
+            }
+
+            var accountModel = await _accountRepository.RemoveUserFromAccount(accountId, userId);
+            if (accountModel == null)
+            {
+                return false;
+            }
+
+            var deletedUser = accountModel.Account2Users.Select(us => us.User).FirstOrDefault(us => us.Id == userId);
+            if (deletedUser == null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteAccount(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                throw new ArgumentException("Account Not Valid");
+            }
+
+            var account = await _accountRepository.DeleteAccount(accountId);
+            return account;
+        }
+
+        public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId)
+        {
+            if (accountId <= 0)
+            {
+                return null;
+            }
+
+            var userProgresses = await _accountRepository.GetAccountRoleProgress(accountId);
+            if (userProgresses == null)
+            {
+                return null;
+            }
+
+            var accountUserActivities = userProgresses.Where(ben => ben.Account2UserModel.AccountRoleId == accountRoleId).ToList();
+            if (accountUserActivities == null || !accountUserActivities.Any())
+            {
+                return null;
+            }
+
+            return accountUserActivities;
+        }
+
+        public async Task<AccountUserActivityModel> AddAccountUserActivityProgress(AccountUserActivityModel accountUserActivityModel)
+        {
+            var account2User = await _accountRepository.GetAccount2Users();
+            if (account2User == null)
+            {
+                return null;
+            }
+
+            var account2UserCheck =  account2User.FirstOrDefault(acc => acc.Id == accountUserActivityModel.Account2UserId);
+            if(account2UserCheck == null)
+            {
+                return null;
+            }
+
+            var activityUser = await _accountRepository.AddAccountUserActivityProgress(accountUserActivityModel);
+            if (activityUser == null)
+            {
+                return null;
+            }
+
+            return activityUser;
         }
     }
 }

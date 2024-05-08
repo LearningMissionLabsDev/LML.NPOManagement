@@ -1,4 +1,4 @@
-﻿using LML.NPOManagement.Common;
+﻿using LML.NPOManagement.Common.Model;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {

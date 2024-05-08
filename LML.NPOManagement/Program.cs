@@ -6,13 +6,18 @@ using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using LML.NPOManagement.Middeware;
+using Microsoft.Extensions.DependencyInjection;
+using System.Configuration;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 // Add services to the container.
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -25,16 +30,11 @@ builder.Services.AddScoped<IInvestorService, InvestorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInventoryService, UserInventoryService>();
-//builder.Services.AddScoped<IAccountRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 //builder.Services.AddScoped<INotificationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvestorRepository, InvestorRepository>();
 builder.Services.AddScoped <NpomanagementContext>();
-
-
-
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,12 +46,12 @@ if (app.Environment.IsDevelopment())
 
 // Custom JWT AUTH Middleware
 app.UseMiddleware<JwtMiddleware>();
-
 app.UseHttpsRedirection();
 
 app.UseCors(x => x
                 .AllowAnyMethod()
                 .AllowAnyHeader()
+                .WithExposedHeaders("Authorization")
                 .SetIsOriginAllowed(origin => true) // allow any origin
                 .AllowCredentials()); // allow credentials
 

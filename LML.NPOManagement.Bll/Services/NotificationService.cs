@@ -23,7 +23,6 @@ namespace LML.NPOManagement.Bll.Services
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<AccountProgress, AccountProgressModel>();
                 cfg.CreateMap<Dal.Models.Attachment, AttachmentModel>();
                 cfg.CreateMap<Donation, DonationModel>();
                 cfg.CreateMap<Account, AccountModel>();
@@ -32,8 +31,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<Notification, NotificationModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
-                cfg.CreateMap<UserType, UserTypeModel>();
-                cfg.CreateMap<AccountProgressModel, AccountProgress>();
+                //cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AttachmentModel, Dal.Models.Attachment>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
@@ -42,7 +40,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<NotificationModel, Notification>();
                 cfg.CreateMap<UserInformationModel, UserInformation>();
                 cfg.CreateMap<UserInventoryModel, UserInventory>();
-                cfg.CreateMap<UserTypeModel, UserType>();
+                //cfg.CreateMap<UserTypeModel, UserType>();
                 cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
@@ -192,17 +190,17 @@ namespace LML.NPOManagement.Bll.Services
             } 
         }
 
-        public void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string body)
+        public async void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string body)
         {
             if (notificationModel.Subject == null)
             {
                 notificationModel.Subject = HtmlSubject();
             }
-            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration);
-            string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
-            var uri = $"{clientVerificationURL}?token={token}";
-            body = body.Replace("@verifiyCode", uri);
-            SendNotification(body, notificationModel.Subject, userModel.Email);
+            //string token = await TokenCreationHelper.GenerateJwtToken(userModel, configuration);
+            //string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
+            //var uri = $"{clientVerificationURL}?token={token}";
+            //body = body.Replace("@verifiyCode", uri);
+            //SendNotification(body, notificationModel.Subject, userModel.Email);
         }
 
         private string HtmlSubject()

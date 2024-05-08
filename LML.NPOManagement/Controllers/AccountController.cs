@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
+using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,122 +17,361 @@ namespace LML.NPOManagement.Controllers
     public class AccountController : ControllerBase
     {
         private IMapper _mapper;
+        private IConfiguration _configuration;
         private IAccountService _accountService;
         private INotificationService _notificationService;
         private IUserService _userService;
-        public AccountController(IAccountService accountService, INotificationService notificationService, IUserService userService)
+        public AccountController(IConfiguration configuration, IAccountService accountService, INotificationService notificationService, IUserService userService)
         {
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AccountRequest, AccountModel>();
-                cfg.CreateMap<AccountProgressRequest, AccountProgressModel>();
-                cfg.CreateMap<AttachmentRequest, AttachmentModel>();
-                cfg.CreateMap<DonationRequest, DonationModel>();
-                cfg.CreateMap<InventoryTypeRequest, InventoryTypeModel>();
-                cfg.CreateMap<InvestorInformationRequest, InvestorInformationModel>();
-                cfg.CreateMap<NotificationRequest, NotificationModel>();
-                cfg.CreateMap<UserInformationRequest, UserInformationModel>();
-                cfg.CreateMap<UserInventoryRequest, UserInventoryModel>();
-                cfg.CreateMap<UserRequest, UserModel>();
                 cfg.CreateMap<AccountModel, AccountResponse>();
-                cfg.CreateMap<AccountProgressModel, AccountProgressResponse>();
-                cfg.CreateMap<AttachmentModel, AttachmentResponse>();
-                cfg.CreateMap<DonationModel, DonationResponse>();
-                cfg.CreateMap<InventoryTypeModel, InventoryTypeResponse>();
-                cfg.CreateMap<InvestorInformationModel, InvestorInformationResponse>();
-                cfg.CreateMap<InvestorTierTypeModel, InvestorTierTypeResponse>();
-                cfg.CreateMap<NotificationModel, NotificationResponse>();
-                cfg.CreateMap<NotificationTransportTypeModel, NotificationTypeResponse>();
-                cfg.CreateMap<UserInformationModel, UserInformationResponse>();
-                cfg.CreateMap<UserInventoryModel, UserInventoryResponse>();
                 cfg.CreateMap<UserModel, UserResponse>();
-                cfg.CreateMap<UserTypeModel, UserTypeResponse>();
-                cfg.CreateMap<LoginRequest, UserModel>();
                 cfg.CreateMap<UserIdeaRequest, UserIdeaModel>();
                 cfg.CreateMap<UserIdeaModel, UserIdeaResponse>();
+                cfg.CreateMap<AddUserToAccountRequest, Account2UserModel>();
+                cfg.CreateMap<Account2UserModel, Account2UserResponse>();
+                cfg.CreateMap<AccountUserActivityRequest, AccountUserActivityModel>();
+                cfg.CreateMap<AccountUserActivityModel,AccountUserActivityResponse>();
             });
             _mapper = config.CreateMapper();
+            _configuration = configuration;
             _accountService = accountService;
             _notificationService = notificationService;
             _userService = userService;
         }
 
-        // GET: api/<AccountController>
+        // DONE
         [HttpGet]
-        public async Task<List<AccountResponse>> Get()
+        //[Authorize]
+        public async Task<ActionResult<List<AccountResponse>>> GetAccounts()
         {
             var accounts = await _accountService.GetAllAccounts();
-            return _mapper.Map<List<AccountModel>,List<AccountResponse>>(accounts);
-        }
-
-        // GET api/<AccountController>/5
-        [HttpGet("{id}")]
-        public async Task<AccountResponse> Get(int id)
-        {
-            var account = await _accountService.GetAccountById(id);
-            return _mapper.Map<AccountModel,AccountResponse>(account);
-        }
-
-        // GET: api/<AccountController>
-        [HttpGet("idea")]
-        public async Task<List<UserIdeaResponse>> GetIdea()
-        {
-            List<UserIdeaResponse> ideaModels = new List<UserIdeaResponse>();
-            var ideas = await _accountService.GetAllIdea();
-            if (ideas.Count > 0)
+            if (accounts == null)
             {
-                foreach (var idea in ideas)
-                {
-                    var ideaResponse = _mapper.Map<UserIdeaModel, UserIdeaResponse>(idea);
-                    ideaModels.Add(ideaResponse);
-                }
-                return ideaModels;
+                return NotFound();
             }
-            return null;
+            var accountResponses = new List<AccountResponse>();
+
+            foreach (var account in accounts)
+            {
+                var newAccountResponse = new AccountResponse()
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    Description = account.Description,
+                    StatusId = account.StatusId
+                };
+                accountResponses.Add(newAccountResponse);
+            }
+            return Ok(accountResponses);
         }
 
-        // POST api/<AccountController>
-        [HttpPost]
-        public async Task <ActionResult <AccountResponse>> Post([FromBody] AccountRequest accountRequest)
-        {           
-            var accountModel = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
-            var account = await _accountService.AddAccount(accountModel);
-            var accountResponse = _mapper.Map<AccountModel, AccountResponse>(account);
-            return Ok(accountResponse);
-        }
-
-        // POST api/<AccountController>
-        [HttpPost("submitComments")]
-        public async Task<ActionResult> SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
+        [HttpGet("userProgress/{accountRoleId}")]
+        [Authorize((int)UserAccountRoleEnum.SysAdmin | (int)UserAccountRoleEnum.Admin)]
+        public async Task<ActionResult<List<AccountUserActivityResponse>>> GetAccountRoleProgress(int accountRoleId)
         {
-            var user = _userService.GetUserById(userIdeaRequest.UserId);
-            if(user == null)
+            if (accountRoleId < 1 || accountRoleId > 3)
             {
                 return BadRequest();
             }
-            var ideaModel = _mapper.Map<UserIdeaRequest, UserIdeaModel>(userIdeaRequest);
-            var idea = await _accountService.AddUserIdea(ideaModel);
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return Unauthorized();
+            }
+            var userActivities = await _accountService.GetAccountRoleProgress(account.AccountId, accountRoleId);
+
+            if (userActivities == null)
+            {
+                return NotFound();
+            }
+            var accountUserResponses = new List<AccountUserActivityResponse>();
+
+            foreach (var userProgress in userActivities)
+            {
+                var newAccountUserResponse = new AccountUserActivityResponse()
+                {
+                    Id = userProgress.Id,
+                    Account2UserId = userProgress.Account2UserId,
+                    ActivityInfo = userProgress.ActivityInfo,
+                    DateCreated = userProgress.DateCreated,
+                };
+                accountUserResponses.Add(newAccountUserResponse);
+            }
+            return Ok(accountUserResponses);
+        }
+
+        // DONE
+        [HttpGet("{accountId}")]
+        public async Task<ActionResult<AccountResponse>> GetAccountById(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                return BadRequest();
+            }
+            var account = await _accountService.GetAccountById(accountId);
+
+            if (account == null)
+            {
+                return NotFound();
+            }
+            var accountResponse = new AccountResponse()
+            {
+                Id = account.Id,
+                Name = account.Name,
+                Description = account.Description,
+                StatusId = account.StatusId,
+                DateCreated = account.DateCreated,
+            };
+            return Ok(accountResponse);
+        }
+        //???
+        [HttpGet("users")]
+        public async Task<ActionResult<List<UserResponse>>> GetUsersByAccount()
+        {
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return BadRequest();
+            }
+            var users = await _accountService.GetUsersByAccount(account.AccountId);
+
+            if (users == null)
+            {
+                return NotFound();
+            }
+            var userResponse = new List<UserResponse>();
+            foreach (var user in users)
+            {
+                userResponse.Add(new UserResponse()
+                {
+                    Id = user.Id,
+                    Email = user.Email
+                });
+            }
+            return Ok(userResponse);
+        }
+
+        // DONE
+        [HttpGet("search/{accountName}")]
+        public async Task<ActionResult<List<AccountResponse>>> GetAccountsByName(string accountName)
+        {
+            if (string.IsNullOrEmpty(accountName))
+            {
+                return BadRequest();
+            }
+            var accountModel = await _accountService.GetAccountsByName(accountName);
+
+            if (accountModel == null)
+            {
+                return NotFound();
+            }
+            var accounts = new List<AccountResponse>();
+
+            foreach (var account in accountModel)
+            {
+                var accountResponse = new AccountResponse()
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    Description = account.Description,
+                    StatusId = account.StatusId,
+                    CreatorId = account.CreatorId,
+                    DateCreated = account.DateCreated
+                };
+                accounts.Add(accountResponse);
+            }
+            return Ok(accounts);
+        }
+
+        //Done
+        [HttpPost("login")]
+        public async Task<ActionResult<Account2UserResponse>> Login()
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+
+            if (user == null)
+            {
+                return Unauthorized("User not logged in!");
+            }
+            if (account == null)
+            {
+                return StatusCode(403, "Access denied");
+            }
+
+            var account2user = new Account2UserModel()
+            {
+                AccountId = account.AccountId,
+                UserId = account.UserId,
+                AccountRoleId = account.AccountRoleId
+            };
+
+            var login = await _accountService.AccountLogin(account2user);
+
+            if (login == null)
+            {
+                return Conflict();
+            }
+            var accountResponse = new Account2UserResponse()
+            {
+                AccountId = login.AccountId,
+                UserId = login.UserId,
+                AccountRoleId = login.AccountRoleId
+            };
+            return Ok(accountResponse);
+        }
+
+        // DONE
+        [HttpPost("addAccount")]
+        public async Task<ActionResult<AccountResponse>> AddAccount([FromBody] AccountRequest accountRequest)
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            var accountModel = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
+            accountModel.CreatorId = user.Id;
+            var account = await _accountService.AddAccount(accountModel);
+
+            if (account == null)
+            {
+                return BadRequest("Process Failed!");
+            }
+            var accountResponse = new AccountResponse()
+            {
+                Id = account.Id,
+                StatusId = account.StatusId,
+                CreatorId = account.CreatorId,
+                Name = account.Name,
+                Description = account.Description,
+                DateCreated = account.DateCreated
+            };
+            return Ok(accountResponse);
+        }
+
+        [HttpPost("addUserActivity")]
+        public async Task<ActionResult<AccountUserActivityResponse>> AddAccountUserActivityProgress([FromBody] AccountUserActivityRequest accountUserActivityRequest)
+        {
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return StatusCode(403, "Access denied");
+            }
+            var activityModel = _mapper.Map<AccountUserActivityModel>(accountUserActivityRequest);
+            var activityUser = await _accountService.AddAccountUserActivityProgress(activityModel);
+            if (activityUser == null)
+            {
+                return Conflict();
+            }
+            var activityResponse = new AccountUserActivityResponse()
+            {
+                Id = activityUser.Id,
+                Account2UserId = activityUser.Account2UserId,
+                ActivityInfo = activityUser.ActivityInfo,
+                DateCreated = activityUser.DateCreated
+            };
+            return Ok(activityResponse);
+        }
+
+        // DONE
+        [HttpPost("addUser")]
+        public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest addUserToAccountRequest)
+        {
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return NotFound("Access denied");
+            }
+            var account2User = new Account2UserModel()
+            {
+                AccountId = account.AccountId,
+                UserId = addUserToAccountRequest.UserId,
+                AccountRoleId = (int)addUserToAccountRequest.UserAccountRoleEnum
+            };
+            var result = await _accountService.AddUserToAccount(account2User);
+
+            if (!result)
+            {
+                return Conflict();
+            }
             return Ok();
         }
 
-        // PUT api/<AccountController>/5
-        [HttpPut("{id}")]
-        public async Task <ActionResult> Put(int id, [FromBody] AccountRequest accountRequest)
+        // DONE
+        [HttpPut("modifyAccount")]
+        public async Task<ActionResult<AccountResponse>> ModifyAccount([FromBody] AccountRequest accountRequest)
         {
-            var account = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
-            var modifyAccount = await _accountService.ModifyAccount(account, id);
-            if (modifyAccount != null)
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
             {
-                return Ok();
+                return StatusCode(403, "Access denied");
             }
-            return BadRequest();
+            var accountModel = new AccountModel()
+            {
+                Id = account.AccountId,
+                Name = accountRequest.Name,
+                Description = accountRequest.Description,
+                StatusId = (int)accountRequest.StatusEnum
+            };
+            var modifyAccount = await _accountService.ModifyAccount(accountModel);
+
+            if (modifyAccount == null)
+            {
+                return BadRequest();
+            }
+            var accountResponse = new AccountResponse()
+            {
+                Id = modifyAccount.Id,
+                CreatorId = modifyAccount.CreatorId,
+                Name = modifyAccount.Name,
+                Description = modifyAccount.Description,
+                StatusId = modifyAccount.StatusId,
+            };
+            return Ok(accountResponse);
         }
 
-        // DELETE api/<AccountController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // DONE
+        [HttpDelete("removeUser/{userId}")]
+        public async Task<ActionResult> RemoveUserFromAccount(int userId)
         {
-            _accountService.DeleteAccount(id);
+            if (userId <= 0)
+            {
+                return BadRequest("User Not Found");
+            }
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return StatusCode(403, "Access denied");
+            }
+            var user = await _accountService.RemoveUserFromAccount(account.AccountId, userId);
+
+            if (!user)
+            {
+                return Conflict();
+            }
+            return Ok();
+        }
+
+        // DONE
+        [HttpDelete("deleteAccount")]
+        public async Task<ActionResult> DeleteAccount()
+        {
+            var account = HttpContext.Items["Account"] as Account2UserModel;
+            if (account == null)
+            {
+                return NotFound("Account Not Found");
+            }
+            var deletedAccount = await _accountService.DeleteAccount(account.AccountId);
+
+            if (!deletedAccount)
+            {
+                return Conflict();
+            }
+            return Ok();
         }
     }
 }
