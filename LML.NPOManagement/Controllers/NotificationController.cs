@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
+using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
@@ -61,7 +62,8 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<NotificationController>
         [HttpGet]
-        public async Task<List<NotificationResponse>> Get()//???????
+        [Authorize(RoleAccess.AccountAdmin)]
+        public async Task<List<NotificationResponse>> Get()
         {  
             var notification = await _notificationService.GetAllNotifications();
             return _mapper.Map<List<NotificationModel>, List<NotificationResponse>>(notification);
