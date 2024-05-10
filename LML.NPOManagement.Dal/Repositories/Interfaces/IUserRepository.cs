@@ -8,11 +8,11 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task<List<UserModel>> GetAllUsers();
         Task<List<UserModel>> GetUsersByInvestorTier(int userId);
         Task<UserModel> GetUserById(int userId);
-        Task<List<UserIdeaModel>> GetAllIdea();
+        Task<List<UserIdeaModel>> GetAllIdeas();
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId, int statusId);
-        Task<bool> ModifyUserInfo(UserInformationModel userInformation, int userId);
-        Task<UserModel> UpdateUserStatus(int userId, StatusEnumModel status);
+        Task<bool> ModifyUserInfo(UserInformationModel userInformation);
+        Task<UserModel> UpdateUserStatus(int userGroupId, StatusEnumModel status);
         Task UpdateGroupStatus(int userId, GroupStatusEnum status);
         Task<UsersGroupModel> DeleteUserFromGroup(int userId, int groupId);
         Task<bool> DeleteGroup(int groupId);
