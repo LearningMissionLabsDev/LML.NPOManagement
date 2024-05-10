@@ -22,7 +22,7 @@ namespace TestProject.BLL.Test
             var retrievedAccounts = await accountService.GetAllAccounts();
 
             // Assert
-            Assert.AreEqual(retrievedAccounts, null);
+            Assert.IsNull(retrievedAccounts);
         }
 
         [TestMethod]
@@ -79,10 +79,10 @@ namespace TestProject.BLL.Test
             accountRepositoryMock.Setup(repo => repo.GetAccountById(nonExistentAccountId)).ReturnsAsync((AccountModel)null);
 
             // Act
-            var retrievedAccountWhenIdIsValid = await accountService.GetAccountById(nonExistentAccountId);
+            var retrievedAccountWhenIdIsNotValid = await accountService.GetAccountById(nonExistentAccountId);
 
             // Assert
-            Assert.IsNull(retrievedAccountWhenIdIsValid, "The account should be null for a non-existent ID.");
+            Assert.IsNull(retrievedAccountWhenIdIsNotValid, "The account should be null for a non-existent ID.");
         }
 
 
@@ -130,38 +130,38 @@ namespace TestProject.BLL.Test
         }
 
         [TestMethod] 
-        public async Task GetUsersByAccount_UserAbsentAccountId_ReturnsNull()
+        public async Task GetUsersByAccount_WhenThereAreNotUsersInRequestedAccount_ReturnsNull()
         {
             // Arrange
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            int userAbsentAccountId = 1;
+            int requestedAccountId = 1;
 
-            accountRepositoryMock.Setup(repo => repo.GetAccountById(userAbsentAccountId)).ReturnsAsync(new AccountModel());
-            accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(userAbsentAccountId)).ReturnsAsync((List<UserModel>)null);
+            accountRepositoryMock.Setup(repo => repo.GetAccountById(requestedAccountId)).ReturnsAsync(new AccountModel());
+            accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(requestedAccountId)).ReturnsAsync((List<UserModel>)null);
 
             // Act
-            var usersOfUsersAbsentAccount = await accountService.GetUsersByAccount(userAbsentAccountId);
+            var usersOfUsersAbsentAccount = await accountService.GetUsersByAccount(requestedAccountId);
 
             // Assert
-            Assert.IsNull(usersOfUsersAbsentAccount);
+            Assert.IsNull(usersOfUsersAbsentAccount, "Expected null when there are not users in requested account.");
         }
 
         [TestMethod]
-        public async Task GetUsersByAccount_WhenAccountIdIsNegative_ReturnsNull()
+        public async Task GetUsersByAccount_WhenAccountIdIsNotPositive_ReturnsNull()
         {
             // Arrange
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            int negativeAccountId = -1;
+            int notPositiveAccountId = -1;
 
             // Act
-            var usersOfAccountWithNegativeId = await accountService.GetUsersByAccount(negativeAccountId);
+            var usersOfAccountWithNegativeId = await accountService.GetUsersByAccount(notPositiveAccountId);
 
             // Assert
-            Assert.IsNull(usersOfAccountWithNegativeId);
+            Assert.IsNull(usersOfAccountWithNegativeId, "Expected null when requested id is not positive.");
         }
 
 
@@ -175,15 +175,15 @@ namespace TestProject.BLL.Test
 
             // Act
             var accountsWhichNameIsEmpty = await accountService.GetAccountsByName(string.Empty);
-            var accountsWhichNameIsNull = await accountService.GetAccountsByName(string.Empty);
+            var accountsWhichNameIsNull = await accountService.GetAccountsByName(null);
 
             // Assert
-            Assert.IsNull(accountsWhichNameIsEmpty, "Expected ArgumentException for empty account name");
-            Assert.IsNull(accountsWhichNameIsNull, "Expected ArgumentException for empty account name");
+            Assert.IsNull(accountsWhichNameIsEmpty, "Expected null for empty account name");
+            Assert.IsNull(accountsWhichNameIsNull, "Expected null for null account name");
         }
 
         [TestMethod]
-        public async Task GetAccountsByName_WhenNameIsNotNullOrEmpty_ReturnsAccount()
+        public async Task GetAccountsByName_WhenAccountsByNameExist_ReturnsAccount()
         {
             // Arrange
             var accountRepositoryMock = GetAccountRepository();
@@ -202,7 +202,30 @@ namespace TestProject.BLL.Test
             var accountsWhichNameIsNotNullOrEmpty = await accountService.GetAccountsByName(nameOfAccount);
 
             // Assert
-            Assert.AreEqual(accountsWhichNameIsNotNullOrEmpty, accounts, "When the name isn't null or empty, the result should be a list of accounts.");
+            Assert.AreEqual(accountsWhichNameIsNotNullOrEmpty, accounts, "When accounts by name exist, the result should be a list of accounts.");
+        }
+
+        [TestMethod]
+        public async Task GetAccountsByName_WhenAccountsByNameAreNotExist_ReturnsAccount()
+        {
+            // Arrange
+            var accountRepositoryMock = GetAccountRepository();
+            var accountService = GetAccountService(accountRepositoryMock);
+
+            var nameOfAccount = "account";
+
+            var accounts = new List<AccountModel> {
+                new AccountModel { Id = 1, Name = nameOfAccount},
+                new AccountModel { Id = 2, Name = nameOfAccount }
+            };
+
+            accountRepositoryMock.Setup(repo => repo.GetAccountsByName("testname")).ReturnsAsync(accounts);
+
+            // Act
+            var accountsWhichNameIsNotNullOrEmpty = await accountService.GetAccountsByName(nameOfAccount);
+
+            // Assert
+            Assert.IsNull(accountsWhichNameIsNotNullOrEmpty, "When accounts by name are not exist, the result should be null.");
         }
 
 
@@ -230,14 +253,13 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            int idleUsersAccount = 1; 
+            int idleUsersAccountId = 1; 
             int accountRoleId = 1;
 
-            accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(idleUsersAccount, accountRoleId)).ReturnsAsync((List<AccountUserActivityModel>)null);
+            accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(idleUsersAccountId)).ReturnsAsync((List<AccountUserActivityModel>)null);
 
             // Act
-            var result = await accountService.GetAccountRoleProgress(idleUsersAccount, accountRoleId);
-
+            var result = await accountService.GetAccountRoleProgress(idleUsersAccountId, accountRoleId);
             // Assert
             Assert.IsNull(result, "Expected null when user progresses are null");
         }
@@ -252,11 +274,11 @@ namespace TestProject.BLL.Test
             int existingAccountId = 1; 
             int requestedAccountRoleId = 1;
 
-            var AccountUserActivityModeles = new List<AccountUserActivityModel> {
+            var accountUserActivityModeles = new List<AccountUserActivityModel> {
                 new AccountUserActivityModel { Account2UserModel = new Account2UserModel { AccountRoleId = requestedAccountRoleId + 1} }
             };
 
-            accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(existingAccountId, requestedAccountRoleId)).ReturnsAsync(AccountUserActivityModeles);
+            accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(existingAccountId)).ReturnsAsync(accountUserActivityModeles);
 
             // Act
             var result = await accountService.GetAccountRoleProgress(existingAccountId, requestedAccountRoleId);
@@ -275,17 +297,17 @@ namespace TestProject.BLL.Test
             int existingAccountId = 1; 
             int requestedAccountRoleId = 1; 
 
-            var AccountUserActivityModeles = new List<AccountUserActivityModel> {
+            var accountUserActivityModeles = new List<AccountUserActivityModel> {
                 new AccountUserActivityModel { Account2UserModel = new Account2UserModel { AccountRoleId = requestedAccountRoleId } }
             };
 
-            accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(existingAccountId, requestedAccountRoleId)).ReturnsAsync(AccountUserActivityModeles);
+            accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(existingAccountId)).ReturnsAsync(accountUserActivityModeles);
 
             // Act
             var result = await accountService.GetAccountRoleProgress(existingAccountId, requestedAccountRoleId);
-
-            // Assert
-            Assert.IsNotNull(result, "Expected non-null result when matching account user activities exist");
+            
+            // Assert 
+            Assert.IsTrue(result.SequenceEqual(accountUserActivityModeles), "Expected non-null result when matching account user activities exist");
         }
 
 
@@ -731,7 +753,7 @@ namespace TestProject.BLL.Test
         }
 
         [TestMethod]
-        public async Task DeleteAccount_WhenAccountIdIsValid_CallsRepositoryDeleteAccountAndReturnsResult()
+        public async Task DeleteAccount_WhenAccountDeletedSuccessfully_ReturnsTrue()
         {
             // Arrange
             var accountRepositoryMock = GetAccountRepository();
@@ -740,13 +762,14 @@ namespace TestProject.BLL.Test
             int accountIdToDelete = 1;
 
             accountRepositoryMock.Setup(repo => repo.DeleteAccount(accountIdToDelete)).ReturnsAsync(true);
-
+            
             // Act
             var result = await accountService.DeleteAccount(accountIdToDelete);
 
             // Assert
             Assert.IsTrue(result, "Expected true when account is deleted successfully");
         }
+
 
 
         private static AccountService GetAccountService(Mock<IAccountRepository> mockedRepo)

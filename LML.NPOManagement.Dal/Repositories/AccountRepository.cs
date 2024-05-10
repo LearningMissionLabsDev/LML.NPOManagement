@@ -4,7 +4,6 @@ using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace LML.NPOManagement.Dal.Repositories
 {
@@ -34,12 +33,13 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
 
+            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
             if (account == null)
             {
                 return null;
             }
+
             return _mapper.Map<AccountModel>(account);
         }
 
@@ -60,22 +60,20 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).ThenInclude(us => us.User).Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
 
+            var account = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).ThenInclude(us => us.User).Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
             if (account == null)
             {
                 return null;
             }
-            var users = account.Account2Users.Select(au => au.User).ToList();
 
+            var users = account.Account2Users.Select(au => au.User).ToList();
             if (users.Count < 1)
             {
                 return null;
             }
-            foreach (var user in users)
-            {
-                user.Password = null;
-            }
+
+            users.ForEach(user => user.Password = null);
             return _mapper.Map<List<UserModel>>(users);
         }
 
@@ -86,8 +84,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account2usermodel = _mapper.Map<List<Account2UserModel>>(account2users);
 
+            var account2usermodel = _mapper.Map<List<Account2UserModel>>(account2users);
             return account2usermodel;
         }
 
@@ -103,7 +101,6 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.SaveChangesAsync();
 
             var newAccount = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).Where(acc => acc.Id == account.Id).FirstOrDefaultAsync();
-
             if (newAccount == null)
             {
                 return null;
@@ -126,8 +123,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountModel.Id).FirstOrDefaultAsync();
 
+            var account = await _dbContext.Accounts.Where(acc => acc.Id == accountModel.Id).FirstOrDefaultAsync();
             if (account == null)
             {
                 return null;
@@ -152,14 +149,15 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return false;
             }
-            var account = await _dbContext.Accounts.Include(us => us.Account2Users).ThenInclude(acc => acc.AccountUserActivities).FirstOrDefaultAsync(acc => acc.Id == accountId);
 
+            var account = await _dbContext.Accounts.Include(us => us.Account2Users).ThenInclude(acc => acc.AccountUserActivities).FirstOrDefaultAsync(acc => acc.Id == accountId);
             if (account == null)
             {
                 return false;
             }
-            var activity = account.Account2Users.SelectMany(act => act.AccountUserActivities).ToList();
-            _dbContext.AccountUserActivities.RemoveRange(activity);
+
+            var userActivities = account.Account2Users.SelectMany(act => act.AccountUserActivities).ToList();
+            _dbContext.AccountUserActivities.RemoveRange(userActivities);
             await _dbContext.SaveChangesAsync();
 
             _dbContext.Account2Users.RemoveRange(account.Account2Users);
@@ -177,8 +175,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var accounts = await _dbContext.Accounts.Where(acc => acc.Name.Contains(accountName)).ToListAsync();
 
+            var accounts = await _dbContext.Accounts.Where(acc => acc.Name.Contains(accountName)).ToListAsync();
             if (accounts.Count < 1)
             {
                 return null;
@@ -192,15 +190,15 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return false;
             }
+
             var account = await _dbContext.Accounts.Include(acc => acc.Account2Users).FirstOrDefaultAsync(acc => acc.Id == account2UserModel.AccountId);
             var user = await _dbContext.Users.FirstOrDefaultAsync(us => us.Id == account2UserModel.UserId);
-
             if (account == null || user == null)
             {
                 return false;
             }
+
             var availableUser = account.Account2Users.FirstOrDefault(us => us.UserId == user.Id);
-            // Update User Role
             if (availableUser == null)
             {
                 var accountUser = new Account2User()
@@ -241,18 +239,19 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<AccountModel>(account);
         }
 
-        public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId, int accountRoleId)
+        public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId)
         {
             if (accountId <= 0)
             {
                 return null;
             }
-            var userProgress = await _dbContext.AccountUserActivities.Where(acc => acc.Account2User.AccountId == accountId).Include(acc2user => acc2user.Account2User).ToListAsync();
 
+            var userProgress = await _dbContext.AccountUserActivities.Where(acc => acc.Account2User.AccountId == accountId).Include(acc2user => acc2user.Account2User).ToListAsync();
             if (userProgress.Count < 1)
             {
                 return null;
             }
+            
             var activityMapping = userProgress.Select(map => new AccountUserActivityModel
             {
                 Account2UserId = map.Account2UserId,
@@ -274,6 +273,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 DateCreated = accountUserActivityModel.DateCreated,
                 ActivityInfo = accountUserActivityModel.ActivityInfo
             };
+
             await _dbContext.AccountUserActivities.AddAsync(userActivity);
             await _dbContext.SaveChangesAsync();
             var activity = await _dbContext.AccountUserActivities.FirstOrDefaultAsync(act => act.Id == userActivity.Id);
@@ -281,6 +281,7 @@ namespace LML.NPOManagement.Dal.Repositories
             { 
                 return null; 
             }
+
             var userActivityModel = new AccountUserActivityModel()
             {
                 Id = activity.Id,

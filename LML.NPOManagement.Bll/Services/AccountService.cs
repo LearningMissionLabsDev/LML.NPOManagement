@@ -198,7 +198,7 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
 
-            var userProgresses = await _accountRepository.GetAccountRoleProgress(accountId, accountRoleId);
+            var userProgresses = await _accountRepository.GetAccountRoleProgress(accountId);
             if (userProgresses == null)
             {
                 return null;
