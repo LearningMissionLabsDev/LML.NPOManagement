@@ -1,5 +1,6 @@
 ﻿using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
+using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -108,6 +109,7 @@ namespace LML.NPOManagement.Bll.Services
                     RequireAudience = false,
                     RequireExpirationTime = false,
                     ValidateLifetime = false,
+                    
                     /*<<<*/
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = GetSigningKey(configuration),
