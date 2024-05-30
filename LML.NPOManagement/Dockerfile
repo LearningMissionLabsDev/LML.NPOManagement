@@ -5,11 +5,9 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM base AS debug
-RUN tdnf install procps-ng -y
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=debug
 WORKDIR /src
 COPY ["LML.NPOManagement/LML.NPOManagement.csproj", "LML.NPOManagement/"]
 COPY ["LML.NPOManagement.Bll/LML.NPOManagement.Bll.csproj", "LML.NPOManagement.Bll/"]
@@ -21,7 +19,7 @@ WORKDIR "/src/LML.NPOManagement"
 RUN dotnet build "./LML.NPOManagement.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
+ARG BUILD_CONFIGURATION=debug
 RUN dotnet publish "./LML.NPOManagement.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
