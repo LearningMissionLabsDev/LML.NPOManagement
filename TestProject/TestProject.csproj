@@ -30,6 +30,13 @@
     <ProjectReference Include="..\LML.NPOManagement.Bll\LML.NPOManagement.Bll.csproj" />
     <ProjectReference Include="..\LML.NPOManagement.Common\LML.NPOManagement.Common.csproj" />
     <ProjectReference Include="..\LML.NPOManagement\LML.NPOManagement.csproj" />
+    <ProjectReference Include="..\LML.ApiSpecGenerator\LML.ApiSpecGenerator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="ApiSpecification\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ApiSpecification\" />
+  </ItemGroup>
 </Project>

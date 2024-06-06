@@ -1,0 +1,20 @@
+﻿Method Name,Role Access,System Admin,Account Admin,Account Manager,Beneficiary
+GetUsers,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetGroups,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetUserbyId,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetGroupById,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetGroupsByName,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetGroupsForUser,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetUsersByGroupId,AllAccess,Allowed,Allowed,Allowed,Allowed
+GetIdeas,AllAccess,Allowed,Allowed,Allowed,Allowed
+SubmitComments,AllAccess,Allowed,Allowed,Allowed,Allowed
+LogOut,AllAccess,Allowed,Allowed,Allowed,Allowed
+SearchByName,AllAccess,Allowed,Allowed,Allowed,Allowed
+UserInfoRegistration,AllAccess,Allowed,Allowed,Allowed,Allowed
+AddGroup,AllAccess,Allowed,Allowed,Allowed,Allowed
+AddUserToGroup,AllAccess,Allowed,Allowed,Allowed,Allowed
+Put,AllAccess,Allowed,Allowed,Allowed,Allowed
+PutUserInfo,AllAccess,Allowed,Allowed,Allowed,Allowed
+Delete,AdminsAndManager,Allowed,Allowed,Allowed,Denied
+DeleteUserFromGroup,AdminsAndManager,Allowed,Allowed,Allowed,Denied
+DeleteGroup,AdminsAndManager,Allowed,Allowed,Allowed,Denied

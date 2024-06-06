@@ -7,8 +7,6 @@ using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal.Models;
-using System.Net.Http;
 
 namespace LML.NPOManagement.Controllers
 {
@@ -45,9 +43,6 @@ namespace LML.NPOManagement.Controllers
 
         [HttpGet]
         [Authorize(RoleAccess.AllAccess)]
-        /* RG: I think we need more restrictive gets which users can use. Let's discuss. 
-         * I think everyone should be able to access but we can filter the response implicitly 
-         * based on the role.  */
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
         {
             var userModel = await _userService.GetAllUsers();
@@ -73,9 +68,6 @@ namespace LML.NPOManagement.Controllers
 
         [HttpGet("groups")]
         [Authorize(RoleAccess.AllAccess)]
-        /* RG: I think we need more restrictive gets which users can use. Let's discuss. 
-         * Maybe all users can see groups but some groups should be protected for sending messages.
-         * We may need to perform authorization by groups in our notification service. We'll discuss that*/
         public async Task<ActionResult<IEnumerable<UsersGroupResponse>>> GetGroups()
         {
             var groupsModel = await _userService.GetAllGroups();
@@ -239,7 +231,6 @@ namespace LML.NPOManagement.Controllers
             return Ok(users);
         }
 
-        // DONE
         [HttpGet("idea")]
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserIdeaResponse>>> GetIdeas()
@@ -343,7 +334,6 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("login")]
-        /*RG: We have two logins one in AccountController another is here. I'm confused, let's discuss*/
         public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
@@ -519,7 +509,7 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var modifyUser = await _userService.ModifyUserInfo(userInfoModel, /*user.Id*/ 9);
+            var modifyUser = await _userService.ModifyUserInfo(userInfoModel, user.Id);
 
             if (modifyUser)
             {
@@ -530,9 +520,6 @@ namespace LML.NPOManagement.Controllers
 
         [HttpDelete]
         [Authorize(RoleAccess.AdminsAndManager)]
-        /*rg: here we should implement the following logic: 
-         *  if this is not site admin and the userid to be deleted does not belong to their account 
-         *  then we should return conflict status */
         public async Task<ActionResult> Delete(int userId)
         {
             if (userId <= 0)
@@ -548,11 +535,8 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        [HttpDelete("group")]
+        [HttpDelete("group/{groupId}/{userId}")]
         [Authorize(RoleAccess.AdminsAndManager)]
-        /*rg: here we should implement the following logic: 
-         *  if this is not site admin and the userid to be deleted does not belong to their account 
-         *  then we should return conflict status */
         public async Task<ActionResult> DeleteUserFromGroup(int userId, int groupId)
         {
             if (userId <= 0 || groupId <= 0)
@@ -570,7 +554,6 @@ namespace LML.NPOManagement.Controllers
 
         [HttpDelete("group")]
         [Authorize(RoleAccess.AdminsAndManager)]
-        /*rg: we need to have a better understanding what groups are*/
         public async Task<ActionResult> DeleteGroup(int groupId)
         {
             if (groupId <= 0)
