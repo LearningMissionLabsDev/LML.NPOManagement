@@ -1,8 +1,5 @@
-﻿using System;
-using System.Reflection;
-using LML.ApiSpecGenerator;
+﻿using LML.ApiSpecGenerator;
 using LML.NPOManagement.Controllers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestProject

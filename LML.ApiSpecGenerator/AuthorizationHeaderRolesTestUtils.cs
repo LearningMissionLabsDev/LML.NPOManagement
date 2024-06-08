@@ -347,10 +347,9 @@ namespace LML.ApiSpecGenerator
 
         public static void Main(string[] args)
         {
+            // Example Of Testing Authorization Header Of AccountController
             //var a = new AuthorizationHeaderRolesTestUtils();
             //a.TestControllerAuthorizationRoles<AccountController>();
-            //a = new();
-            //a.TestControllerAuthorizationRoles<UserController>();
         }
     }
 }
