@@ -25,17 +25,21 @@ namespace LML.NPOManagement.Bll.Services
             if (user == null)
             {
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                return;
             }
+
             var account = context.HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
             {
                 context.Result = new JsonResult(new { message = "Access denied" }) { StatusCode = StatusCodes.Status403Forbidden };
+                return;
             }
-            var userRole = account?.AccountRoleId;
 
+            var userRole = account?.AccountRoleId;
             if ((userRole & _role) != userRole)
             {
                 context.Result = new JsonResult(new { message = "Access denied" }) { StatusCode = StatusCodes.Status403Forbidden };
+                return;
             }
         }
     }

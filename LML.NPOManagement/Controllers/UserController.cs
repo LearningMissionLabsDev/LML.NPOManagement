@@ -235,7 +235,7 @@ namespace LML.NPOManagement.Controllers
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserIdeaResponse>>> GetIdeas()
         {
-            var ideas = await _userService.GetAllIdea();
+            var ideas = await _userService.GetAllIdeas();
 
             if (ideas == null)
             {
@@ -389,7 +389,7 @@ namespace LML.NPOManagement.Controllers
 
             var userInformationModel = new UserInformationModel()
             {
-                RequestedUserTypeEnum = userInformationRequest.UserTypeEnum,
+                RequestedUserRoleId = (int)userInformationRequest.UserTypeEnum,
                 UserId = user.Id,
                 Gender = userInformationRequest.Gender,
                 FirstName = userInformationRequest.FirstName,
@@ -498,7 +498,7 @@ namespace LML.NPOManagement.Controllers
 
             var userInfoModel = new UserInformationModel()
             {
-                RequestedUserTypeEnum = userInformationRequest.UserTypeEnum,
+                RequestedUserRoleId = (int)userInformationRequest.UserTypeEnum,
                 UserId = user.Id,
                 Gender = userInformationRequest.Gender,
                 FirstName = userInformationRequest.FirstName,
