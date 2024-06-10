@@ -172,9 +172,13 @@ namespace LML.NPOManagement.Bll.Services
             return newUserModel;
         }
 
-        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int userId)
+        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel)
         {
-            var user = await _userRepository.ModifyUserInfo(userInformationModel, userId);
+            if (userInformationModel == null)
+            {
+                return false;
+            }
+            var user = await _userRepository.ModifyUserInfo(userInformationModel);
 
             return user;
         }

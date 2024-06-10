@@ -162,21 +162,21 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel, int userId)
+        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel)
         {
-            if (userId <= 0)
+            if (userInformationModel == null)
             {
                 return false;
             }
-            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == userId).FirstOrDefaultAsync();
+            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == userInformationModel.UserId).FirstOrDefaultAsync();
 
             if (userInfo == null)
             {
                 return false;
             }
-            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
 
-            userInfo.UserId = userId;
+            userInfo.UserId = userInformationModel.UserId;
             userInfo.FirstName = userInformationModel.FirstName;
             userInfo.LastName = userInformationModel.LastName;
             userInfo.PhoneNumber = userInformationModel.PhoneNumber;
@@ -186,16 +186,6 @@ namespace LML.NPOManagement.Dal.Repositories
             userInfo.DateOfBirth = userInformationModel.DateOfBirth;
             userInfo.Gender = (int)userInformationModel.Gender;
 
-            //var userTypes = await _dbContext.UserTypes.ToListAsync();
-
-            //foreach (var userType in userTypes)
-            //{
-            //    if (userType.Description == Convert.ToString(userInformationModel.UserTypeEnum) &&
-            //         user.UserTypes.Where(us => us.Description == Convert.ToString(userInformationModel.UserTypeEnum)) == null)
-            //    {
-            //        user.UserTypes.Add(userType);
-            //    }
-            //}
             await _dbContext.SaveChangesAsync();
 
             return true;

@@ -509,7 +509,7 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var modifyUser = await _userService.ModifyUserInfo(userInfoModel, user.Id);
+            var modifyUser = await _userService.ModifyUserInfo(userInfoModel);
 
             if (modifyUser)
             {
@@ -520,7 +520,7 @@ namespace LML.NPOManagement.Controllers
 
         [HttpDelete]
         [Authorize(RoleAccess.AdminsAndManager)]
-        public async Task<ActionResult> Delete(int userId)
+        public async Task<ActionResult> DeleteUser(int userId)
         {
             if (userId <= 0)
             {
