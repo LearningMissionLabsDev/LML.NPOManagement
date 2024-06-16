@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
+using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
@@ -54,6 +55,8 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserInventoryController>
         [HttpGet]
+        [Authorize(RoleAccess.SysAdminOnly)]
+        /*rg: we eed a method whihc would get inventlry by user id */
         public async Task<IEnumerable<UserInventoryResponse>> Get()//???????
         {
             var inventories = await _userInventoryService.GetAllUserInventories();
@@ -62,6 +65,7 @@ namespace LML.NPOManagement.Controllers
 
         // GET: api/<UserInventoryController>
         [HttpGet("inventoryType")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<string>> GetInventoryType(string type, DateTime dateTimeStart, DateTime dateTimeFinsh)
         {
             if(type == null)

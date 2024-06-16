@@ -7,9 +7,6 @@ using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace LML.NPOManagement.Controllers
 {
     [Route("api/[controller]")]
@@ -33,7 +30,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<AddUserToAccountRequest, Account2UserModel>();
                 cfg.CreateMap<Account2UserModel, Account2UserResponse>();
                 cfg.CreateMap<AccountUserActivityRequest, AccountUserActivityModel>();
-                cfg.CreateMap<AccountUserActivityModel,AccountUserActivityResponse>();
+                cfg.CreateMap<AccountUserActivityModel, AccountUserActivityResponse>();
             });
             _mapper = config.CreateMapper();
             _configuration = configuration;
@@ -42,9 +39,8 @@ namespace LML.NPOManagement.Controllers
             _userService = userService;
         }
 
-        // DONE
         [HttpGet]
-        //[Authorize]
+        [Authorize(RoleAccess.AccountAdmin)]
         public async Task<ActionResult<List<AccountResponse>>> GetAccounts()
         {
             var accounts = await _accountService.GetAllAccounts();
@@ -69,7 +65,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("userProgress/{accountRoleId}")]
-        [Authorize((int)UserAccountRoleEnum.SysAdmin | (int)UserAccountRoleEnum.Admin)]
+        [Authorize(RoleAccess.AccountAdmin)]
         public async Task<ActionResult<List<AccountUserActivityResponse>>> GetAccountRoleProgress(int accountRoleId)
         {
             if (accountRoleId < 1 || accountRoleId > 3)
@@ -103,8 +99,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountUserResponses);
         }
 
-        // DONE
         [HttpGet("{accountId}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<AccountResponse>> GetAccountById(int accountId)
         {
             if (accountId <= 0)
@@ -127,8 +123,8 @@ namespace LML.NPOManagement.Controllers
             };
             return Ok(accountResponse);
         }
-        //???
         [HttpGet("users")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserResponse>>> GetUsersByAccount()
         {
             var account = HttpContext.Items["Account"] as Account2UserModel;
@@ -154,8 +150,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(userResponse);
         }
 
-        // DONE
         [HttpGet("search/{accountName}")]
+        [Authorize(RoleAccess.SysAdminOnly)]
         public async Task<ActionResult<List<AccountResponse>>> GetAccountsByName(string accountName)
         {
             if (string.IsNullOrEmpty(accountName))
@@ -186,7 +182,6 @@ namespace LML.NPOManagement.Controllers
             return Ok(accounts);
         }
 
-        //Done
         [HttpPost("login")]
         public async Task<ActionResult<Account2UserResponse>> Login()
         {
@@ -224,8 +219,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountResponse);
         }
 
-        // DONE
         [HttpPost("addAccount")]
+        [Authorize(RoleAccess.SysAdminOnly)]
         public async Task<ActionResult<AccountResponse>> AddAccount([FromBody] AccountRequest accountRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -254,6 +249,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("addUserActivity")]
+        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult<AccountUserActivityResponse>> AddAccountUserActivityProgress([FromBody] AccountUserActivityRequest accountUserActivityRequest)
         {
             var account = HttpContext.Items["Account"] as Account2UserModel;
@@ -277,8 +273,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(activityResponse);
         }
 
-        // DONE
         [HttpPost("addUser")]
+        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest addUserToAccountRequest)
         {
             var account = HttpContext.Items["Account"] as Account2UserModel;
@@ -301,8 +297,8 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        // DONE
         [HttpPut("modifyAccount")]
+        [Authorize(RoleAccess.AccountAdmin)]
         public async Task<ActionResult<AccountResponse>> ModifyAccount([FromBody] AccountRequest accountRequest)
         {
             var account = HttpContext.Items["Account"] as Account2UserModel;
@@ -334,8 +330,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountResponse);
         }
 
-        // DONE
         [HttpDelete("removeUser/{userId}")]
+        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> RemoveUserFromAccount(int userId)
         {
             if (userId <= 0)
@@ -356,8 +352,8 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        // DONE
         [HttpDelete("deleteAccount")]
+        [Authorize(RoleAccess.AccountAdmin)]
         public async Task<ActionResult> DeleteAccount()
         {
             var account = HttpContext.Items["Account"] as Account2UserModel;
