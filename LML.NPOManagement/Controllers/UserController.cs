@@ -7,8 +7,6 @@ using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal.Models;
-using System.Net.Http;
 
 namespace LML.NPOManagement.Controllers
 {
@@ -44,6 +42,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
         {
             var users = await _userService.GetAllUsers();
@@ -80,6 +79,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("groups")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<IEnumerable<UsersGroupResponse>>> GetGroups()
         {
             var groupsModel = await _userService.GetAllGroups();
@@ -106,6 +106,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<UserCredentialResponse>> GetUserbyId(int userId)
         {
             if (userId <= 0)
@@ -141,6 +142,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("group/{groupId}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<UsersGroupResponse>> GetGroupById(int groupId)
         {
             if (groupId <= 0)
@@ -166,6 +168,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("group/search/{groupName}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UsersGroupResponse>>> GetGroupsByName(string groupName)
         {
             if (string.IsNullOrEmpty(groupName))
@@ -194,6 +197,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("group/user/{userId}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UsersGroupResponse>>> GetGroupsForUser(int userId)
         {
             if (userId <= 0)
@@ -224,6 +228,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("group/members/{groupId}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserResponse>>> GetUsersByGroupId(int groupId)
         {
             if (groupId <= 0)
@@ -251,8 +256,8 @@ namespace LML.NPOManagement.Controllers
             return Ok(users);
         }
 
-        // DONE
         [HttpGet("idea")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserIdeaResponse>>> GetIdeas()
         {
             var ideas = await _userService.GetAllIdeas();
@@ -278,6 +283,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("submitComments")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -318,6 +324,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("logout")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> LogOut()
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -332,6 +339,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("search/{searchParam}/{includeGroups}")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<SearchResponse>>> SearchByName(string searchParam, bool includeGroups)
         {
             if (string.IsNullOrEmpty(searchParam))
@@ -365,7 +373,7 @@ namespace LML.NPOManagement.Controllers
                     Email = userModel.Email,
                     UserAccounts = accounts.Select(x => new AccountMappingResponse() { AccountId = x.AccountId, AccountName = x.Account?.Name, AccountRoleId = x.AccountRoleId }).ToList()
                 };
-               
+
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
                     HttpContext.Response.Headers.Add("Authorization", user.Token);
@@ -375,7 +383,7 @@ namespace LML.NPOManagement.Controllers
             }
             return Unauthorized(401);
         }
-       
+
         [HttpPost("registration")]
         public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
         {
@@ -394,6 +402,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("userInfoRegistration")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -430,7 +439,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("group")]
-        [Authorize]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<UsersGroupResponse>> AddGroup([FromBody] UsersGroupRequest usersGroupRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -455,7 +464,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("group/addUser")]
-        [Authorize]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> AddUserToGroup([FromBody] AddUserToGroupRequest addUserToGroupRequest)
         {
             if (addUserToGroupRequest.UserId <= 0 || addUserToGroupRequest.GroupId <= 0)
@@ -472,7 +481,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> Put([FromBody] UserRequest userRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -502,6 +511,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut("userInfo")]
+        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> PutUserInfo([FromBody] UserCredentialRequest userCredentialRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
@@ -537,6 +547,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpDelete("{userID}")]
+        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> DeleteUser(int userId)
         {
             if (userId <= 0)
@@ -552,7 +563,8 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        [HttpDelete("groups")]
+        [HttpDelete("group/{groupId}/{userId}")]
+        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> DeleteUserFromGroup(int userId, int groupId)
         {
             if (userId <= 0 || groupId <= 0)
@@ -569,6 +581,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpDelete("group")]
+        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> DeleteGroup(int groupId)
         {
             if (groupId <= 0)
