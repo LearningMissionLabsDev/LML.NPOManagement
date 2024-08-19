@@ -3,11 +3,9 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace LML.NPOManagement.Controllers
 {
@@ -51,7 +49,7 @@ namespace LML.NPOManagement.Controllers
                 return NotFound();
             }
             var accountResponses = new List<AccountResponse>();
-           
+
             foreach (var account in accounts)
             {
                 var newAccountResponse = new AccountResponse()
@@ -63,7 +61,7 @@ namespace LML.NPOManagement.Controllers
                     IsVisible = account.IsVisible,
                     Name = account.Name,
                     OnboardingLink = account.OnboardingLink,
-                    Description = account.Description,                
+                    Description = account.Description,
                     DateCreated = account.DateCreated,
                 };
                 accountResponses.Add(newAccountResponse);
@@ -109,10 +107,10 @@ namespace LML.NPOManagement.Controllers
 
         [HttpGet("{accountId}")]
         [Authorize(RoleAccess.AllAccess)]
-        public async Task<ActionResult<AccountResponse>> GetAccountById([FromQuery] int accountId)>>>>>>> master
+        public async Task<ActionResult<AccountResponse>> GetAccountById([FromQuery] int accountId)
         {
             var user = HttpContext.Items["User"] as UserModel;
-            if(user == null)
+            if (user == null)
             {
                 return Unauthorized();
             }
@@ -140,12 +138,12 @@ namespace LML.NPOManagement.Controllers
                 DateCreated = account.DateCreated,
                 Description = account.Description,
                 AccountImage = account.AccountImage,
-                AccountRoleId = account2User?.AccountRoleId               
+                AccountRoleId = account2User?.AccountRoleId
             };
             HttpContext.Response.Headers.Add("Authorization", user.Token);
             return Ok(accountResponse);
         }
-        
+
         [HttpGet("users")]
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserInformationResponse>>> GetUsersByAccount()
@@ -240,8 +238,7 @@ namespace LML.NPOManagement.Controllers
             return Ok(accounts);
         }
 
-        [Authorize((int)UserAccountRoleEnum.SysAdmin | (int)UserAccountRoleEnum.Admin
-            | (int)UserAccountRoleEnum.AccountManager | (int)UserAccountRoleEnum.Beneficiary)]
+        [Authorize(RoleAccess.AllAccess)]
         [HttpPost("login")]
         public async Task<ActionResult<Account2UserResponse>> Login([FromQuery] int accountId)
         {
@@ -252,17 +249,18 @@ namespace LML.NPOManagement.Controllers
             {
                 return Unauthorized("User not logged in!");
             }
+
             if (account2user == null)
             {
                 return StatusCode(403, "Access denied");
             }
-            
+
             var loginToken = await _accountService.AccountLogin(account2user, user);
             if (loginToken == null)
             {
                 return StatusCode(403, "Access denied");
             }
-            
+
             HttpContext.Response.Headers.Add("Authorization", loginToken);
             return Ok();
         }
@@ -356,7 +354,7 @@ namespace LML.NPOManagement.Controllers
                 return StatusCode(403, "Access denied");
             }
             var accountModel = new AccountModel()
-            {          
+            {
                 Id = account.AccountId,
                 Name = accountRequest.Name,
                 IsVisible = accountRequest.IsVisible,

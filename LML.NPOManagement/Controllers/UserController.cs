@@ -1,12 +1,12 @@
 ﻿using Amazon.S3;
 using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
-using LML.NPOManagement.Common;
 using LML.NPOManagement.Bll.Services;
+using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
-using LML.NPOManagement.Common.Model;
 
 namespace LML.NPOManagement.Controllers
 {
