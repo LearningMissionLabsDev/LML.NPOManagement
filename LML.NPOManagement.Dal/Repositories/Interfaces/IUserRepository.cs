@@ -11,7 +11,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task<List<UserIdeaModel>> GetAllIdeas();
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId, int statusId);
-        Task<bool> ModifyUserInfo(UserInformationModel userInformation);
+        Task<bool> ModifyUserInfo(UserCredential userInformation);
         Task<UserModel> UpdateUserStatus(int userGroupId, StatusEnumModel status);
         Task UpdateGroupStatus(int userId, GroupStatusEnum status);
         Task<UsersGroupModel> DeleteUserFromGroup(int userId, int groupId);

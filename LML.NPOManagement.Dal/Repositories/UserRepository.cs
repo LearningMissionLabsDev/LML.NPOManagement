@@ -68,7 +68,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
         public async Task<List<UserModel>> GetAllUsers()
         {
-            var users = await _dbContext.Users.ToListAsync();
+            var users = await _dbContext.Users.Include(usInfo => usInfo.UserInformations).ToListAsync();
             if (!users.Any())
             {
                 return null;
@@ -84,7 +84,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
 
-            var user = await _dbContext.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(x => x.Id == userId).Include(usInfo => usInfo.UserInformations).FirstOrDefaultAsync();
             if (user == null)
             {
                 return null;
@@ -173,30 +173,31 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<UserModel>(user);
         }
 
-        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel)
+        public async Task<bool> ModifyUserInfo(UserCredential userCredential)
         {
-            if (userInformationModel == null)
+            if (userCredential == null)
             {
                 return false;
             }
-            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == userInformationModel.UserId).FirstOrDefaultAsync();
-
-            if (userInfo == null)
+            var userInfo = await _dbContext.UserInformations.Where(us => us.UserId == userCredential.UserId).Include(us => us.User).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(us => us.Id == userCredential.UserId).FirstOrDefaultAsync();
+            if (userInfo == null || user == null)
             {
                 return false;
             }
-            var user = await _dbContext.Users.Where(us => us.Id == userInformationModel.UserId).FirstOrDefaultAsync();
 
-            userInfo.UserId = userInformationModel.UserId;
-            userInfo.FirstName = userInformationModel.FirstName;
-            userInfo.LastName = userInformationModel.LastName;
-            userInfo.PhoneNumber = userInformationModel.PhoneNumber;
+            user.Email = userCredential.Email;
+            userInfo.FirstName = userCredential.FirstName;
+            user.StatusId = userCredential.StatusId;
+            userInfo.LastName = userCredential.LastName;
+            userInfo.RequestedUserRoleId = userCredential.RequestedUserRoleId;
+            userInfo.PhoneNumber = userCredential.PhoneNumber;
             userInfo.UpdateDate = DateTime.UtcNow;
-            userInfo.MiddleName = userInformationModel.MiddleName;
-            userInfo.Metadata = userInformationModel.Metadata;
-            userInfo.DateOfBirth = userInformationModel.DateOfBirth;
-            userInfo.Gender = (int)userInformationModel.Gender;
-
+            userInfo.MiddleName = userCredential.MiddleName;
+            userInfo.Metadata = userCredential.Metadata;
+            userInfo.DateOfBirth = userCredential.DateOfBirth;
+            userInfo.Gender = (int)userCredential.Gender;
+            userInfo.UserImage = userCredential.UserImage;
             await _dbContext.SaveChangesAsync();
 
             return true;

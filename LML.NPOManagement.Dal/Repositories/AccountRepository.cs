@@ -11,6 +11,7 @@ namespace LML.NPOManagement.Dal.Repositories
     {
         IMapper _mapper;
         NpomanagementContext _dbContext;
+        
         public AccountRepository(NpomanagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
@@ -51,31 +52,98 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            return _mapper.Map<List<AccountModel>>(accounts);
+            var accountsModel = new List<AccountModel>();
+            foreach (var account in accounts)
+            {
+                var accountModel = new AccountModel
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    MaxCapacity = account.MaxCapacity,
+                    CreatorId = account.CreatorId,
+                    StatusId = account.StatusId,
+                    DateCreated = account.DateCreated,
+                    IsVisible = account.IsVisible,
+                    OnboardingLink = account.OnboardingLink,
+                    Description = account.Description,
+                };
+                accountsModel.Add(accountModel);
+            }
+            return accountsModel;
         }
 
-        public async Task<List<UserModel>> GetUsersByAccount(int accountId)
+        public async Task<List<UserInformationModel>> GetUsersByAccount(int accountId)
         {
             if (accountId <= 0)
             {
                 return null;
             }
 
-            var account = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).ThenInclude(us => us.User).Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
+            var account = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).ThenInclude(us => us.User).ThenInclude(usInfo => usInfo.UserInformations).Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
             if (account == null)
             {
                 return null;
             }
 
-            var users = account.Account2Users.Select(au => au.User).ToList();
+            var users = account.Account2Users.Select(au => au.User).ToList();          
             if (users.Count < 1)
             {
                 return null;
             }
+          
+            var usersInformationModel = new List<UserInformationModel>();
 
-            users.ForEach(user => user.Password = null);
-            return _mapper.Map<List<UserModel>>(users);
+            foreach (var user in users)
+            {
+                var userInformation = user.UserInformations.FirstOrDefault();
+                
+               var userInfo = new UserInformationModel
+                {
+                    Id = user.Id,
+                    FirstName = userInformation.FirstName,
+                    LastName = userInformation.LastName,
+                    UserImage = userInformation.UserImage
+                };
+                usersInformationModel.Add(userInfo);
+            }           
+            return usersInformationModel;
         }
+
+        public async Task<List<AccountModel>> GetAccountsByUserId(int userId)
+        {
+            if (userId <= 0)
+            {
+                return null;
+            }
+
+            var user = await _dbContext.Users.Include(acc2us => acc2us.Account2Users).ThenInclude(us => us.Account).Where(us => us.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return null;
+            }
+
+            var accounts = user.Account2Users.Select(au => au.Account).ToList();
+            if (accounts.Count < 1)
+            {
+                return null;
+            }
+
+            var accountModel = new List<AccountModel>();
+
+            foreach (var account in accounts)
+            {
+                var accountInfo = new AccountModel
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    Description = account.Description,
+                    AccountImage = account.AccountImage
+                };
+                accountModel.Add(accountInfo);
+            }
+            return accountModel;
+        }
+
 
         public async Task<List<Account2UserModel>> GetAccount2Users()
         {
@@ -95,7 +163,16 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account = _mapper.Map<Account>(accountModel);
+            var account = new Account()
+            {
+                IsVisible = accountModel.IsVisible,
+                StatusId = accountModel.StatusId,
+                CreatorId = accountModel.CreatorId,
+                MaxCapacity = accountModel.MaxCapacity,
+                Name = accountModel.Name,
+                OnboardingLink = accountModel.OnboardingLink,
+                Description = accountModel.Description,
+            };
 
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
@@ -119,6 +196,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
         public async Task<AccountModel> ModifyAccount(AccountModel accountModel)
         {
+
             if (accountModel == null)
             {
                 return null;
@@ -135,6 +213,9 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
             account.Name = accountModel.Name;
+            account.IsVisible = accountModel.IsVisible;
+            account.MaxCapacity = accountModel.MaxCapacity;
+            account.OnboardingLink = accountModel.OnboardingLink;
             account.Description = accountModel.Description;
             account.StatusId = accountModel.StatusId;
 
@@ -236,7 +317,19 @@ namespace LML.NPOManagement.Dal.Repositories
 
             var account = await _dbContext.Accounts.Include(u => u.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
 
-            return _mapper.Map<AccountModel>(account);
+            var newAccountModel = new AccountModel
+            {
+                Id = account.Id,
+                CreatorId = account.CreatorId,
+                StatusId = account.StatusId,
+                IsVisible = account.IsVisible,
+                DateCreated = account.DateCreated,
+                Name = account.Name,
+                MaxCapacity = account.MaxCapacity,
+                OnboardingLink = account.OnboardingLink,
+                Description = account.Description
+            };
+            return newAccountModel;
         }
 
         public async Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId)

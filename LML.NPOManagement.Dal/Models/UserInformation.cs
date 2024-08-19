@@ -27,6 +27,8 @@ public partial class UserInformation
 
     public int Gender { get; set; }
 
+    public string? UserImage { get; set; }
+
     public string? Metadata { get; set; }
 
     public virtual RequestedUserType RequestedUserRole { get; set; } = null!;

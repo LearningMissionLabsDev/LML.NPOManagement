@@ -8,8 +8,9 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task<List<AccountModel>> GetAllAccounts();
         Task<AccountModel> GetAccountById(int accountId);
         Task<List<AccountModel>> GetAccountsByName(string name);
-        Task<List<UserModel>> GetUsersByAccount(int userId);
+        Task<List<UserInformationModel>> GetUsersByAccount(int userId);
         Task<List<AccountUserActivityModel>> GetAccountRoleProgress(int accountId);
+        Task<List<AccountModel>> GetAccountsByUserId(int userId);
         Task<List<Account2UserModel>> GetAccount2Users();
         Task<AccountModel> AddAccount(AccountModel accountModel); 
         Task<bool> AddUserToAccount(Account2UserModel account2UserModel);

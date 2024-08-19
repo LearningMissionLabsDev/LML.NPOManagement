@@ -46,25 +46,37 @@ namespace LML.NPOManagement.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
         {
-            var userModel = await _userService.GetAllUsers();
+            var users = await _userService.GetAllUsers();
 
-            if (userModel == null)
+            if (users == null)
             {
                 return NotFound();
             }
-            var userResponses = new List<UserResponse>();
 
-            foreach (var user in userModel)
+            var userCredentialResponse = new List<UserCredentialResponse>();
+            foreach (var user in users)
             {
-                var newUserResponse = new UserResponse()
+                var userInfo = user.UserInformations.FirstOrDefault();
+                if (userInfo != null)
                 {
-                    Id = user.Id,
-                    Email = user.Email
-                };
-                userResponses.Add(newUserResponse);
+                    userCredentialResponse.Add(new UserCredentialResponse()
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        StatusId = user.StatusId,
+                        FirstName = userInfo.FirstName,
+                        LastName = userInfo.LastName,
+                        PhoneNumber = userInfo.PhoneNumber,
+                        DateOfBirth = userInfo.DateOfBirth,
+                        MiddleName = userInfo.MiddleName,
+                        Gender = userInfo.Gender,
+                        RequestedUserRoleId = userInfo.RequestedUserRoleId,
+                        CreateDate = userInfo.CreateDate,
+                        UpdateDate = userInfo.UpdateDate,
+                    });
+                }
             }
-
-            return Ok(userResponses);
+            return Ok(userCredentialResponse);
         }
 
         [HttpGet("groups")]
@@ -94,7 +106,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<UserResponse>> GetUserbyId(int userId)
+        public async Task<ActionResult<UserCredentialResponse>> GetUserbyId(int userId)
         {
             if (userId <= 0)
             {
@@ -106,13 +118,26 @@ namespace LML.NPOManagement.Controllers
             {
                 return NotFound();
             }
-
-            var userResponse = new UserResponse()
+            var userInfo = user.UserInformations.First();
+            var userCredentialResponse = new UserCredentialResponse()
             {
-                Email = user.Email
+                Id = user.Id,
+                Email = user.Email,
+                StatusId = user.StatusId,
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+                PhoneNumber = userInfo.PhoneNumber,
+                MiddleName = userInfo.MiddleName,
+                Gender = userInfo.Gender,
+                RequestedUserRoleId = userInfo.RequestedUserRoleId,
+                DateOfBirth = userInfo.DateOfBirth,
+                CreateDate = userInfo.CreateDate,
+                UpdateDate = userInfo.UpdateDate,
+                Metadata = userInfo.Metadata,
+                UserImage = userInfo.UserImage
             };
 
-            return Ok(userResponse);
+            return Ok(userCredentialResponse);
         }
 
         [HttpGet("group/{groupId}")]
@@ -394,12 +419,12 @@ namespace LML.NPOManagement.Controllers
             var newUser = await _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
 
-            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-            var template = _configuration.GetSection("AppSettings:Templates").Value;
-            var key = "NotificationTemplates/CheckingEmail.html";
-            var body = await GetFileByKeyAsync(bucketName, key);
+            //var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            //var template = _configuration.GetSection("AppSettings:Templates").Value;
+            //var key = "NotificationTemplates/CheckingEmail.html";
+            //var body = await GetFileByKeyAsync(bucketName, key);
 
-            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
+            //_notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
 
             return Ok(userInfoId);
         }
@@ -477,7 +502,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut("userInfo")]
-        public async Task<ActionResult> PutUserInfo([FromBody] UserInformationRequest userInformationRequest)
+        public async Task<ActionResult> PutUserInfo([FromBody] UserCredentialRequest userCredentialRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
 
@@ -486,17 +511,20 @@ namespace LML.NPOManagement.Controllers
                 return BadRequest("Please logged in");
             }
 
-            var userInfoModel = new UserInformationModel()
+            var userInfoModel = new UserCredential()
             {
-                RequestedUserRoleId = (int)userInformationRequest.UserTypeEnum,
-                UserId = user.Id,
-                Gender = userInformationRequest.Gender,
-                FirstName = userInformationRequest.FirstName,
-                LastName = userInformationRequest.LastName,
-                MiddleName = userInformationRequest.MiddleName,
-                Metadata = userInformationRequest.UserMetadata,
-                PhoneNumber = userInformationRequest.PhoneNumber,
-                DateOfBirth = userInformationRequest.DateOfBirth,
+                Email = userCredentialRequest.Email,
+                StatusId = userCredentialRequest.StatusId,
+                UserId = userCredentialRequest.Id,
+                RequestedUserRoleId = userCredentialRequest.RequestedUserRoleId,
+                Gender = userCredentialRequest.Gender,
+                FirstName = userCredentialRequest.FirstName,
+                LastName = userCredentialRequest.LastName,
+                MiddleName = userCredentialRequest.MiddleName,
+                Metadata = userCredentialRequest.Metadata,
+                PhoneNumber = userCredentialRequest.PhoneNumber,
+                DateOfBirth = userCredentialRequest.DateOfBirth,
+                UserImage = userCredentialRequest.UserImage
             };
 
             var modifyUser = await _userService.ModifyUserInfo(userInfoModel);
@@ -508,7 +536,7 @@ namespace LML.NPOManagement.Controllers
             return BadRequest();
         }
 
-        [HttpDelete]
+        [HttpDelete("{userID}")]
         public async Task<ActionResult> DeleteUser(int userId)
         {
             if (userId <= 0)

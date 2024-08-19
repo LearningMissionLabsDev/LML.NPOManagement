@@ -5,8 +5,6 @@ namespace LML.NPOManagement.Request
 {
     public class UserInformationRequest
     {
-        [Required]
-        [Range(1, 4)]
         public RequestedUserTypeEnum UserTypeEnum { get; set; }
 
         [Required]

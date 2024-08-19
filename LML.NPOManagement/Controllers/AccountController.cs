@@ -3,9 +3,11 @@ using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
+using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -53,15 +55,20 @@ namespace LML.NPOManagement.Controllers
                 return NotFound();
             }
             var accountResponses = new List<AccountResponse>();
-
+           
             foreach (var account in accounts)
             {
                 var newAccountResponse = new AccountResponse()
                 {
                     Id = account.Id,
+                    CreatorId = account.CreatorId,
+                    StatusId = account.StatusId,
+                    MaxCapacity = account.MaxCapacity,
+                    IsVisible = account.IsVisible,
                     Name = account.Name,
-                    Description = account.Description,
-                    StatusId = account.StatusId
+                    OnboardingLink = account.OnboardingLink,
+                    Description = account.Description,                
+                    DateCreated = account.DateCreated,
                 };
                 accountResponses.Add(newAccountResponse);
             }
@@ -104,9 +111,16 @@ namespace LML.NPOManagement.Controllers
         }
 
         // DONE
-        [HttpGet("{accountId}")]
-        public async Task<ActionResult<AccountResponse>> GetAccountById(int accountId)
+        [HttpGet("account")]
+        public async Task<ActionResult<AccountResponse>> GetAccountById([FromQuery] int accountId)
         {
+            var user = HttpContext.Items["User"] as UserModel;
+            if(user == null)
+            {
+                return Unauthorized();
+            }
+            var account2User = HttpContext.Items["Account"] as Account2UserModel;
+
             if (accountId <= 0)
             {
                 return BadRequest();
@@ -120,16 +134,23 @@ namespace LML.NPOManagement.Controllers
             var accountResponse = new AccountResponse()
             {
                 Id = account.Id,
-                Name = account.Name,
-                Description = account.Description,
+                CreatorId = account.CreatorId,
                 StatusId = account.StatusId,
+                IsVisible = account.IsVisible,
+                MaxCapacity = account.MaxCapacity,
+                OnboardingLink = account.OnboardingLink,
+                Name = account.Name,
                 DateCreated = account.DateCreated,
+                Description = account.Description,
+                AccountImage = account.AccountImage,
+                AccountRoleId = account2User?.AccountRoleId               
             };
+            HttpContext.Response.Headers.Add("Authorization", user.Token);
             return Ok(accountResponse);
         }
         //???
         [HttpGet("users")]
-        public async Task<ActionResult<List<UserResponse>>> GetUsersByAccount()
+        public async Task<ActionResult<List<UserInformationResponse>>> GetUsersByAccount()
         {
             var account = HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
@@ -142,17 +163,53 @@ namespace LML.NPOManagement.Controllers
             {
                 return NotFound();
             }
-            var userResponse = new List<UserResponse>();
-            foreach (var user in users)
+            var usersInfoResponse = new List<UserInformationResponse>();
+            foreach (var userInfo in users)
             {
-                userResponse.Add(new UserResponse()
+                usersInfoResponse.Add(new UserInformationResponse()
                 {
-                    Id = user.Id,
-                    Email = user.Email
+                    UserId = userInfo.Id,
+                    FirstName = userInfo.FirstName,
+                    LastName = userInfo.LastName,
+                    UserImage = userInfo.UserImage
                 });
             }
-            return Ok(userResponse);
+            return Ok(usersInfoResponse);
         }
+
+        [HttpGet("users/accounts")]
+        public async Task<ActionResult<List<AccountResponse>>> GetAccountsByUserId()
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+
+            if (user == null)
+            {
+                return StatusCode(401);
+            }
+            var accounts = await _accountService.GetAccountsByUserId(user.Id);
+
+            if (accounts == null)
+            {
+                return Conflict();
+            }
+            var accountResponses = new List<AccountResponse>();
+            foreach (var account in accounts)
+            {
+                var account2User = user.Account2Users.FirstOrDefault(a2u => a2u.AccountId == account.Id);
+                var accountRoleId = account2User?.AccountRoleId;
+
+                accountResponses.Add(new AccountResponse()
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    Description = account.Description,
+                    AccountImage = account.AccountImage,
+                    AccountRoleId = accountRoleId
+                });
+            }
+            return Ok(accountResponses);
+        }
+
 
         // DONE
         [HttpGet("search/{accountName}")]
@@ -187,41 +244,31 @@ namespace LML.NPOManagement.Controllers
         }
 
         //Done
+        [Authorize((int)UserAccountRoleEnum.SysAdmin | (int)UserAccountRoleEnum.Admin
+            | (int)UserAccountRoleEnum.AccountManager | (int)UserAccountRoleEnum.Beneficiary)]
         [HttpPost("login")]
-        public async Task<ActionResult<Account2UserResponse>> Login()
+        public async Task<ActionResult<Account2UserResponse>> Login([FromQuery] int accountId)
         {
             var user = HttpContext.Items["User"] as UserModel;
-            var account = HttpContext.Items["Account"] as Account2UserModel;
+            var account2user = HttpContext.Items["Account"] as Account2UserModel;
 
             if (user == null)
             {
                 return Unauthorized("User not logged in!");
             }
-            if (account == null)
+            if (account2user == null)
             {
                 return StatusCode(403, "Access denied");
             }
-
-            var account2user = new Account2UserModel()
+            
+            var loginToken = await _accountService.AccountLogin(account2user, user);
+            if (loginToken == null)
             {
-                AccountId = account.AccountId,
-                UserId = account.UserId,
-                AccountRoleId = account.AccountRoleId
-            };
-
-            var login = await _accountService.AccountLogin(account2user);
-
-            if (login == null)
-            {
-                return Conflict();
+                return StatusCode(403, "Access denied");
             }
-            var accountResponse = new Account2UserResponse()
-            {
-                AccountId = login.AccountId,
-                UserId = login.UserId,
-                AccountRoleId = login.AccountRoleId
-            };
-            return Ok(accountResponse);
+            
+            HttpContext.Response.Headers.Add("Authorization", loginToken);
+            return Ok();
         }
 
         // DONE
@@ -246,6 +293,7 @@ namespace LML.NPOManagement.Controllers
                 Id = account.Id,
                 StatusId = account.StatusId,
                 CreatorId = account.CreatorId,
+                MaxCapacity = account.MaxCapacity,
                 Name = account.Name,
                 Description = account.Description,
                 DateCreated = account.DateCreated
@@ -311,11 +359,14 @@ namespace LML.NPOManagement.Controllers
                 return StatusCode(403, "Access denied");
             }
             var accountModel = new AccountModel()
-            {
+            {          
                 Id = account.AccountId,
                 Name = accountRequest.Name,
+                IsVisible = accountRequest.IsVisible,
+                MaxCapacity = accountRequest.MaxCapacity,
+                OnboardingLink = accountRequest.OnboardingLink,
                 Description = accountRequest.Description,
-                StatusId = (int)accountRequest.StatusEnum
+                StatusId = accountRequest.StatusId
             };
             var modifyAccount = await _accountService.ModifyAccount(accountModel);
 
@@ -326,10 +377,13 @@ namespace LML.NPOManagement.Controllers
             var accountResponse = new AccountResponse()
             {
                 Id = modifyAccount.Id,
-                CreatorId = modifyAccount.CreatorId,
-                Name = modifyAccount.Name,
-                Description = modifyAccount.Description,
                 StatusId = modifyAccount.StatusId,
+                CreatorId = modifyAccount.CreatorId,
+                IsVisible = modifyAccount.IsVisible,
+                MaxCapacity = modifyAccount.MaxCapacity,
+                Name = modifyAccount.Name,
+                OnboardingLink = modifyAccount.OnboardingLink,
+                Description = modifyAccount.Description
             };
             return Ok(accountResponse);
         }

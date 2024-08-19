@@ -4,6 +4,6 @@
     {
         AccountManager=1,
         Beneficiary,        
-        Investor,
+        Investor
     }
 }

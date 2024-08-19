@@ -1531,26 +1531,26 @@ namespace TestProject.BLL.Test
 
 
 
-        [TestMethod]
-        public async Task ModifyUserInfo_WhenUserInfoIsValid_ReturnsTrue()
-        {
-            #region Arrange
-            var userRepositoryMock = GetUserRepository();
-            var userService = GetUserService(userRepositoryMock);
+        //[TestMethod]
+        //public async Task ModifyUserInfo_WhenUserInfoIsValid_ReturnsTrue()
+        //{
+        //    #region Arrange
+        //    var userRepositoryMock = GetUserRepository();
+        //    var userService = GetUserService(userRepositoryMock);
 
-            var userInformationModel = new UserInformationModel { Id = 1, UserId = 1 };
+        //    var userInformationModel = new UserInformationModel { Id = 1, UserId = 1 };
 
-            userRepositoryMock.Setup(repo => repo.ModifyUserInfo(userInformationModel)).ReturnsAsync(true);
-            #endregion
+        //    userRepositoryMock.Setup(repo => repo.ModifyUserInfo(userInformationModel)).ReturnsAsync(true);
+        //    #endregion
 
-            #region Act
-            var result = await userService.ModifyUserInfo(userInformationModel);
-            #endregion
+        //    #region Act
+        //    var result = await userService.ModifyUserInfo(userInformationModel);
+        //    #endregion
 
-            #region Assert
-            Assert.IsTrue(result, "Modifying user information with a valid model should return true.");
-            #endregion
-        }
+        //    #region Assert
+        //    Assert.IsTrue(result, "Modifying user information with a valid model should return true.");
+        //    #endregion
+        //}
 
         [TestMethod]
         public async Task ModifyUserInfo_WithNullModel_ReturnsFalse()

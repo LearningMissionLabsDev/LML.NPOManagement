@@ -28,7 +28,7 @@ namespace LML.NPOManagement.Bll.Services
             return _signingKey;
         }
 
-        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository)
+        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository, int accountId=0)
         {
             string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -45,7 +45,7 @@ namespace LML.NPOManagement.Bll.Services
                 currentRoleId = adminAccount.AccountRoleId;
             }
 
-            if (user.Account2Users.Count == 0)
+            if (accountId <= 0)
             {
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -56,37 +56,29 @@ namespace LML.NPOManagement.Bll.Services
                     SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var createdToken = tokenHandler.CreateToken(tokenDescriptor);
-                token = tokenHandler.WriteToken(createdToken);
-                return token;
+                token = tokenHandler.WriteToken(createdToken);             
             }
-            else if (user.Account2Users.Count == 1)
+            else
             {
-                var roleId = user.Account2Users.First().AccountRoleId;
-                if(currentRoleId == -1)
+                var account2User = user.Account2Users.Where(accId => accId.AccountId == accountId).FirstOrDefault();
+                if(account2User == null)
                 {
-                    currentRoleId = roleId;
+                    return null;
                 }
+                var roleId = account2User.AccountRoleId;
+                
+                if(currentRoleId != -1)
+                {
+                    roleId = currentRoleId;
+                }
+
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
-                    new Claim("AccountId", user.Account2Users.First().AccountId.ToString()),
-                    new Claim("AccountRoleId", currentRoleId.ToString())
+                    new Claim("AccountId", accountId.ToString()),
+                    new Claim("AccountRoleId", roleId.ToString())
                 }),
-                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
-                    SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var createdToken = tokenHandler.CreateToken(tokenDescriptor);
-                token = tokenHandler.WriteToken(createdToken);
-                return token;
-            }
-            else if (user.Account2Users.Count > 1)
-            {
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[] {
-                        new Claim("Id", user.Id.ToString())
-                    }),
                     Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
                     SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
                 };
