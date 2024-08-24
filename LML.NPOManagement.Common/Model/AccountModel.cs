@@ -14,7 +14,7 @@ namespace LML.NPOManagement.Common.Model
         /// If set to True, this account will be browsable by the newly registered user
         /// </summary>
         public bool? IsVisible { get; set; }
-
+        public AccountStatusEnum StatusEnum { get; set; }
         /// <summary>
         /// This is optional field to set maximum numbers of members for this account. if zero or null then membership is unlimited.
         /// </summary>
@@ -24,6 +24,7 @@ namespace LML.NPOManagement.Common.Model
         public DateTime DateCreated { get; set; }
         public string? OnboardingLink { get; set; }
         public string? Description { get; set; }
+        public string? AccountImage { get; set; }
         public virtual ICollection<Account2UserModel> Account2Users { get; } = new List<Account2UserModel>();
         public virtual UserModel Creator { get; set; } = null!;
         public virtual AccountStatusModel Status { get; set; } = null!;

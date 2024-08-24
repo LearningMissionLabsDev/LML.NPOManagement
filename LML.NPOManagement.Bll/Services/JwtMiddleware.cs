@@ -2,8 +2,6 @@
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -54,9 +52,9 @@ namespace LML.NPOManagement.Bll.Services
                 var user = await TokenCreationHelper.ValidateJwtToken(token, configuration, userRepository);
                 if (user.Account2Users != null)
                 {
-                    var account = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
+                    var account2User = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
 
-                    context.Items["Account"] = account;
+                    context.Items["Account"] = account2User;
                 }
             }
             catch

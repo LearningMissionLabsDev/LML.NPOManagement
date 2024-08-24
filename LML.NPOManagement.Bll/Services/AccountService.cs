@@ -2,8 +2,10 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
+using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -28,6 +30,7 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             var accountModel = await _accountRepository.GetAccountById(accountId);
+            
             if (accountModel == null)
             {
                 return null;
@@ -63,7 +66,7 @@ namespace LML.NPOManagement.Bll.Services
             return accounts;
         }
 
-        public async Task<List<UserModel>> GetUsersByAccount(int accountId)
+        public async Task<List<UserInformationModel>> GetUsersByAccount(int accountId)
         {
             if (accountId <= 0)
             {
@@ -81,25 +84,46 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-
             return usersByAccount;
         }
 
-        public async Task<Account2UserModel> AccountLogin(Account2UserModel account2UserModel)
+        public async Task<List<AccountModel>> GetAccountsByUserId(int userId)
         {
-            var account = await _userRepository.GetUsersInfoAccount(account2UserModel.UserId);
-            if (account == null)
+            if (userId <= 0)
             {
                 return null;
             }
 
-            var account2user = account.FirstOrDefault(ac => ac.AccountId == account2UserModel.AccountId);
-            if (account2user == null)
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
             {
                 return null;
             }
 
-            return account2user;
+            var accountsByUser = await _accountRepository.GetAccountsByUserId(userId);
+            if (accountsByUser == null)
+            {
+                return null;
+            }
+            return accountsByUser;
+        }
+
+        public async Task<string> AccountLogin(Account2UserModel account2UserModel, UserModel userModel)
+        {
+            //var account = await _userRepository.GetUsersInfoAccount(account2UserModel.UserId);
+            //if (account == null)
+            //{
+            //    return null;
+            //}
+
+            //var account2user = account.FirstOrDefault(ac => ac.AccountId == account2UserModel.AccountId);
+            //if (account2user == null)
+            //{
+            //    return null;
+            //}
+            string token = TokenCreationHelper.GenerateJwtToken(userModel, _configuration, _userRepository, account2UserModel.AccountId);
+
+            return token;
         }
 
         public async Task<AccountModel> AddAccount(AccountModel accountModel)

@@ -27,6 +27,8 @@ public partial class Account
 
     public string? OnboardingLink { get; set; }
 
+    public string? AccountImage { get; set; }
+
     public string? Description { get; set; }
 
     public virtual ICollection<Account2User> Account2Users { get; } = new List<Account2User>();

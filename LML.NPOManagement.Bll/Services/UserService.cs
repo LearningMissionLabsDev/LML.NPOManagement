@@ -191,7 +191,7 @@ namespace LML.NPOManagement.Bll.Services
             return newUserModel;
         }
 
-        public async Task<bool> ModifyUserInfo(UserInformationModel userInformationModel)
+        public async Task<bool> ModifyUserInfo(UserCredential userInformationModel)
         {
             if (userInformationModel == null)
             {

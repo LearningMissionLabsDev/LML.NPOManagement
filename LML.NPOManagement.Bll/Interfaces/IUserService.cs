@@ -14,7 +14,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<List<UserIdeaModel>> GetAllIdeas();
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId);
-        Task<bool> ModifyUserInfo(UserInformationModel userInformationModel);
+        Task<bool> ModifyUserInfo(UserCredential userInformationModel);
         Task<UserModel> DeleteUser(int userId);
         Task<bool> DeleteUserFromGroup(int userId, int groupId);
         Task<bool> DeleteGroup(int groupId);
