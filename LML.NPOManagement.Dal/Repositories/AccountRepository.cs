@@ -163,8 +163,10 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var account = new Account()
             {
+                Id = accountModel.Id,
                 IsVisible = accountModel.IsVisible,
                 StatusId = accountModel.StatusId,
                 CreatorId = accountModel.CreatorId,
@@ -177,7 +179,11 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
 
-            var newAccount = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).Where(acc => acc.Id == account.Id).FirstOrDefaultAsync();
+            var newAccount = await _dbContext.Accounts
+                    .Include(acc2us => acc2us.Account2Users)
+                    .Where(acc => acc.Id == account.Id)
+                    .FirstOrDefaultAsync();
+
             if (newAccount == null)
             {
                 return null;
@@ -231,7 +237,11 @@ namespace LML.NPOManagement.Dal.Repositories
                 return false;
             }
 
-            var account = await _dbContext.Accounts.Include(us => us.Account2Users).ThenInclude(acc => acc.AccountUserActivities).FirstOrDefaultAsync(acc => acc.Id == accountId);
+            var account = await _dbContext.Accounts
+                .Include(us => us.Account2Users)
+                .ThenInclude(acc => acc.AccountUserActivities)
+                .FirstOrDefaultAsync(acc => acc.Id == accountId);
+
             if (account == null)
             {
                 return false;

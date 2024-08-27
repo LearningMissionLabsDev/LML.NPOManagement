@@ -13,12 +13,9 @@ namespace LML.NPOManagement.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private IMapper _mapper;
-        private IConfiguration _configuration;
-        private IAccountService _accountService;
-        private INotificationService _notificationService;
-        private IUserService _userService;
-        public AccountController(IConfiguration configuration, IAccountService accountService, INotificationService notificationService, IUserService userService)
+        private readonly IMapper _mapper;
+        private readonly IAccountService _accountService;
+        public AccountController(IAccountService accountService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -33,10 +30,7 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<AccountUserActivityModel, AccountUserActivityResponse>();
             });
             _mapper = config.CreateMapper();
-            _configuration = configuration;
             _accountService = accountService;
-            _notificationService = notificationService;
-            _userService = userService;
         }
 
         [HttpGet]
@@ -77,17 +71,19 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
+
             var account = HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
             {
                 return Unauthorized();
             }
-            var userActivities = await _accountService.GetAccountRoleProgress(account.AccountId, accountRoleId);
 
+            var userActivities = await _accountService.GetAccountRoleProgress(account.AccountId, accountRoleId);
             if (userActivities == null)
             {
                 return NotFound();
             }
+
             var accountUserResponses = new List<AccountUserActivityResponse>();
 
             foreach (var userProgress in userActivities)
@@ -101,6 +97,7 @@ namespace LML.NPOManagement.Controllers
                 };
                 accountUserResponses.Add(newAccountUserResponse);
             }
+
             return Ok(accountUserResponses);
         }
 
@@ -114,18 +111,19 @@ namespace LML.NPOManagement.Controllers
             {
                 return Unauthorized();
             }
-            var account2User = HttpContext.Items["Account"] as Account2UserModel;
 
+            var account2User = HttpContext.Items["Account"] as Account2UserModel;
             if (accountId <= 0)
             {
                 return BadRequest();
             }
-            var account = await _accountService.GetAccountById(accountId);
 
+            var account = await _accountService.GetAccountById(accountId);
             if (account == null)
             {
                 return NotFound();
             }
+
             var accountResponse = new AccountResponse()
             {
                 Id = account.Id,
@@ -140,6 +138,7 @@ namespace LML.NPOManagement.Controllers
                 AccountImage = account.AccountImage,
                 AccountRoleId = account2User?.AccountRoleId
             };
+
             HttpContext.Response.Headers.Add("Authorization", user.Token);
             return Ok(accountResponse);
         }
@@ -153,12 +152,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var users = await _accountService.GetUsersByAccount(account.AccountId);
 
+            var users = await _accountService.GetUsersByAccount(account.AccountId);
             if (users == null)
             {
                 return NotFound();
             }
+
             var usersInfoResponse = new List<UserInformationResponse>();
             foreach (var userInfo in users)
             {
@@ -170,6 +170,7 @@ namespace LML.NPOManagement.Controllers
                     UserImage = userInfo.UserImage
                 });
             }
+
             return Ok(usersInfoResponse);
         }
 
@@ -177,17 +178,17 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<List<AccountResponse>>> GetAccountsByUserId()
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user == null)
             {
                 return StatusCode(401);
             }
-            var accounts = await _accountService.GetAccountsByUserId(user.Id);
 
+            var accounts = await _accountService.GetAccountsByUserId(user.Id);
             if (accounts == null)
             {
                 return Conflict();
             }
+
             var accountResponses = new List<AccountResponse>();
             foreach (var account in accounts)
             {
@@ -203,6 +204,7 @@ namespace LML.NPOManagement.Controllers
                     AccountRoleId = accountRoleId
                 });
             }
+
             return Ok(accountResponses);
         }
 
@@ -214,14 +216,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var accountModel = await _accountService.GetAccountsByName(accountName);
 
+            var accountModel = await _accountService.GetAccountsByName(accountName);
             if (accountModel == null)
             {
                 return NotFound();
             }
-            var accounts = new List<AccountResponse>();
 
+            var accounts = new List<AccountResponse>();
             foreach (var account in accountModel)
             {
                 var accountResponse = new AccountResponse()
@@ -235,6 +237,7 @@ namespace LML.NPOManagement.Controllers
                 };
                 accounts.Add(accountResponse);
             }
+
             return Ok(accounts);
         }
 
@@ -274,14 +277,16 @@ namespace LML.NPOManagement.Controllers
             {
                 return Unauthorized();
             }
+
             var accountModel = _mapper.Map<AccountRequest, AccountModel>(accountRequest);
             accountModel.CreatorId = user.Id;
-            var account = await _accountService.AddAccount(accountModel);
 
+            var account = await _accountService.AddAccount(accountModel);
             if (account == null)
             {
                 return BadRequest("Process Failed!");
             }
+
             var accountResponse = new AccountResponse()
             {
                 Id = account.Id,
@@ -292,6 +297,7 @@ namespace LML.NPOManagement.Controllers
                 Description = account.Description,
                 DateCreated = account.DateCreated
             };
+
             return Ok(accountResponse);
         }
 
@@ -304,12 +310,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return StatusCode(403, "Access denied");
             }
+
             var activityModel = _mapper.Map<AccountUserActivityModel>(accountUserActivityRequest);
             var activityUser = await _accountService.AddAccountUserActivityProgress(activityModel);
             if (activityUser == null)
             {
                 return Conflict();
             }
+
             var activityResponse = new AccountUserActivityResponse()
             {
                 Id = activityUser.Id,
@@ -317,6 +325,7 @@ namespace LML.NPOManagement.Controllers
                 ActivityInfo = activityUser.ActivityInfo,
                 DateCreated = activityUser.DateCreated
             };
+
             return Ok(activityResponse);
         }
 
@@ -329,18 +338,20 @@ namespace LML.NPOManagement.Controllers
             {
                 return NotFound("Access denied");
             }
+
             var account2User = new Account2UserModel()
             {
                 AccountId = account.AccountId,
                 UserId = addUserToAccountRequest.UserId,
                 AccountRoleId = (int)addUserToAccountRequest.UserAccountRoleEnum
             };
-            var result = await _accountService.AddUserToAccount(account2User);
 
+            var result = await _accountService.AddUserToAccount(account2User);
             if (!result)
             {
                 return Conflict();
             }
+            
             return Ok();
         }
 
@@ -353,6 +364,7 @@ namespace LML.NPOManagement.Controllers
             {
                 return StatusCode(403, "Access denied");
             }
+
             var accountModel = new AccountModel()
             {
                 Id = account.AccountId,
@@ -363,12 +375,13 @@ namespace LML.NPOManagement.Controllers
                 Description = accountRequest.Description,
                 StatusId = accountRequest.StatusId
             };
-            var modifyAccount = await _accountService.ModifyAccount(accountModel);
 
+            var modifyAccount = await _accountService.ModifyAccount(accountModel);
             if (modifyAccount == null)
             {
                 return BadRequest();
             }
+
             var accountResponse = new AccountResponse()
             {
                 Id = modifyAccount.Id,
@@ -380,6 +393,7 @@ namespace LML.NPOManagement.Controllers
                 OnboardingLink = modifyAccount.OnboardingLink,
                 Description = modifyAccount.Description
             };
+
             return Ok(accountResponse);
         }
 
@@ -391,17 +405,19 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("User Not Found");
             }
+
             var account = HttpContext.Items["Account"] as Account2UserModel;
             if (account == null)
             {
                 return StatusCode(403, "Access denied");
             }
-            var user = await _accountService.RemoveUserFromAccount(account.AccountId, userId);
 
+            var user = await _accountService.RemoveUserFromAccount(account.AccountId, userId);
             if (!user)
             {
                 return Conflict();
             }
+
             return Ok();
         }
 
@@ -414,12 +430,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return NotFound("Account Not Found");
             }
-            var deletedAccount = await _accountService.DeleteAccount(account.AccountId);
 
+            var deletedAccount = await _accountService.DeleteAccount(account.AccountId);
             if (!deletedAccount)
             {
                 return Conflict();
             }
+
             return Ok();
         }
     }

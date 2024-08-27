@@ -875,7 +875,6 @@ namespace TestProject.DAL.Test
 
 
 
-
         [TestMethod]
         public async Task ModifyUserInfo_WhenUserToModifyIsNull_ReturnsFalse()
         {
@@ -888,64 +887,6 @@ namespace TestProject.DAL.Test
             // Assert
             Assert.IsFalse(result, "Expected null when accountModel is null");
         }
-
-        //[TestMethod]
-        //public async Task ModifyUserInfo_WhenUserToModifyIsNotExist_ReturnsFalse()
-        //{
-        //    // Arrange
-        //    var mockedDbContext = GetMockedDbContext();
-        //    var userRepository = GetUserRepository(mockedDbContext);
-
-        //    var userToModify = new UserInformationModel { Id = 1, UserId = 1 };
-        //    mockedDbContext.Setup(context => context.UserInformations).ReturnsDbSet(new List<UserInformation>());
-
-        //    // Act
-        //    var result = await userRepository.ModifyUserInfo(userToModify);
-
-        //    // Assert
-        //    Assert.IsFalse(result, "Expected null when account to modify is not exist");
-        //}
-
-        //[TestMethod]
-        //public async Task ModifyUserInfo_WhenUserInfoModifiedSuccessfully_ReturnsTrue()
-        //{
-        //    // Arrange
-        //    var mockedDbContext = GetMockedDbContext();
-        //    var userRepository = GetUserRepository(mockedDbContext);
-
-        //    var user = new User
-        //    {
-        //        Id = 1,
-        //    };
-
-        //    var userInfoModelToModify = new UserInformationModel
-        //    {
-        //        UserId = 1,
-        //        FirstName = "New First Name",
-        //        LastName = "New Last Name",
-        //        PhoneNumber = "New Phone Number",
-        //        MiddleName = "New Middle Name",
-        //        Metadata = "New Metadata",
-        //        DateOfBirth = DateTime.Parse("1990-01-01"),
-        //        Gender = Gender.Male
-        //    };
-
-        //    var userInformation = new UserInformation
-        //    {
-        //        UserId = 1,
-        //    };
-
-        //    mockedDbContext.Setup(context => context.UserInformations).ReturnsDbSet(new List<UserInformation> { userInformation });
-        //    mockedDbContext.Setup(context => context.Users).ReturnsDbSet(new List<User> { user });
-
-        //    // Act
-        //    var result = await userRepository.ModifyUserInfo(userInfoModelToModify);
-
-        //    // Assert
-        //    Assert.IsTrue(result, "Expected true when user info modified successfully");
-        //}
-
-
 
         [TestMethod]
         public async Task ModifyUserCredentials_InvalidUserId_ReturnsNull()

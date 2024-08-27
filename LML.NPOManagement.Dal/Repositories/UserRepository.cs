@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FluentEmail.Core;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
@@ -123,6 +122,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 };
                 models.Add(model);
             }
+
             return models;
         }
 
@@ -225,6 +225,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var users = await _dbContext.UserInformations
                 .Where(u => u.FirstName.Contains(searchParam) || u.LastName.Contains(searchParam))
                 .ToListAsync();

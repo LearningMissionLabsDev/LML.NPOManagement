@@ -202,7 +202,6 @@ namespace TestProject.DAL.Test
             var accountRepository = GetAccountRepository(mockedDbContext);
 
             int idleUsersAccount = 1;
-            int accountRoleId = 1;
 
             mockedDbContext.Setup(context => context.AccountUserActivities).ReturnsDbSet(new List<AccountUserActivity>());
 
@@ -301,32 +300,6 @@ namespace TestProject.DAL.Test
             // Assert
             Assert.IsNull(usersOfAccount, "Expected null when there are not users in requested account.");
         }
-
-        //[TestMethod]
-        //public async Task GetUsersByAccount_WhenUserOfRequestedAccountFoundSuccessfully_ReturnsUsers()
-        //{
-        //    // Arrange
-        //    var mockedDbContext = GetMockedDbContext();
-        //    var accountRepository = GetAccountRepository(mockedDbContext);
-
-        //    int requestedAccountId = 1;
-
-        //    var accounts = new List<Account> { new Account { Id = requestedAccountId, StatusId = (int)AccountStatusEnum.Active } };
-
-        //    var account2User = new Account2User() { User = new User() { Id = requestedAccountId, Password = "Not Null Password" } };
-        //    var accountUserActivity = new AccountUserActivity { Id = requestedAccountId };
-        //    account2User.AccountUserActivities.Add(accountUserActivity);
-        //    accounts[0].Account2Users.Add(account2User);
-
-        //    mockedDbContext.Setup(context => context.Accounts).ReturnsDbSet(accounts);
-
-        //    // Act
-        //    var usersOfAccountWhichIsNotExist = await accountRepository.GetUsersByAccount(requestedAccountId);
-
-        //    // Assert
-        //    Assert.IsNotNull(usersOfAccountWhichIsNotExist, "Expected not null result when users found successfully.");
-        //    usersOfAccountWhichIsNotExist.ForEach(u => Assert.IsNull(u.Password, "Expected users passwords to be null."));
-        //}
 
 
 

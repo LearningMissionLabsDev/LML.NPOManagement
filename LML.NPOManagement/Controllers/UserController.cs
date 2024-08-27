@@ -14,11 +14,11 @@ namespace LML.NPOManagement.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IMapper _mapper;
-        private IUserService _userService;
-        private INotificationService _notificationService;
-        private IConfiguration _configuration;
-        private IAmazonS3 _s3Client;
+        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
+        private readonly INotificationService _notificationService;
+        private readonly IConfiguration _configuration;
+        private readonly IAmazonS3 _s3Client;
 
         public UserController(IUserService userService, INotificationService notificationService, IConfiguration configuration, IAmazonS3 s3Client)
         {
@@ -83,13 +83,12 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<IEnumerable<UsersGroupResponse>>> GetGroups()
         {
             var groupsModel = await _userService.GetAllGroups();
-
             if (groupsModel == null)
             {
                 return NotFound();
             }
-            var groups = new List<UsersGroupResponse>();
 
+            var groups = new List<UsersGroupResponse>();
             foreach (var group in groupsModel)
             {
                 var groupResponse = new UsersGroupResponse()
@@ -112,12 +111,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var user = await _userService.GetUserById(userId);
 
+            var user = await _userService.GetUserById(userId);
             if (user == null)
             {
                 return NotFound();
             }
+
             var userInfo = user.UserInformations.First();
             var userCredentialResponse = new UserCredentialResponse()
             {
@@ -174,12 +174,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var groupModel = await _userService.GetGroupsByName(groupName);
 
+            var groupModel = await _userService.GetGroupsByName(groupName);
             if (groupModel == null)
             {
                 return NotFound();
             }
+
             var groups = new List<UsersGroupResponse>();
             foreach (var group in groupModel)
             {
@@ -192,6 +193,7 @@ namespace LML.NPOManagement.Controllers
                 };
                 groups.Add(groupResponse);
             }
+
             return Ok(groups);
         }
 
@@ -203,14 +205,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var usersGroupModel = await _userService.GetGroupsForUser(userId);
 
+            var usersGroupModel = await _userService.GetGroupsForUser(userId);
             if (usersGroupModel == null)
             {
                 return NotFound();
             }
-            var userGroups = new List<UsersGroupResponse>();
 
+            var userGroups = new List<UsersGroupResponse>();
             foreach (var user in usersGroupModel)
             {
                 var userResponse = new UsersGroupResponse()
@@ -234,14 +236,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var usersModel = await _userService.GetUsersByGroupId(groupId);
 
+            var usersModel = await _userService.GetUsersByGroupId(groupId);
             if (usersModel == null || !usersModel.Any())
             {
                 return NotFound();
             }
-            var users = new List<UserResponse>();
 
+            var users = new List<UserResponse>();
             foreach (var user in usersModel)
             {
                 var usersResponse = new UserResponse()
@@ -260,13 +262,12 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<List<UserIdeaResponse>>> GetIdeas()
         {
             var ideas = await _userService.GetAllIdeas();
-
             if (ideas == null)
             {
                 return NotFound();
             }
-            List<UserIdeaResponse> ideaResponses = new List<UserIdeaResponse>();
 
+            var ideaResponses = new List<UserIdeaResponse>();
             foreach (var idea in ideas)
             {
                 var ideaResponse = new UserIdeaResponse()
@@ -278,6 +279,7 @@ namespace LML.NPOManagement.Controllers
                 };
                 ideaResponses.Add(ideaResponse);
             }
+
             return Ok(ideaResponses);
         }
 
@@ -286,11 +288,11 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult> SubmitComments([FromBody] UserIdeaRequest userIdeaRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user == null)
             {
                 return BadRequest();
             }
+
             var ideaModel = _mapper.Map<UserIdeaRequest, UserIdeaModel>(userIdeaRequest);
             ideaModel.UserId = user.Id;
 
@@ -299,6 +301,7 @@ namespace LML.NPOManagement.Controllers
             {
                 return Conflict();
             }
+
             return Ok();
         }
 
@@ -324,16 +327,16 @@ namespace LML.NPOManagement.Controllers
 
         [HttpGet("logout")]
         [Authorize(RoleAccess.AllAccess)]
-        public async Task<ActionResult> LogOut()
+        public ActionResult LogOut()
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user != null)
             {
                 user.Token = null;
 
                 return Ok();
             }
+
             return BadRequest("Not User");
         }
 
@@ -345,15 +348,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("This field is required!");
             }
-            var searchResults = await _userService.GetSearchResults(searchParam, includeGroups);
 
+            var searchResults = await _userService.GetSearchResults(searchParam, includeGroups);
             if (searchResults == null || !searchResults.Any())
             {
                 return NotFound("Users Not Found");
             }
 
             var searchResponses = _mapper.Map<List<SearchModel>, List<SearchResponse>>(searchResults);
-
             return Ok(searchResponses);
         }
 
@@ -390,13 +392,14 @@ namespace LML.NPOManagement.Controllers
             {
                 return StatusCode(409);
             }
+
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var result = await _userService.Registration(userModel, _configuration);
-
             if (result != null)
             {
                 return Ok(result);
             }
+
             return BadRequest();
         }
 
@@ -405,7 +408,6 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user == null)
             {
                 return BadRequest();
@@ -424,16 +426,7 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var newUser = await _userService.GetUserById(userInformationModel.UserId);
             var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
-
-            //var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-            //var template = _configuration.GetSection("AppSettings:Templates").Value;
-            //var key = "NotificationTemplates/CheckingEmail.html";
-            //var body = await GetFileByKeyAsync(bucketName, key);
-
-            //_notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
-
             return Ok(userInfoId);
         }
 
@@ -442,7 +435,6 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UsersGroupResponse>> AddGroup([FromBody] UsersGroupRequest usersGroupRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user == null)
             {
                 return BadRequest("Please logged in or check account verification!");
@@ -452,13 +444,12 @@ namespace LML.NPOManagement.Controllers
             usersGroupModel.CreatorId = user.Id;
 
             var newUsersGroupModel = await _userService.CreateGroup(usersGroupModel);
-
             if (newUsersGroupModel == null)
             {
                 return BadRequest("Your Request Is Not Valid");
             }
-            var newUsersGroupResponse = _mapper.Map<UsersGroupModel, UsersGroupResponse>(newUsersGroupModel);
 
+            var newUsersGroupResponse = _mapper.Map<UsersGroupModel, UsersGroupResponse>(newUsersGroupModel);
             return Ok(newUsersGroupResponse);
         }
 
@@ -470,12 +461,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("Process Failed");
             }
-            var result = await _userService.AddUserToGroup(addUserToGroupRequest.UserId, addUserToGroupRequest.GroupId);
 
+            var result = await _userService.AddUserToGroup(addUserToGroupRequest.UserId, addUserToGroupRequest.GroupId);
             if (!result)
             {
                 return Conflict();
             }
+
             return Ok();
         }
 
@@ -484,21 +476,18 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult> Put([FromBody] UserRequest userRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user == null)
             {
                 return BadRequest();
             }
+
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
-
             var modifyUser = await _userService.ModifyUserCredentials(userModel.Email, userModel.Password, user.Id);
-
             if (modifyUser != null)
             {
                 if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
                 {
                     var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-                    var template = _configuration.GetSection("AppSettings:Templates").Value;
                     var key = "NotificationTemplates/CheckingEmail.html";
                     var body = await GetFileByKeyAsync(bucketName, key);
 
@@ -506,6 +495,7 @@ namespace LML.NPOManagement.Controllers
                 }
                 return Ok();
             }
+
             return BadRequest();
         }
 
@@ -514,7 +504,6 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult> PutUserInfo([FromBody] UserCredentialRequest userCredentialRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
-
             if (user == null)
             {
                 return BadRequest("Please logged in");
@@ -537,11 +526,11 @@ namespace LML.NPOManagement.Controllers
             };
 
             var modifyUser = await _userService.ModifyUserInfo(userInfoModel);
-
             if (modifyUser)
             {
                 return Ok();
             }
+
             return BadRequest();
         }
 
@@ -553,12 +542,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var deletedUser = await _userService.DeleteUser(userId);
 
+            var deletedUser = await _userService.DeleteUser(userId);
             if (deletedUser == null)
             {
                 return NotFound();
             }
+
             return Ok();
         }
 
@@ -570,12 +560,13 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest("Unable to remove user from group");
             }
-            var user = await _userService.DeleteUserFromGroup(userId, groupId);
 
+            var user = await _userService.DeleteUserFromGroup(userId, groupId);
             if (!user)
             {
                 return NotFound();
             }
+
             return Ok();
         }
 
@@ -587,19 +578,19 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var group = await _userService.DeleteGroup(groupId);
 
+            var group = await _userService.DeleteGroup(groupId);
             if (!group)
             {
                 return NotFound();
             }
+
             return Ok();
         }
 
         private async Task<string> GetFileByKeyAsync(string bucketName, string key)
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
-
             if (!bucketExists)
             {
                 return null;
