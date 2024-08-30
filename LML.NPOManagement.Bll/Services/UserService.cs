@@ -161,7 +161,7 @@ namespace LML.NPOManagement.Bll.Services
             }
             var user = await _userRepository.GetUserByEmail(email);
 
-            if (user != null)
+            if (user == null)
             {
                 return null;
             }

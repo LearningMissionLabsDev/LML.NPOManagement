@@ -472,13 +472,12 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut]
-        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> Put([FromBody] UserRequest userRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
             if (user == null)
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
@@ -500,7 +499,6 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut("userInfo")]
-        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult> PutUserInfo([FromBody] UserCredentialRequest userCredentialRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;
