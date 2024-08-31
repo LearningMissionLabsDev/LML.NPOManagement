@@ -404,7 +404,6 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("userInfoRegistration")]
-        [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
             var user = HttpContext.Items["User"] as UserModel;

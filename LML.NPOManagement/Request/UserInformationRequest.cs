@@ -29,6 +29,7 @@ namespace LML.NPOManagement.Request
         [Required]
         [Range(1, 3)]
         public Gender Gender { get; set; }
+        public string? UserImage { get; set; }
 
         [StringLength(int.MaxValue)]
         public string UserMetadata { get; set; }

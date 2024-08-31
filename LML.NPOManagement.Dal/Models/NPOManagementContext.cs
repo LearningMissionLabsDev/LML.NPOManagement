@@ -23,6 +23,8 @@ public partial class NpomanagementContext : DbContext
 
     public virtual DbSet<AccountUserActivity> AccountUserActivities { get; set; }
 
+    public virtual DbSet<Appointment> Appointments { get; set; }
+
     public virtual DbSet<Attachment> Attachments { get; set; }
 
     public virtual DbSet<Donation> Donations { get; set; }
@@ -70,6 +72,7 @@ public partial class NpomanagementContext : DbContext
             entity.Property(e => e.DateCreated)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(250);
             entity.Property(e => e.IsVisible)
                 .IsRequired()
@@ -142,6 +145,16 @@ public partial class NpomanagementContext : DbContext
                 .HasForeignKey(d => d.Account2UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AccountUserActivity_Account2User");
+        });
+
+        modelBuilder.Entity<Appointment>(entity =>
+        {
+            entity.ToTable("Appointment");
+
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.EndDate).HasColumnType("date");
+            entity.Property(e => e.StartDate).HasColumnType("date");
+            entity.Property(e => e.Title).HasMaxLength(255);
         });
 
         modelBuilder.Entity<Attachment>(entity =>
@@ -350,12 +363,14 @@ public partial class NpomanagementContext : DbContext
 
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.DateOfBirth).HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
             entity.Property(e => e.FirstName).HasMaxLength(50);
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.Metadata).HasColumnType("ntext");
             entity.Property(e => e.MiddleName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).HasMaxLength(50);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.UserImage).HasDefaultValueSql("('https://firebasestorage.googleapis.com/v0/b/learningml-3ee6f.appspot.com/o/profile-photos%2Fprofile.jpeg?alt=media&token=55bbb024-85fd-4dc4-b2ed-9bb0ed12b954')");
 
             entity.HasOne(d => d.RequestedUserRole).WithMany(p => p.UserInformations)
                 .HasForeignKey(d => d.RequestedUserRoleId)
