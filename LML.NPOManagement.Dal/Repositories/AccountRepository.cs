@@ -66,6 +66,8 @@ namespace LML.NPOManagement.Dal.Repositories
                     IsVisible = account.IsVisible,
                     OnboardingLink = account.OnboardingLink,
                     Description = account.Description,
+                    AccountImage = account.AccountImage,
+                    DeletedAt = account.DeletedAt
                 };
                 accountsModel.Add(accountModel);
             }
@@ -274,6 +276,7 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.SaveChangesAsync();
 
             account.StatusId = (int)AccountStatusEnum.Deleted;
+            account.DeletedAt = DateTime.Now;
             await _dbContext.SaveChangesAsync();
 
             return true;

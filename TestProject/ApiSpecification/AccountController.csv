@@ -12,3 +12,4 @@ AddUserToAccount,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 ModifyAccount,AccountAdmin,Allowed,Allowed,Denied,Denied
 RemoveUserFromAccount,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 DeleteAccount,AccountAdmin,Allowed,Allowed,Denied,Denied
+DeleteAccountById,SysAdminOnly,Allowed,Denied,Denied,Denied

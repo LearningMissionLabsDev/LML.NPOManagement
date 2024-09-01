@@ -22,6 +22,7 @@ namespace LML.NPOManagement.Common.Model
         public int CreatorId { get; set; }
         public string Name { get; set; } = null!;
         public DateTime DateCreated { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public string? OnboardingLink { get; set; }
         public string? Description { get; set; }
         public string? AccountImage { get; set; }

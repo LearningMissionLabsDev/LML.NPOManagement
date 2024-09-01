@@ -57,7 +57,8 @@ namespace LML.NPOManagement.Controllers
                     OnboardingLink = account.OnboardingLink,
                     Description = account.Description,
                     DateCreated = account.DateCreated,
-                    AccountImage = account.AccountImage
+                    AccountImage = account.AccountImage,
+                    DeletedAt = account.DeletedAt
                 };
                 accountResponses.Add(newAccountResponse);
             }
@@ -89,7 +90,8 @@ namespace LML.NPOManagement.Controllers
                     OnboardingLink = account.OnboardingLink,
                     Description = account.Description,
                     DateCreated = account.DateCreated,
-                    AccountImage = account.AccountImage
+                    AccountImage = account.AccountImage,
+                    DeletedAt = account.DeletedAt
                 };
                 accountResponses.Add(newAccountResponse);
             }
@@ -465,6 +467,24 @@ namespace LML.NPOManagement.Controllers
             }
 
             var deletedAccount = await _accountService.DeleteAccount(account.AccountId);
+            if (!deletedAccount)
+            {
+                return Conflict();
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("{accountId}")]
+        [Authorize(RoleAccess.SysAdminOnly)]
+        public async Task<ActionResult> DeleteAccountById(int accountId)
+        {
+            if (accountId <= 0)
+            {
+                return NotFound("Account Not Found");
+            }
+
+            var deletedAccount = await _accountService.DeleteAccount(accountId);
             if (!deletedAccount)
             {
                 return Conflict();
