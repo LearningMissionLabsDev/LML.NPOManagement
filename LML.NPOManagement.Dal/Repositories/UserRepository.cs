@@ -222,7 +222,6 @@ namespace LML.NPOManagement.Dal.Repositories
                 return false;
             }
 
-            user.Email = userCredential.Email;
             userInfo.FirstName = userCredential.FirstName;
             user.StatusId = userCredential.StatusId;
             userInfo.LastName = userCredential.LastName;

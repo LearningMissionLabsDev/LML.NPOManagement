@@ -466,8 +466,8 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var userInfoId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
-            return Ok(userInfoId);
+            var userId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            return Ok(userId);
         }
 
         [HttpPost("group")]
@@ -549,7 +549,6 @@ namespace LML.NPOManagement.Controllers
 
             var userInfoModel = new UserCredential()
             {
-                Email = userCredentialRequest.Email,
                 StatusId = userCredentialRequest.StatusId,
                 UserId = userCredentialRequest.Id,
                 RequestedUserRoleId = userCredentialRequest.RequestedUserRoleId,

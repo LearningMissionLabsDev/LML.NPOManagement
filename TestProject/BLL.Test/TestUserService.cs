@@ -1302,7 +1302,7 @@ namespace TestProject.BLL.Test
 
             #region Assert
             Assert.IsNotNull(result, "The result should not be null.");
-            Assert.AreEqual(userInformation.Id, result, "The returned user information ID should match the provided user information ID.");
+            Assert.AreEqual(userInformation.UserId, result, "The returned user information ID should match the provided user information ID.");
             #endregion
         }
 

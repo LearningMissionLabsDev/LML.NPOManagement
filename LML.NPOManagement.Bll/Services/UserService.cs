@@ -262,7 +262,7 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             await _userRepository.AddUserInformation(userInformationModel);
-            return userInformationModel.Id;
+            return userInformationModel.UserId;
         }
 
         public async Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups)
