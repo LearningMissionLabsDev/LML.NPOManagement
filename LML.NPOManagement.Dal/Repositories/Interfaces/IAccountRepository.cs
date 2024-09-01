@@ -1,11 +1,11 @@
-﻿using LML.NPOManagement.Common;
-using LML.NPOManagement.Common.Model;
+﻿using LML.NPOManagement.Common.Model;
 
 namespace LML.NPOManagement.Dal.Repositories.Interfaces
 {
     public interface IAccountRepository
     {
         Task<List<AccountModel>> GetAllAccounts();
+        Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds);
         Task<AccountModel> GetAccountById(int accountId);
         Task<List<AccountModel>> GetAccountsByName(string name);
         Task<List<UserInformationModel>> GetUsersByAccount(int userId);

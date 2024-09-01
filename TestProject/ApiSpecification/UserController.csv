@@ -18,4 +18,4 @@ PutUserInfo,AllAccess,Allowed,Allowed,Allowed,Allowed
 DeleteUser,SysAdminOnly,Allowed,Denied,Denied,Denied
 DeleteUserFromGroup,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 DeleteGroup,AdminsAndManager,Allowed,Allowed,Allowed,Denied
-GetUsersFiltered,SysAdminOnly,Allowed,Denied,Denied,Denied
+GetUsersByStatus,SysAdminOnly,Allowed,Denied,Denied,Denied

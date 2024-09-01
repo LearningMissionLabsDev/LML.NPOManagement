@@ -57,6 +57,39 @@ namespace LML.NPOManagement.Controllers
                     OnboardingLink = account.OnboardingLink,
                     Description = account.Description,
                     DateCreated = account.DateCreated,
+                    AccountImage = account.AccountImage
+                };
+                accountResponses.Add(newAccountResponse);
+            }
+
+            return Ok(accountResponses);
+        }
+
+        [HttpGet("filter")]
+        [Authorize(RoleAccess.SysAdminOnly)]
+        public async Task<ActionResult<List<AccountResponse>>> GetAccountsByStatus([FromQuery] List<int>? statusIds)
+        {
+            var accounts = await _accountService.GetAccountsByStatus(statusIds);
+            if (accounts == null)
+            {
+                return NotFound("Accounts by this criteria not found.");
+            }
+
+            var accountResponses = new List<AccountResponse>();
+            foreach (var account in accounts)
+            {
+                var newAccountResponse = new AccountResponse()
+                {
+                    Id = account.Id,
+                    CreatorId = account.CreatorId,
+                    StatusId = account.StatusId,
+                    MaxCapacity = account.MaxCapacity,
+                    IsVisible = account.IsVisible,
+                    Name = account.Name,
+                    OnboardingLink = account.OnboardingLink,
+                    Description = account.Description,
+                    DateCreated = account.DateCreated,
+                    AccountImage = account.AccountImage
                 };
                 accountResponses.Add(newAccountResponse);
             }

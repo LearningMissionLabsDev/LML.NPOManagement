@@ -67,9 +67,9 @@ namespace LML.NPOManagement.Bll.Services
             return userModel;
         }
 
-        public async Task<List<UserModel>> GetUsersByCriteria(int? statusId, string? firstName, string? lastName)
+        public async Task<List<UserModel>> GetUsersByCriteria(List<int>? statusIds)
         {
-            var userModel = await _userRepository.GetUsersByCriteria(statusId, firstName, lastName);
+            var userModel = await _userRepository.GetUsersByCriteria(statusIds);
             if (userModel == null) {
                 return null;
             }

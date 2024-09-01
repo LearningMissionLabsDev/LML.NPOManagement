@@ -11,6 +11,7 @@ namespace LML.NPOManagement.Dal.Repositories
     {
         private readonly IMapper _mapper;
         private readonly NpomanagementContext _dbContext;
+
         public UserRepository(NpomanagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
@@ -85,22 +86,12 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<List<UserModel>>(users);
         }
 
-        public async Task<List<UserModel>> GetUsersByCriteria(int? statusId, string? firstName, string? lastName)
+        public async Task<List<UserModel>> GetUsersByCriteria(List<int>? statusIds)
         {
             var query = _dbContext.Users.Include(usInfo => usInfo.UserInformations).AsQueryable();
-            if (statusId.HasValue)
+            if (statusIds != null && statusIds.Any())
             {
-                query = query.Where(u => u.StatusId == statusId.Value);
-            }
-
-            if (!string.IsNullOrEmpty(firstName))
-            {
-                query = query.Where(u => u.UserInformations.Any(ui => ui.FirstName.Contains(firstName)));
-            }
-
-            if (!string.IsNullOrEmpty(lastName))
-            {
-                query = query.Where(u => u.UserInformations.Any(ui => ui.LastName.Contains(lastName)));
+                query = query.Where(u => statusIds.Contains(u.StatusId));
             }
 
             var users = await query.ToListAsync();

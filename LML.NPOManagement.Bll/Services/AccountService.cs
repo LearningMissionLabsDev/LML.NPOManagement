@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using LML.NPOManagement.Bll.Interfaces;
+﻿using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
@@ -40,6 +39,18 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<List<AccountModel>> GetAllAccounts()
         {
             var accounts = await _accountRepository.GetAllAccounts();
+            if (accounts == null)
+            {
+                return null;
+            }
+
+            return accounts;
+        }
+
+
+        public async Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds)
+        {
+            var accounts = await _accountRepository.GetAccountsByStatus(statusIds);
             if (accounts == null)
             {
                 return null;

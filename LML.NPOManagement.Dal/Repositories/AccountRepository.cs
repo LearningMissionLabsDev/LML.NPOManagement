@@ -73,6 +73,23 @@ namespace LML.NPOManagement.Dal.Repositories
             return accountsModel;
         }
 
+        public async Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds)
+        {
+            var query = _dbContext.Accounts.AsQueryable();
+            if (statusIds != null && statusIds.Any())
+            {
+                query = query.Where(u => statusIds.Contains(u.StatusId));
+            }
+
+            var accounts = await query.ToListAsync();
+            if (!accounts.Any())
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<AccountModel>>(accounts);
+        }
+
         public async Task<List<UserInformationModel>> GetUsersByAccount(int accountId)
         {
             if (accountId <= 0)

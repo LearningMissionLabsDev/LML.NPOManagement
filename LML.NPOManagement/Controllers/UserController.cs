@@ -81,12 +81,9 @@ namespace LML.NPOManagement.Controllers
 
         [HttpGet("filter")]
         [Authorize(RoleAccess.SysAdminOnly)]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersFiltered(
-           [FromQuery] int? statusId,
-           [FromQuery] string? firstName,
-           [FromQuery] string? lastName)
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersByStatus([FromQuery] List<int>? statusIds)
         {
-            var users = await _userService.GetUsersByCriteria(statusId, firstName, lastName);
+            var users = await _userService.GetUsersByCriteria(statusIds);
             if (users == null || !users.Any())
             {
                 return NotFound("Users By This Criteria Not Found");
