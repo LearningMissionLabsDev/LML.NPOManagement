@@ -8,10 +8,10 @@
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
         public string? MiddleName { get; set; }
-        public RequestedUserTypeEnum RequestedUserTypeEnum { get; set; }
         public DateTime DateOfBirth { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public string? UserImage { get; set; }
         public Gender Gender { get; set; }

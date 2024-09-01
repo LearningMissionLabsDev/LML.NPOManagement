@@ -1,5 +1,4 @@
 ﻿using LML.NPOManagement.Common.Model;
-using System.Security.Principal;
 
 namespace LML.NPOManagement.Common
 {

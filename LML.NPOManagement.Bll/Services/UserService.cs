@@ -2,7 +2,6 @@
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 
@@ -11,12 +10,10 @@ namespace LML.NPOManagement.Bll.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IInvestorRepository _investorRepository;
 
-        public UserService(IUserRepository userRepository, IInvestorRepository investorRepository)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _investorRepository = investorRepository;
         }
 
         public async Task<UserModel> ActivationUser(string token, IConfiguration configuration)
@@ -25,8 +22,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var newUser = await TokenCreationHelper.ValidateJwtToken(token, configuration, _userRepository);
 
+            var newUser = await TokenCreationHelper.ValidateJwtToken(token, configuration, _userRepository);
             if (newUser == null)
             {
                 return null;
@@ -43,26 +40,37 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
+
             var user = await _userRepository.GetUserById(userId);
             if (user == null || user.StatusId == (int)StatusEnumModel.Deleted)
             {
                 return null;
             }
-            var userModel = await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Deleted);
 
+            var userModel = await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Deleted);
             if (userModel == null)
             {
                 return null;
             }
+
             return userModel;
         }
 
         public async Task<List<UserModel>> GetAllUsers()
         {
             var userModel = await _userRepository.GetAllUsers();
-
             if (userModel == null)
             {
+                return null;
+            }
+
+            return userModel;
+        }
+
+        public async Task<List<UserModel>> GetUsersByCriteria(int? statusId, string? firstName, string? lastName)
+        {
+            var userModel = await _userRepository.GetUsersByCriteria(statusId, firstName, lastName);
+            if (userModel == null) {
                 return null;
             }
 
@@ -75,22 +83,25 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return false;
             }
+
             var userModel = await _userRepository.GetUserById(userId);
             var groupModel = await _userRepository.GetGroupById(groupId);
             if (userModel == null || groupModel == null)
             {
                 return false;
             }
-            var group = await _userRepository.DeleteUserFromGroup(userModel.Id, groupModel.Id);
 
+            var group = await _userRepository.DeleteUserFromGroup(userModel.Id, groupModel.Id);
             if (group == null)
             {
                 return false;
             }
+
             if (group.Users.FirstOrDefault(user => user.Id == userId) == null)
             {
                 return true;
             }
+
             return false;
         }
 
@@ -100,8 +111,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var userModel = await _userRepository.GetUserById(userId);
 
+            var userModel = await _userRepository.GetUserById(userId);
             if (userModel == null)
             {
                 return null;
@@ -116,8 +127,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var userModel = await _userRepository.GetUserByEmail(email);
 
+            var userModel = await _userRepository.GetUserByEmail(email);
             if (userModel == null)
             {
                 return null;
@@ -132,8 +143,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var userModel = await _userRepository.GetUsersByInvestorTier(investorTierId);
 
+            var userModel = await _userRepository.GetUsersByInvestorTier(investorTierId);
             if (userModel == null)
             {
                 return null;
@@ -145,11 +156,11 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<List<UserIdeaModel>> GetAllIdeas()
         {
             var ideas = await _userRepository.GetAllIdeas();
-
             if (ideas == null)
             {
                 return null;
             }
+
             return ideas;
         }
 
@@ -159,15 +170,14 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var user = await _userRepository.GetUserByEmail(email);
 
+            var user = await _userRepository.GetUserByEmail(email);
             if (user != null)
             {
                 return null;
             }
 
             var existingUser = await _userRepository.GetUserById(userId);
-
             if (existingUser == null)
             {
                 return null;
@@ -181,13 +191,12 @@ namespace LML.NPOManagement.Bll.Services
             existingUser.Password = BC.HashPassword(password);
 
             var newUserModel = await _userRepository.ModifyUserCredentials(email, password, userId, existingUser.StatusId.Value);
-
             if (newUserModel == null)
             {
                 return null;
             }
-            newUserModel.Password = null;
 
+            newUserModel.Password = null;
             return newUserModel;
         }
 
@@ -197,15 +206,14 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return false;
             }
-            var user = await _userRepository.ModifyUserInfo(userInformationModel);
 
+            var user = await _userRepository.ModifyUserInfo(userInformationModel);
             return user;
         }
 
         public async Task<UserModel> Login(UserModel userModel, IConfiguration configuration)
         {
             var user = await _userRepository.GetUserByEmail(userModel.Email);
-
             if (user != null && BC.Verify(userModel.Password, user.Password))
             {
                 var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
@@ -213,11 +221,13 @@ namespace LML.NPOManagement.Bll.Services
                 {
                     user.Account2Users = accounts;
                 }
+
                 user.Password = null;
                 user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration, _userRepository);
 
                 return user;
             }
+
             return null;
         }
 
@@ -227,8 +237,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var user = await _userRepository.GetUserByEmail(userModel.Email);
 
+            var user = await _userRepository.GetUserByEmail(userModel.Email);
             if (user == null)
             {
                 userModel.Password = BC.HashPassword(userModel.Password);
@@ -240,6 +250,7 @@ namespace LML.NPOManagement.Bll.Services
 
                 return newUser;
             }
+
             return null;
         }
 
@@ -249,6 +260,7 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
+
             await _userRepository.AddUserInformation(userInformationModel);
             return userInformationModel.Id;
         }
@@ -259,12 +271,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var users = await _userRepository.GetSearchResults(searchParam, includeGroups);
 
+            var users = await _userRepository.GetSearchResults(searchParam, includeGroups);
             if (users == null)
             {
                 return null;
             }
+
             return users;
         }
 
@@ -274,15 +287,16 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
+
             var creatorUser = await _userRepository.GetUserById(usersGroupModel.CreatorId);
             if (creatorUser == null)
             {
                 return null;
             }
+
             usersGroupModel.UserIds.Add(creatorUser.Id);
 
             var usersGroup = await _userRepository.AddGroup(usersGroupModel);
-
             if (usersGroup == null)
             {
                 return null;
@@ -293,7 +307,6 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<List<UsersGroupModel>> GetAllGroups()
         {
             var groupsModel = await _userRepository.GetAllGroups();
-
             if (groupsModel == null)
             {
                 return null;
@@ -308,8 +321,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var groupsModel = await _userRepository.GetGroupsByName(groupName);
 
+            var groupsModel = await _userRepository.GetGroupsByName(groupName);
             if (groupsModel == null)
             {
                 return null;
@@ -324,8 +337,8 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var groupModel = await _userRepository.GetGroupById(groupId);
 
+            var groupModel = await _userRepository.GetGroupById(groupId);
             if (groupModel == null)
             {
                 return null;
@@ -342,7 +355,6 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             var users = await _userRepository.GetUsersByGroupId(groupId);
-
             if (users == null)
             {
                 return null;
@@ -357,12 +369,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var groups = await _userRepository.GetGroupsForUser(userId);
 
+            var groups = await _userRepository.GetGroupsForUser(userId);
             if (groups == null)
             {
                 return null;
             }
+
             return groups;
         }
 
@@ -372,12 +385,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return false;
             }
-            var group = await _userRepository.DeleteGroup(groupId);
 
+            var group = await _userRepository.DeleteGroup(groupId);
             if (!group)
             {
                 return false;
             }
+
             return true;
         }
 
@@ -387,12 +401,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return false;
             }
-            var user = await _userRepository.AddUserToGroup(userId, groupId);
 
+            var user = await _userRepository.AddUserToGroup(userId, groupId);
             if (!user)
             {
                 return false;
             }
+
             return true;
         }
 
@@ -402,12 +417,13 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            var idea = await _userRepository.AddUserIdea(userIdeaModel);
 
+            var idea = await _userRepository.AddUserIdea(userIdeaModel);
             if (idea == null)
             {
                 return null;
             }
+
             return idea;
         }
     }

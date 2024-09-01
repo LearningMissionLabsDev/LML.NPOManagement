@@ -15,6 +15,7 @@ AddGroup,AllAccess,Allowed,Allowed,Allowed,Allowed
 AddUserToGroup,AllAccess,Allowed,Allowed,Allowed,Allowed
 Put,AllAccess,Allowed,Allowed,Allowed,Allowed
 PutUserInfo,AllAccess,Allowed,Allowed,Allowed,Allowed
-DeleteUser,AdminsAndManager,Allowed,Allowed,Allowed,Denied
+DeleteUser,SysAdminOnly,Allowed,Denied,Denied,Denied
 DeleteUserFromGroup,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 DeleteGroup,AdminsAndManager,Allowed,Allowed,Allowed,Denied
+GetUsersFiltered,SysAdminOnly,Allowed,Denied,Denied,Denied

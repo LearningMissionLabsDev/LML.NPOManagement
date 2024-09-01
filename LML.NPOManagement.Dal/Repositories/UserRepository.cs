@@ -9,7 +9,7 @@ namespace LML.NPOManagement.Dal.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        IMapper _mapper;
+        private readonly IMapper _mapper;
         private readonly NpomanagementContext _dbContext;
         public UserRepository(NpomanagementContext context)
         {
@@ -48,6 +48,15 @@ namespace LML.NPOManagement.Dal.Repositories
             if (user.StatusId != (int)status)
             {
                 user.StatusId = (int)status;
+                if(status == StatusEnumModel.Deleted)
+                {
+                    var userInfo = user.UserInformations.Where(info => info.UserId == user.Id).FirstOrDefault();
+                    if (userInfo != null)
+                    {
+                        userInfo.DeletedAt = DateTime.Now;
+                    }
+                }
+
                 await _dbContext.SaveChangesAsync();
                 user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
             }
@@ -68,6 +77,33 @@ namespace LML.NPOManagement.Dal.Repositories
         public async Task<List<UserModel>> GetAllUsers()
         {
             var users = await _dbContext.Users.Include(usInfo => usInfo.UserInformations).ToListAsync();
+            if (!users.Any())
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UserModel>>(users);
+        }
+
+        public async Task<List<UserModel>> GetUsersByCriteria(int? statusId, string? firstName, string? lastName)
+        {
+            var query = _dbContext.Users.Include(usInfo => usInfo.UserInformations).AsQueryable();
+            if (statusId.HasValue)
+            {
+                query = query.Where(u => u.StatusId == statusId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                query = query.Where(u => u.UserInformations.Any(ui => ui.FirstName.Contains(firstName)));
+            }
+
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                query = query.Where(u => u.UserInformations.Any(ui => ui.LastName.Contains(lastName)));
+            }
+
+            var users = await query.ToListAsync();
             if (!users.Any())
             {
                 return null;
@@ -264,10 +300,10 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var usersGroup = _mapper.Map<UsersGroupModel, UsersGroup>(usersGroupModel);
 
             var users = await _dbContext.Users.Where(u => usersGroupModel.UserIds.Contains(u.Id)).ToListAsync();
-
             if (users.Any())
             {
                 foreach (var user in users)
@@ -347,6 +383,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var groups = await _dbContext.UsersGroups.Where(group => group.GroupName.Contains(groupName)).ToListAsync();
             if (!groups.Any())
             {
@@ -362,8 +399,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var group = await _dbContext.UsersGroups.Where(group => group.Id == groupId).FirstOrDefaultAsync();
 
+            var group = await _dbContext.UsersGroups.Where(group => group.Id == groupId).FirstOrDefaultAsync();
             if (group == null)
             {
                 return null;
@@ -394,6 +431,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var user = await _dbContext.Users.Include(g => g.Groups).Where(g => g.Id == userId).FirstOrDefaultAsync();
             if (user == null || !user.Groups.Any())
             {
@@ -477,8 +515,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).Include(acc => acc.Account).ToListAsync();
 
+            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).Include(acc => acc.Account).ToListAsync();
             if (account2user == null || !account2user.Any())
             {
                 return null;

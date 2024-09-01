@@ -970,7 +970,7 @@ namespace TestProject.BLL.Test
         public async Task ActivationUser_WhenTokenIsValidButUserValidationFails_ReturnsNull()
         {
             #region Arrange
-            var userService = new UserService(null, null);
+            var userService = new UserService(null);
             var configurationMock = GetConfigurationMock("MER DEM XAX CHKA", 20);
             var userToAdd = new UserModel() { Id = 1, Email = "test@example.com", StatusId = (int)StatusEnumModel.Pending };
             string token = TokenCreationHelper.GenerateJwtToken(userToAdd, configurationMock.Object, null);
@@ -1512,7 +1512,7 @@ namespace TestProject.BLL.Test
         {
             #region Arrange
             var userRepositoryMock = new Mock<IUserRepository>();
-            var userService = new UserService(userRepositoryMock.Object, null);
+            var userService = new UserService(userRepositoryMock.Object);
             var userId = 1;
             var email = "newemail@example.com";
             var password = "newPassword";
@@ -1656,7 +1656,7 @@ namespace TestProject.BLL.Test
 
         private static UserService GetUserService(Mock<IUserRepository> mockedUserRepo)
         {
-            return new UserService(mockedUserRepo.Object, null);
+            return new UserService(mockedUserRepo.Object);
         }
 
         private static Mock<IUserRepository> GetUserRepository()

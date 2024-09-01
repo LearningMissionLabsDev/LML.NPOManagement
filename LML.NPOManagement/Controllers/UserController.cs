@@ -46,7 +46,6 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
         {
             var users = await _userService.GetAllUsers();
-
             if (users == null)
             {
                 return NotFound();
@@ -72,9 +71,53 @@ namespace LML.NPOManagement.Controllers
                         RequestedUserRoleId = userInfo.RequestedUserRoleId,
                         CreateDate = userInfo.CreateDate,
                         UpdateDate = userInfo.UpdateDate,
+                        DeletedAt = userInfo.DeletedAt
                     });
                 }
             }
+
+            return Ok(userCredentialResponse);
+        }
+
+        [HttpGet("filter")]
+        [Authorize(RoleAccess.SysAdminOnly)]
+        public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsersFiltered(
+           [FromQuery] int? statusId,
+           [FromQuery] string? firstName,
+           [FromQuery] string? lastName)
+        {
+            var users = await _userService.GetUsersByCriteria(statusId, firstName, lastName);
+            if (users == null || !users.Any())
+            {
+                return NotFound("Users By This Criteria Not Found");
+            }
+
+            var userCredentialResponse = new List<UserCredentialResponse>();
+            foreach (var user in users)
+            {
+                var userInfo = user.UserInformations.FirstOrDefault();
+                if (userInfo != null)
+                {
+                    userCredentialResponse.Add(new UserCredentialResponse()
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        StatusId = user.StatusId,
+                        FirstName = userInfo.FirstName,
+                        LastName = userInfo.LastName,
+                        PhoneNumber = userInfo.PhoneNumber,
+                        DateOfBirth = userInfo.DateOfBirth,
+                        MiddleName = userInfo.MiddleName,
+                        Gender = userInfo.Gender,
+                        RequestedUserRoleId = userInfo.RequestedUserRoleId,
+                        CreateDate = userInfo.CreateDate,
+                        UpdateDate = userInfo.UpdateDate,
+                        UserImage = userInfo.UserImage,
+                        DeletedAt = userInfo.DeletedAt
+                    });
+                }
+            }
+
             return Ok(userCredentialResponse);
         }
 
@@ -305,7 +348,6 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-
         [HttpGet("verifyEmail")]
         public async Task<ActionResult> VerifyEmail([FromQuery] string token)
         {
@@ -333,7 +375,6 @@ namespace LML.NPOManagement.Controllers
             if (user != null)
             {
                 user.Token = null;
-
                 return Ok();
             }
 
@@ -531,8 +572,8 @@ namespace LML.NPOManagement.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("{userID}")]
-        [Authorize(RoleAccess.AdminsAndManager)]
+        [HttpDelete("{userId}")]
+        [Authorize(RoleAccess.SysAdminOnly)]
         public async Task<ActionResult> DeleteUser(int userId)
         {
             if (userId <= 0)

@@ -9,8 +9,8 @@ namespace LML.NPOManagement.Dal.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        IMapper _mapper;
-        NpomanagementContext _dbContext;
+        private readonly IMapper _mapper;
+        private readonly NpomanagementContext _dbContext;
         
         public AccountRepository(NpomanagementContext context)
         {
@@ -47,11 +47,11 @@ namespace LML.NPOManagement.Dal.Repositories
         public async Task<List<AccountModel>> GetAllAccounts()
         {
             var accounts = await _dbContext.Accounts.ToListAsync();
-
             if (accounts.Count < 1)
             {
                 return null;
             }
+
             var accountsModel = new List<AccountModel>();
             foreach (var account in accounts)
             {
@@ -69,6 +69,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 };
                 accountsModel.Add(accountModel);
             }
+
             return accountsModel;
         }
 
@@ -92,7 +93,6 @@ namespace LML.NPOManagement.Dal.Repositories
             }
           
             var usersInformationModel = new List<UserInformationModel>();
-
             foreach (var user in users)
             {
                 var userInformation = user.UserInformations.FirstOrDefault();
@@ -105,7 +105,8 @@ namespace LML.NPOManagement.Dal.Repositories
                     UserImage = userInformation.UserImage
                 };
                 usersInformationModel.Add(userInfo);
-            }           
+            }
+
             return usersInformationModel;
         }
 
@@ -129,7 +130,6 @@ namespace LML.NPOManagement.Dal.Repositories
             }
 
             var accountModel = new List<AccountModel>();
-
             foreach (var account in accounts)
             {
                 var accountInfo = new AccountModel
@@ -141,6 +141,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 };
                 accountModel.Add(accountInfo);
             }
+
             return accountModel;
         }
 
@@ -194,6 +195,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 UserId = newAccount.CreatorId,
                 AccountRoleId = (int)UserAccountRoleEnum.Admin
             };
+
             newAccount.Account2Users.Add(creatorUser);
             await _dbContext.SaveChangesAsync();
 
@@ -218,6 +220,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             account.Name = accountModel.Name;
             account.IsVisible = accountModel.IsVisible;
             account.MaxCapacity = accountModel.MaxCapacity;
@@ -226,7 +229,6 @@ namespace LML.NPOManagement.Dal.Repositories
             account.StatusId = accountModel.StatusId;
 
             await _dbContext.SaveChangesAsync();
-
             return _mapper.Map<AccountModel>(account);
         }
 
@@ -272,6 +274,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             return _mapper.Map<List<AccountModel>>(accounts);
         }
 
@@ -303,6 +306,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
                 return true;
             }
+
             return false;
         }
 
@@ -326,7 +330,6 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.SaveChangesAsync();
 
             var account = await _dbContext.Accounts.Include(u => u.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
-
             var newAccountModel = new AccountModel
             {
                 Id = account.Id,
@@ -339,6 +342,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 OnboardingLink = account.OnboardingLink,
                 Description = account.Description
             };
+
             return newAccountModel;
         }
 

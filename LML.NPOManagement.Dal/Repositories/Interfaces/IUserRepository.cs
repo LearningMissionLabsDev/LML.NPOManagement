@@ -6,6 +6,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
     public interface IUserRepository
     {
         Task<List<UserModel>> GetAllUsers();
+        Task<List<UserModel>> GetUsersByCriteria(int? statusId, string? firstName, string? lastName);
         Task<List<UserModel>> GetUsersByInvestorTier(int userId);
         Task<UserModel> GetUserById(int userId);
         Task<List<UserIdeaModel>> GetAllIdeas();

@@ -42,8 +42,8 @@ namespace LML.NPOManagement.Controllers
             {
                 return NotFound();
             }
-            var accountResponses = new List<AccountResponse>();
 
+            var accountResponses = new List<AccountResponse>();
             foreach (var account in accounts)
             {
                 var newAccountResponse = new AccountResponse()
@@ -60,6 +60,7 @@ namespace LML.NPOManagement.Controllers
                 };
                 accountResponses.Add(newAccountResponse);
             }
+
             return Ok(accountResponses);
         }
 
@@ -247,7 +248,6 @@ namespace LML.NPOManagement.Controllers
         {
             var user = HttpContext.Items["User"] as UserModel;
             var account2user = HttpContext.Items["Account"] as Account2UserModel;
-
             if (user == null)
             {
                 return Unauthorized("User not logged in!");

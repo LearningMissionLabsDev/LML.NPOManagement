@@ -2,12 +2,12 @@
 using LML.NPOManagement.Common.Model;
 using Microsoft.Extensions.Configuration;
 
-
 namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IUserService
     {
         Task<List<UserModel>> GetAllUsers();
+        Task<List<UserModel>> GetUsersByCriteria(int? statusId, string? firstName, string? lastName);
         Task<List<UserModel>> GetUsersByInvestorTier(int id);
         Task<UserModel> GetUserById(int userId);
         Task<UserModel> GetUserByEmail(string email);
