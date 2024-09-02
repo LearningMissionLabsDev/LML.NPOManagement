@@ -8,7 +8,6 @@ using System.Text;
 using LML.NPOManagement.Bll.Services;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using LML.NPOManagement.Controllers;
 
 namespace LML.ApiSpecGenerator
 {
@@ -40,7 +39,7 @@ namespace LML.ApiSpecGenerator
 
     public class AuthorizationHeaderRolesTestUtils
     {
-        private readonly string BASE_DIRECTORY = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+        private readonly string? BASE_DIRECTORY = Directory.GetParent(Environment.CurrentDirectory)?.Parent?.Parent?.FullName;
 
         private readonly List<TestedMethod> testingMethodsDetails = new();
 
@@ -56,16 +55,12 @@ namespace LML.ApiSpecGenerator
             CreateDirectory();
             string filePathToReadDetails = Path.Combine(BASE_DIRECTORY + "/ApiSpecification/", typeof(T).Name + ".csv");
             string filePathToWriteResults = Path.Combine(BASE_DIRECTORY + "/Output/", typeof(T).Name + "Results.csv");
-            //if (true)
-            //{
-            //    var testingMethods = InspectControllerAuthorization<T>();
-            //    WriteMethodDetailsInFile(filePathToReadDetails, testingMethods);
-            //}
+
             var testAuthorizationRoles = TestAuthorizationRoles(filePathToReadDetails, filePathToWriteResults);
             return testAuthorizationRoles;
         }
 
-        private List<MethodToTest> InspectControllerAuthorization<T>()
+        private static List<MethodToTest> InspectControllerAuthorization<T>()
         {
             var controllerType = typeof(T);
             var methods = controllerType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
@@ -132,7 +127,7 @@ namespace LML.ApiSpecGenerator
             return context.Result is JsonResult jsonResult && !(jsonResult.Value.ToString().ToLower().Contains("denied"));
         }
 
-        private AuthorizationFilterContext SysAdminAuthorize(int role)
+        private static AuthorizationFilterContext SysAdminAuthorize(int role)
         {
             var user = new UserModel();
             var attribute = new AuthorizeAttribute(role);
@@ -143,7 +138,7 @@ namespace LML.ApiSpecGenerator
             return context;
         }
 
-        private AuthorizationFilterContext AdminAuthorize(int role)
+        private static AuthorizationFilterContext AdminAuthorize(int role)
         {
             var user = new UserModel();
             var attribute = new AuthorizeAttribute(role);
@@ -154,7 +149,7 @@ namespace LML.ApiSpecGenerator
             return context;
         }
 
-        private AuthorizationFilterContext AccountManagerAuthorize(int role)
+        private static AuthorizationFilterContext AccountManagerAuthorize(int role)
         {
             var user = new UserModel();
             var attribute = new AuthorizeAttribute(role);
@@ -165,7 +160,7 @@ namespace LML.ApiSpecGenerator
             return context;
         }
 
-        private AuthorizationFilterContext BeneficiaryAuthorize(int role)
+        private static AuthorizationFilterContext BeneficiaryAuthorize(int role)
         {
             var user = new UserModel();
             var attribute = new AuthorizeAttribute(role);
@@ -176,7 +171,7 @@ namespace LML.ApiSpecGenerator
             return context;
         }
 
-        private AuthorizationFilterContext GetMockedContext(UserModel user, Account2UserModel account)
+        private static AuthorizationFilterContext GetMockedContext(UserModel user, Account2UserModel account)
         {
             var httpContext = new DefaultHttpContext();
             httpContext.Items["User"] = user;
@@ -195,7 +190,7 @@ namespace LML.ApiSpecGenerator
             var methodsList = new List<MethodToTest>();
             using (var reader = new StreamReader(filePath, Encoding.UTF8))
             {
-                string headerLine = reader.ReadLine();
+                reader.ReadLine();
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -290,7 +285,15 @@ namespace LML.ApiSpecGenerator
 
             if (field != null && field.FieldType == typeof(int))
             {
-                return (int)field.GetValue(null);
+                var value = field.GetValue(null);
+                if (value != null)
+                {
+                    return (int)value;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The value of constant '{constantName}' is null in {nameof(RoleAccess)}");
+                }
             }
             else
             {
@@ -347,9 +350,38 @@ namespace LML.ApiSpecGenerator
 
         public static void Main(string[] args)
         {
-            // Example Of Testing Authorization Header Of AccountController
-            //var a = new AuthorizationHeaderRolesTestUtils();
-            //a.TestControllerAuthorizationRoles<AccountController>();
+            /*
+                // Example of Testing Authorization Header in AccountController
+
+                // Create an instance of the test utility class to handle authorization header roles.
+                var exampleUtils = new AuthorizationHeaderRolesTestUtils();
+
+                // Check if all necessary files (e.g., roles, function names) have been provided by the product manager.
+                var isProvided = exampleUtils.IsProvided<AccountController>(); 
+
+                // If the necessary files have been provided, test the authorization roles for the specified controller type.
+                if (isProvided)
+                {
+                    exampleUtils.TestControllerAuthorizationRoles<AccountController>();
+                }
+                    
+                If you want to generate a specification file based on the code, follow this example:
+
+                // Example usage:
+                // Uncomment the code below if you want to inspect the authorization of the controller
+                // and write the details to a specification file.
+
+                var exampleUtils = new AuthorizationHeaderRolesTestUtils();
+
+                // Inspect the controller's authorization methods. Replace <T> with your specific controller type.
+                var testingMethods = InspectControllerAuthorization<T>();  
+
+                // Define the path where the specification file will be written.
+                string filePathToWriteSpecifications = Path.Combine(exampleUtils.BASE_DIRECTORY + "/ApiSpecification/", typeof(T).Name + ".csv");
+
+                // Write the method details to the specified file.
+                exampleUtils.WriteMethodDetailsInFile(filePathToWriteSpecifications, testingMethods);
+            */
         }
     }
 }

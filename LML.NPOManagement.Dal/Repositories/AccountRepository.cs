@@ -9,8 +9,8 @@ namespace LML.NPOManagement.Dal.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        IMapper _mapper;
-        NpomanagementContext _dbContext;
+        private readonly IMapper _mapper;
+        private readonly NpomanagementContext _dbContext;
         
         public AccountRepository(NpomanagementContext context)
         {
@@ -47,11 +47,11 @@ namespace LML.NPOManagement.Dal.Repositories
         public async Task<List<AccountModel>> GetAllAccounts()
         {
             var accounts = await _dbContext.Accounts.ToListAsync();
-
             if (accounts.Count < 1)
             {
                 return null;
             }
+
             var accountsModel = new List<AccountModel>();
             foreach (var account in accounts)
             {
@@ -66,10 +66,30 @@ namespace LML.NPOManagement.Dal.Repositories
                     IsVisible = account.IsVisible,
                     OnboardingLink = account.OnboardingLink,
                     Description = account.Description,
+                    AccountImage = account.AccountImage,
+                    DeletedAt = account.DeletedAt
                 };
                 accountsModel.Add(accountModel);
             }
+
             return accountsModel;
+        }
+
+        public async Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds)
+        {
+            var query = _dbContext.Accounts.AsQueryable();
+            if (statusIds != null && statusIds.Any())
+            {
+                query = query.Where(u => statusIds.Contains(u.StatusId));
+            }
+
+            var accounts = await query.ToListAsync();
+            if (!accounts.Any())
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<AccountModel>>(accounts);
         }
 
         public async Task<List<UserInformationModel>> GetUsersByAccount(int accountId)
@@ -92,7 +112,6 @@ namespace LML.NPOManagement.Dal.Repositories
             }
           
             var usersInformationModel = new List<UserInformationModel>();
-
             foreach (var user in users)
             {
                 var userInformation = user.UserInformations.FirstOrDefault();
@@ -105,7 +124,8 @@ namespace LML.NPOManagement.Dal.Repositories
                     UserImage = userInformation.UserImage
                 };
                 usersInformationModel.Add(userInfo);
-            }           
+            }
+
             return usersInformationModel;
         }
 
@@ -129,7 +149,6 @@ namespace LML.NPOManagement.Dal.Repositories
             }
 
             var accountModel = new List<AccountModel>();
-
             foreach (var account in accounts)
             {
                 var accountInfo = new AccountModel
@@ -141,6 +160,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 };
                 accountModel.Add(accountInfo);
             }
+
             return accountModel;
         }
 
@@ -163,8 +183,10 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var account = new Account()
             {
+                Id = accountModel.Id,
                 IsVisible = accountModel.IsVisible,
                 StatusId = accountModel.StatusId,
                 CreatorId = accountModel.CreatorId,
@@ -177,7 +199,11 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
 
-            var newAccount = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).Where(acc => acc.Id == account.Id).FirstOrDefaultAsync();
+            var newAccount = await _dbContext.Accounts
+                    .Include(acc2us => acc2us.Account2Users)
+                    .Where(acc => acc.Id == account.Id)
+                    .FirstOrDefaultAsync();
+
             if (newAccount == null)
             {
                 return null;
@@ -188,6 +214,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 UserId = newAccount.CreatorId,
                 AccountRoleId = (int)UserAccountRoleEnum.Admin
             };
+
             newAccount.Account2Users.Add(creatorUser);
             await _dbContext.SaveChangesAsync();
 
@@ -212,6 +239,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             account.Name = accountModel.Name;
             account.IsVisible = accountModel.IsVisible;
             account.MaxCapacity = accountModel.MaxCapacity;
@@ -220,7 +248,6 @@ namespace LML.NPOManagement.Dal.Repositories
             account.StatusId = accountModel.StatusId;
 
             await _dbContext.SaveChangesAsync();
-
             return _mapper.Map<AccountModel>(account);
         }
 
@@ -231,7 +258,11 @@ namespace LML.NPOManagement.Dal.Repositories
                 return false;
             }
 
-            var account = await _dbContext.Accounts.Include(us => us.Account2Users).ThenInclude(acc => acc.AccountUserActivities).FirstOrDefaultAsync(acc => acc.Id == accountId);
+            var account = await _dbContext.Accounts
+                .Include(us => us.Account2Users)
+                .ThenInclude(acc => acc.AccountUserActivities)
+                .FirstOrDefaultAsync(acc => acc.Id == accountId);
+
             if (account == null)
             {
                 return false;
@@ -245,6 +276,7 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.SaveChangesAsync();
 
             account.StatusId = (int)AccountStatusEnum.Deleted;
+            account.DeletedAt = DateTime.Now;
             await _dbContext.SaveChangesAsync();
 
             return true;
@@ -262,6 +294,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             return _mapper.Map<List<AccountModel>>(accounts);
         }
 
@@ -293,6 +326,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
                 return true;
             }
+
             return false;
         }
 
@@ -316,7 +350,6 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.SaveChangesAsync();
 
             var account = await _dbContext.Accounts.Include(u => u.Account2Users).ThenInclude(u => u.User).FirstOrDefaultAsync(acc => acc.Id == accountId);
-
             var newAccountModel = new AccountModel
             {
                 Id = account.Id,
@@ -329,6 +362,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 OnboardingLink = account.OnboardingLink,
                 Description = account.Description
             };
+
             return newAccountModel;
         }
 

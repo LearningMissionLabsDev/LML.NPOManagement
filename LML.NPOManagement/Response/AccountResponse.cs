@@ -16,6 +16,7 @@ namespace LML.NPOManagement.Response
         public string? AccountImage { get; set; }
         public string? Description { get; set; }
         public DateTime DateCreated { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public int? AccountRoleId { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace LML.NPOManagement.Response
         public DateTime DateOfBirth { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
+        public DateTime? DeletedAt { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public Gender Gender { get; set; }
         public string? Metadata { get; set; }

@@ -2,18 +2,20 @@
 using LML.NPOManagement.Common.Model;
 using Microsoft.Extensions.Configuration;
 
-
 namespace LML.NPOManagement.Bll.Interfaces
 {
     public interface IUserService
     {
         Task<List<UserModel>> GetAllUsers();
+        Task<List<UserModel>> GetUsersByCriteria(List<int>? statusIds);
         Task<List<UserModel>> GetUsersByInvestorTier(int id);
         Task<UserModel> GetUserById(int userId);
         Task<UserModel> GetUserByEmail(string email);
         Task<List<UserIdeaModel>> GetAllIdeas();
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId);
+        Task<UserModel> ModifyUserEmail(string email, string password, int userId);
+        Task<bool> ModifyUserPassword(string oldPassword, string newPassword, int userId);
         Task<bool> ModifyUserInfo(UserCredential userInformationModel);
         Task<UserModel> DeleteUser(int userId);
         Task<bool> DeleteUserFromGroup(int userId, int groupId);

@@ -1,12 +1,15 @@
 ﻿Method Name,Role Access,System Admin,Account Admin,Account Manager,Beneficiary
 GetAccounts,AccountAdmin,Allowed,Allowed,Denied,Denied
+GetAccountsByStatus,SysAdminOnly,Allowed,Denied,Denied,Denied
 GetAccountRoleProgress,AccountAdmin,Allowed,Allowed,Denied,Denied
 GetAccountById,AllAccess,Allowed,Allowed,Allowed,Allowed
 GetUsersByAccount,AllAccess,Allowed,Allowed,Allowed,Allowed
 GetAccountsByName,SysAdminOnly,Allowed,Denied,Denied,Denied
+Login,AllAccess,Allowed,Allowed,Allowed,Allowed
 AddAccount,SysAdminOnly,Allowed,Denied,Denied,Denied
 AddAccountUserActivityProgress,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 AddUserToAccount,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 ModifyAccount,AccountAdmin,Allowed,Allowed,Denied,Denied
 RemoveUserFromAccount,AdminsAndManager,Allowed,Allowed,Allowed,Denied
 DeleteAccount,AccountAdmin,Allowed,Allowed,Denied,Denied
+DeleteAccountById,SysAdminOnly,Allowed,Denied,Denied,Denied

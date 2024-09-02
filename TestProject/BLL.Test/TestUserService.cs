@@ -970,7 +970,7 @@ namespace TestProject.BLL.Test
         public async Task ActivationUser_WhenTokenIsValidButUserValidationFails_ReturnsNull()
         {
             #region Arrange
-            var userService = new UserService(null, null);
+            var userService = new UserService(null);
             var configurationMock = GetConfigurationMock("MER DEM XAX CHKA", 20);
             var userToAdd = new UserModel() { Id = 1, Email = "test@example.com", StatusId = (int)StatusEnumModel.Pending };
             string token = TokenCreationHelper.GenerateJwtToken(userToAdd, configurationMock.Object, null);
@@ -1302,7 +1302,7 @@ namespace TestProject.BLL.Test
 
             #region Assert
             Assert.IsNotNull(result, "The result should not be null.");
-            Assert.AreEqual(userInformation.Id, result, "The returned user information ID should match the provided user information ID.");
+            Assert.AreEqual(userInformation.UserId, result, "The returned user information ID should match the provided user information ID.");
             #endregion
         }
 
@@ -1512,7 +1512,7 @@ namespace TestProject.BLL.Test
         {
             #region Arrange
             var userRepositoryMock = new Mock<IUserRepository>();
-            var userService = new UserService(userRepositoryMock.Object, null);
+            var userService = new UserService(userRepositoryMock.Object);
             var userId = 1;
             var email = "newemail@example.com";
             var password = "newPassword";
@@ -1530,27 +1530,6 @@ namespace TestProject.BLL.Test
         }
 
 
-
-        //[TestMethod]
-        //public async Task ModifyUserInfo_WhenUserInfoIsValid_ReturnsTrue()
-        //{
-        //    #region Arrange
-        //    var userRepositoryMock = GetUserRepository();
-        //    var userService = GetUserService(userRepositoryMock);
-
-        //    var userInformationModel = new UserInformationModel { Id = 1, UserId = 1 };
-
-        //    userRepositoryMock.Setup(repo => repo.ModifyUserInfo(userInformationModel)).ReturnsAsync(true);
-        //    #endregion
-
-        //    #region Act
-        //    var result = await userService.ModifyUserInfo(userInformationModel);
-        //    #endregion
-
-        //    #region Assert
-        //    Assert.IsTrue(result, "Modifying user information with a valid model should return true.");
-        //    #endregion
-        //}
 
         [TestMethod]
         public async Task ModifyUserInfo_WithNullModel_ReturnsFalse()
@@ -1675,17 +1654,17 @@ namespace TestProject.BLL.Test
 
 
 
-        private UserService GetUserService(Mock<IUserRepository> mockedUserRepo)
+        private static UserService GetUserService(Mock<IUserRepository> mockedUserRepo)
         {
-            return new UserService(mockedUserRepo.Object, null);
+            return new UserService(mockedUserRepo.Object);
         }
 
-        private Mock<IUserRepository> GetUserRepository()
+        private static Mock<IUserRepository> GetUserRepository()
         {
             return new Mock<IUserRepository>();
         }
 
-        private Mock<IConfiguration> GetConfigurationMock(string secretKey, int tokenExpiration)
+        private static Mock<IConfiguration> GetConfigurationMock(string secretKey, int tokenExpiration)
         {
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x.GetSection("AppSettings:SecretKey").Value).Returns(secretKey);

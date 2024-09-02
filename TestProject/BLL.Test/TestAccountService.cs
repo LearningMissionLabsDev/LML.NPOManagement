@@ -87,66 +87,66 @@ namespace TestProject.BLL.Test
 
 
 
-        //[TestMethod]
-        //public async Task GetUsersByAccount_WhenInAccountWithAccountIdExistsUsers_ReturnsUsers()
-        //{
-        //    // Arrange
-        //    var accountRepositoryMock = GetAccountRepository();
-        //    var accountService = GetAccountService(accountRepositoryMock);
+        [TestMethod]
+        public async Task GetUsersByAccount_WhenInAccountWithAccountIdExistsUsers_ReturnsUsers()
+        {
+            // Arrange
+            var accountRepositoryMock = GetAccountRepository();
+            var accountService = GetAccountService(accountRepositoryMock);
 
-        //    int validAccountId = 1;
+            int validAccountId = 1;
 
-        //    var users = new List<UserModel> {
-        //        new UserModel { Id = 1, Email = "Testemail1@gmail.com" },
-        //        new UserModel { Id = 2, Email = "Testemail2@gmail.com" }
-        //    };
+            var users = new List<UserInformationModel> {
+                new UserInformationModel { Id = 1, FirstName = "First Name" },
+                new UserInformationModel { Id = 2, FirstName = "First Name2" }
+            };
 
-        //    accountRepositoryMock.Setup(repo => repo.GetAccountById(validAccountId)).ReturnsAsync(new AccountModel());
-        //    accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(validAccountId)).ReturnsAsync(users);
+            accountRepositoryMock.Setup(repo => repo.GetAccountById(validAccountId)).ReturnsAsync(new AccountModel());
+            accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(validAccountId)).ReturnsAsync(users);
 
-        //    // Act
-        //    var usersOfAccountWithValidId = await accountService.GetUsersByAccount(validAccountId);
+            // Act
+            var usersOfAccountWithValidId = await accountService.GetUsersByAccount(validAccountId);
 
-        //    // Assert
-        //    Assert.IsTrue(usersOfAccountWithValidId.SequenceEqual(users));
-        //}
+            // Assert
+            Assert.IsTrue(usersOfAccountWithValidId.SequenceEqual(users));
+        }
 
-        //[TestMethod]
-        //public async Task GetUsersByAccount_WhenAccountWithAccountIdIsNotExist_ReturnsNull()
-        //{
-        //    // Arrange
-        //    var accountRepositoryMock = GetAccountRepository();
-        //    var accountService = GetAccountService(accountRepositoryMock);
+        [TestMethod]
+        public async Task GetUsersByAccount_WhenAccountWithAccountIdIsNotExist_ReturnsNull()
+        {
+            // Arrange
+            var accountRepositoryMock = GetAccountRepository();
+            var accountService = GetAccountService(accountRepositoryMock);
 
-        //    int nonExistingAccountId = 1;
+            int nonExistingAccountId = 1;
 
-        //    accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(nonExistingAccountId)).ReturnsAsync((List<UserModel>)null);
+            accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(nonExistingAccountId)).ReturnsAsync((List<UserInformationModel>)null);
 
-        //    // Act
-        //    var usersOfNonExistingAccount = await accountService.GetUsersByAccount(nonExistingAccountId);
+            // Act
+            var usersOfNonExistingAccount = await accountService.GetUsersByAccount(nonExistingAccountId);
 
-        //    // Assert
-        //    Assert.IsNull(usersOfNonExistingAccount);
-        //}
+            // Assert
+            Assert.IsNull(usersOfNonExistingAccount);
+        }
 
-        //[TestMethod] 
-        //public async Task GetUsersByAccount_WhenThereAreNotUsersInRequestedAccount_ReturnsNull()
-        //{
-        //    // Arrange
-        //    var accountRepositoryMock = GetAccountRepository();
-        //    var accountService = GetAccountService(accountRepositoryMock);
+        [TestMethod]
+        public async Task GetUsersByAccount_WhenThereAreNotUsersInRequestedAccount_ReturnsNull()
+        {
+            // Arrange
+            var accountRepositoryMock = GetAccountRepository();
+            var accountService = GetAccountService(accountRepositoryMock);
 
-        //    int requestedAccountId = 1;
+            int requestedAccountId = 1;
 
-        //    accountRepositoryMock.Setup(repo => repo.GetAccountById(requestedAccountId)).ReturnsAsync(new AccountModel());
-        //    accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(requestedAccountId)).ReturnsAsync((List<UserModel>)null);
+            accountRepositoryMock.Setup(repo => repo.GetAccountById(requestedAccountId)).ReturnsAsync(new AccountModel());
+            accountRepositoryMock.Setup(repo => repo.GetUsersByAccount(requestedAccountId)).ReturnsAsync((List<UserInformationModel>)null);
 
-        //    // Act
-        //    var usersOfUsersAbsentAccount = await accountService.GetUsersByAccount(requestedAccountId);
+            // Act
+            var usersOfUsersAbsentAccount = await accountService.GetUsersByAccount(requestedAccountId);
 
-        //    // Assert
-        //    Assert.IsNull(usersOfUsersAbsentAccount, "Expected null when there are not users in requested account.");
-        //}
+            // Assert
+            Assert.IsNull(usersOfUsersAbsentAccount, "Expected null when there are not users in requested account.");
+        }
 
         [TestMethod]
         public async Task GetUsersByAccount_WhenAccountIdIsNotPositive_ReturnsNull()

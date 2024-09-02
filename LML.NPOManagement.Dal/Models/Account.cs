@@ -31,6 +31,8 @@ public partial class Account
 
     public string? Description { get; set; }
 
+    public DateTime? DeletedAt { get; set; }
+
     public virtual ICollection<Account2User> Account2Users { get; } = new List<Account2User>();
 
     public virtual User Creator { get; set; } = null!;

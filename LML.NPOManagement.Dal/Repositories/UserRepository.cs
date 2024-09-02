@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentEmail.Core;
+using Grpc.Core;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
@@ -10,8 +11,9 @@ namespace LML.NPOManagement.Dal.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        IMapper _mapper;
+        private readonly IMapper _mapper;
         private readonly NpomanagementContext _dbContext;
+
         public UserRepository(NpomanagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
@@ -49,6 +51,15 @@ namespace LML.NPOManagement.Dal.Repositories
             if (user.StatusId != (int)status)
             {
                 user.StatusId = (int)status;
+                if(status == StatusEnumModel.Deleted)
+                {
+                    var userInfo = user.UserInformations.Where(info => info.UserId == user.Id).FirstOrDefault();
+                    if (userInfo != null)
+                    {
+                        userInfo.DeletedAt = DateTime.Now;
+                    }
+                }
+
                 await _dbContext.SaveChangesAsync();
                 user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
             }
@@ -69,6 +80,23 @@ namespace LML.NPOManagement.Dal.Repositories
         public async Task<List<UserModel>> GetAllUsers()
         {
             var users = await _dbContext.Users.Include(usInfo => usInfo.UserInformations).ToListAsync();
+            if (!users.Any())
+            {
+                return null;
+            }
+
+            return _mapper.Map<List<UserModel>>(users);
+        }
+
+        public async Task<List<UserModel>> GetUsersByCriteria(List<int>? statusIds)
+        {
+            var query = _dbContext.Users.Include(usInfo => usInfo.UserInformations).AsQueryable();
+            if (statusIds != null && statusIds.Any())
+            {
+                query = query.Where(u => statusIds.Contains(u.StatusId));
+            }
+
+            var users = await query.ToListAsync();
             if (!users.Any())
             {
                 return null;
@@ -123,6 +151,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 };
                 models.Add(model);
             }
+
             return models;
         }
 
@@ -173,6 +202,46 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<UserModel>(user);
         }
 
+        public async Task<UserModel> ModifyUserEmail(string email, string password, int userId, int statusId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Email = email;
+            //user.StatusId = statusId;
+
+            await _dbContext.SaveChangesAsync();
+
+            return _mapper.Map<UserModel>(user);
+        }
+
+        public async Task<bool> ModifyUserPassword(string newPassword, int userId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(newPassword))
+            {
+                return false;
+            }
+
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Password = newPassword;
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> ModifyUserInfo(UserCredential userCredential)
         {
             if (userCredential == null)
@@ -186,7 +255,6 @@ namespace LML.NPOManagement.Dal.Repositories
                 return false;
             }
 
-            user.Email = userCredential.Email;
             userInfo.FirstName = userCredential.FirstName;
             user.StatusId = userCredential.StatusId;
             userInfo.LastName = userCredential.LastName;
@@ -225,6 +293,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var users = await _dbContext.UserInformations
                 .Where(u => u.FirstName.Contains(searchParam) || u.LastName.Contains(searchParam))
                 .ToListAsync();
@@ -263,10 +332,10 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var usersGroup = _mapper.Map<UsersGroupModel, UsersGroup>(usersGroupModel);
 
             var users = await _dbContext.Users.Where(u => usersGroupModel.UserIds.Contains(u.Id)).ToListAsync();
-
             if (users.Any())
             {
                 foreach (var user in users)
@@ -346,6 +415,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var groups = await _dbContext.UsersGroups.Where(group => group.GroupName.Contains(groupName)).ToListAsync();
             if (!groups.Any())
             {
@@ -361,8 +431,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var group = await _dbContext.UsersGroups.Where(group => group.Id == groupId).FirstOrDefaultAsync();
 
+            var group = await _dbContext.UsersGroups.Where(group => group.Id == groupId).FirstOrDefaultAsync();
             if (group == null)
             {
                 return null;
@@ -393,6 +463,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
+
             var user = await _dbContext.Users.Include(g => g.Groups).Where(g => g.Id == userId).FirstOrDefaultAsync();
             if (user == null || !user.Groups.Any())
             {
@@ -476,8 +547,8 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).Include(acc => acc.Account).ToListAsync();
 
+            var account2user = await _dbContext.Account2Users.Where(us => us.UserId == userId).Include(acc => acc.Account).ToListAsync();
             if (account2user == null || !account2user.Any())
             {
                 return null;

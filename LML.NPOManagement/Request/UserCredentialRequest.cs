@@ -6,7 +6,6 @@ namespace LML.NPOManagement.Request
     {
         public int Id { get; set; }
         public int StatusId { get; set; }
-        public string Email { get; set; } = null!;
         public string? Password { get; set; }
         public int RequestedUserRoleId { get; set; }
         public string FirstName { get; set; } = null!;
