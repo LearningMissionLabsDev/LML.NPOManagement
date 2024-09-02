@@ -535,6 +535,51 @@ namespace LML.NPOManagement.Controllers
             return BadRequest();
         }
 
+        [HttpPut("modifyEmail")]
+        public async Task<ActionResult> ModifyUserEmail([FromBody] LoginRequest loginRequest)
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
+            var modifyUser = await _userService.ModifyUserEmail(userModel.Email, userModel.Password, user.Id);
+            if (modifyUser == null)
+            {
+                return BadRequest();
+            }
+
+            if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
+            {
+                //var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+                //var key = "NotificationTemplates/CheckingEmail.html";
+                //var body = await GetFileByKeyAsync(bucketName, key);
+
+                //_notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);
+            }
+            return Ok();
+        }
+
+        [HttpPut("modifyPassword")]
+        public async Task<ActionResult> ModifyUserPassword([FromBody] ModifyUserPasswordRequest modifyUserPasswordRequest)
+        {
+            var user = HttpContext.Items["User"] as UserModel;
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var modifyUser = await _userService.ModifyUserPassword(modifyUserPasswordRequest.OldPassword, modifyUserPasswordRequest.NewPassword, user.Id);
+            if (!modifyUser)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
         [HttpPut("userInfo")]
         public async Task<ActionResult> PutUserInfo([FromBody] UserCredentialRequest userCredentialRequest)
         {
@@ -546,7 +591,6 @@ namespace LML.NPOManagement.Controllers
 
             var userInfoModel = new UserCredential()
             {
-                StatusId = userCredentialRequest.StatusId,
                 UserId = userCredentialRequest.Id,
                 RequestedUserRoleId = userCredentialRequest.RequestedUserRoleId,
                 Gender = userCredentialRequest.Gender,

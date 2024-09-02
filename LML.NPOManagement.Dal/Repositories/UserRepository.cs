@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentEmail.Core;
+using Grpc.Core;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
@@ -198,6 +200,46 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.SaveChangesAsync();
 
             return _mapper.Map<UserModel>(user);
+        }
+
+        public async Task<UserModel> ModifyUserEmail(string email, string password, int userId, int statusId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Email = email;
+            //user.StatusId = statusId;
+
+            await _dbContext.SaveChangesAsync();
+
+            return _mapper.Map<UserModel>(user);
+        }
+
+        public async Task<bool> ModifyUserPassword(string newPassword, int userId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(newPassword))
+            {
+                return false;
+            }
+
+            var user = await _dbContext.Users.Where(us => us.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Password = newPassword;
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> ModifyUserInfo(UserCredential userCredential)

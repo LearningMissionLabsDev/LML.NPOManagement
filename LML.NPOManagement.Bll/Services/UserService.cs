@@ -1,4 +1,5 @@
-﻿using LML.NPOManagement.Bll.Interfaces;
+﻿using FluentEmail.Core;
+using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
@@ -198,6 +199,69 @@ namespace LML.NPOManagement.Bll.Services
 
             newUserModel.Password = null;
             return newUserModel;
+        }
+
+        public async Task<UserModel> ModifyUserEmail(string email, string password, int userId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(email))
+            {
+                return null;
+            }
+
+            var user = await _userRepository.GetUserByEmail(email);
+            if (user != null)
+            {
+                return null;
+            }     
+
+            var existingUser = await _userRepository.GetUserById(userId);
+            if (existingUser == null)
+            {
+                return null;
+            }
+
+            if (!BC.Verify(password, existingUser.Password))
+            {
+                return null;
+            }
+
+            if (string.Compare(existingUser.Email, email, true) != 0)
+            {
+                existingUser.Email = email;
+                existingUser.StatusId = (int)StatusEnumModel.Pending;
+            }
+
+            var newUserModel = await _userRepository.ModifyUserEmail(email, password, userId, existingUser.StatusId.Value);
+            if (newUserModel == null)
+            {
+                return null;
+            }
+
+            newUserModel.Password = null;
+            return newUserModel;
+        }
+
+        public async Task<bool> ModifyUserPassword(string oldPassword, string newPassword, int userId)
+        {
+            if (userId <= 0 || string.IsNullOrEmpty(oldPassword) || string.IsNullOrEmpty(newPassword))
+            {
+                return false;
+            }
+
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            if (!BC.Verify(oldPassword, user.Password))
+            {
+                return false;
+            }
+
+            var hashedPassword = BC.HashPassword(newPassword);
+            var isSuccessful = await _userRepository.ModifyUserPassword(hashedPassword, userId);
+            return isSuccessful;
         }
 
         public async Task<bool> ModifyUserInfo(UserCredential userInformationModel)
