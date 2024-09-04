@@ -23,7 +23,7 @@ namespace LML.NPOManagement.Bll.Services
             return _signingKey;
         }
 
-        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository, int accountId=0)
+        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository, int accountId = 0)
         {
             string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -51,18 +51,18 @@ namespace LML.NPOManagement.Bll.Services
                     SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var createdToken = tokenHandler.CreateToken(tokenDescriptor);
-                token = tokenHandler.WriteToken(createdToken);             
+                token = tokenHandler.WriteToken(createdToken);
             }
             else
             {
                 var account2User = user.Account2Users.Where(accId => accId.AccountId == accountId).FirstOrDefault();
-                if(account2User == null)
+                if (account2User == null)
                 {
                     return null;
                 }
                 var roleId = account2User.AccountRoleId;
-                
-                if(currentRoleId != -1)
+
+                if (currentRoleId != -1)
                 {
                     roleId = currentRoleId;
                 }
@@ -92,42 +92,42 @@ namespace LML.NPOManagement.Bll.Services
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
-                    /* rg: added */
                     RequireAudience = false,
                     RequireExpirationTime = false,
                     ValidateLifetime = false,
-                    
-                    /*<<<*/
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = GetSigningKey(configuration),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
+
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                UserModel userModel = new UserModel();
-                userModel.Id = Convert.ToInt16(jwtToken.Claims.First(x => x.Type == "Id").Value);
-                var accounts = await userRepository.GetUsersInfoAccount(userModel.Id);
-                if (accounts == null)
+
+                var userModel = new UserModel
                 {
-                    return userModel;
-                }
-                else
+                    Id = Convert.ToInt16(jwtToken.Claims.First(x => x.Type == "Id").Value)
+                };
+
+                var accounts = await userRepository.GetUsersInfoAccount(userModel.Id);
+
+                if (accounts != null)
                 {
                     foreach (var account in accounts)
                     {
+                        if (account.AccountId == 1 && account.AccountRoleId == (int)UserAccountRoleEnum.Admin)
+                        {
+                            userModel.IsSystemAdmin = true;
+                        }
                         userModel.Account2Users.Add(account);
                     }
                 }
                 return userModel;
             }
-            catch (Exception exp)
+            catch (Exception)
             {
-                // if validation fails then return null
                 return null;
             }
         }
     }
 }
-
-

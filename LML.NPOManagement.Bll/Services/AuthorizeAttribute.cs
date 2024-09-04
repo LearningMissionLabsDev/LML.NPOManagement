@@ -10,7 +10,7 @@ namespace LML.NPOManagement.Bll.Services
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
         private readonly int _role;
-        public AuthorizeAttribute() {}
+        public AuthorizeAttribute() { }
 
         public AuthorizeAttribute(int role)
         {
@@ -23,6 +23,11 @@ namespace LML.NPOManagement.Bll.Services
             if (user == null)
             {
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                return;
+            }
+
+            if (user.IsSystemAdmin)
+            {
                 return;
             }
 

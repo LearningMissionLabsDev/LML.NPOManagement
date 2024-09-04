@@ -194,8 +194,10 @@ namespace LML.NPOManagement.Dal.Repositories
                 Name = accountModel.Name,
                 OnboardingLink = accountModel.OnboardingLink,
                 Description = accountModel.Description,
+                AccountImage = accountModel.AccountImage
             };
 
+            account.StatusId = (int)AccountStatusEnum.Active;
             await _dbContext.Accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
 
@@ -246,6 +248,7 @@ namespace LML.NPOManagement.Dal.Repositories
             account.OnboardingLink = accountModel.OnboardingLink;
             account.Description = accountModel.Description;
             account.StatusId = accountModel.StatusId;
+            account.AccountImage = accountModel.AccountImage;
 
             await _dbContext.SaveChangesAsync();
             return _mapper.Map<AccountModel>(account);
@@ -277,6 +280,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
             account.StatusId = (int)AccountStatusEnum.Deleted;
             account.DeletedAt = DateTime.Now;
+            account.IsVisible = false;
             await _dbContext.SaveChangesAsync();
 
             return true;
