@@ -17,26 +17,24 @@ namespace LML.NPOManagement.Bll.Services
         public async Task Invoke(HttpContext context, IConfiguration configuration, IUserRepository userRepository)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
             if (token != null)
             {
-                await AttachAccountToContext(context, token, configuration, userRepository);
+                await AttachUserToContext(context, token, configuration, userRepository);
                 var user = context.Items["User"] as UserModel;
                 if (user?.Account2Users.Count > 0)
                 {
-                    int.TryParse(context.Request.Query["accountId"], out int accountId);
+                    _ = int.TryParse(context.Request.Query["accountId"], out int accountId);
                     await SetAccountAndRoleContext(context, accountId, token, configuration, userRepository);
                 }
             }
             await _next(context);
         }
 
-        private async Task AttachAccountToContext(HttpContext context, string token, IConfiguration configuration, IUserRepository userRepository)
+        private async Task AttachUserToContext(HttpContext context, string token, IConfiguration configuration, IUserRepository userRepository)
         {
             try
             {
                 var user = await TokenCreationHelper.ValidateJwtToken(token, configuration, userRepository);
-
                 context.Items["User"] = user;
             }
             catch
@@ -53,7 +51,6 @@ namespace LML.NPOManagement.Bll.Services
                 if (user.Account2Users != null)
                 {
                     var account2User = user.Account2Users.FirstOrDefault(acc => acc.AccountId == accountId);
-
                     context.Items["Account"] = account2User;
                 }
             }

@@ -137,7 +137,6 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountUserResponses);
         }
 
-
         [HttpGet("{accountId}")]
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<AccountResponse>> GetAccountById([FromQuery] int accountId)
@@ -179,17 +178,53 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountResponse);
         }
 
+        [HttpGet("info/{accountId}")]
+        [Authorize(RoleAccess.AllAccess)]
+        public async Task<ActionResult<AccountResponse>> GetInfoAccountById(int accountId)
+        {
+            if (HttpContext.Items["User"] is not UserModel)
+            {
+                return Unauthorized();
+            }
+
+            if (accountId <= 0)
+            {
+                return BadRequest();
+            }
+
+            var account = await _accountService.GetAccountById(accountId);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            var accountResponse = new AccountResponse()
+            {
+                Id = account.Id,
+                StatusId = account.StatusId,
+                IsVisible = account.IsVisible,
+                MaxCapacity = account.MaxCapacity,
+                OnboardingLink = account.OnboardingLink,
+                Name = account.Name,
+                DateCreated = account.DateCreated,
+                Description = account.Description,
+                AccountImage = account.AccountImage
+            };
+
+            return Ok(accountResponse);
+        }
+
         [HttpGet("users")]
         [Authorize(RoleAccess.AllAccess)]
-        public async Task<ActionResult<List<UserInformationResponse>>> GetUsersByAccount()
+        public async Task<ActionResult<List<UserInformationResponse>>> GetUsersByAccount([FromQuery] int accountId)
         {
-            var account = HttpContext.Items["Account"] as Account2UserModel;
+            var account = await _accountService.GetAccountById(accountId);
             if (account == null)
             {
                 return BadRequest();
             }
 
-            var users = await _accountService.GetUsersByAccount(account.AccountId);
+            var users = await _accountService.GetUsersByAccount(accountId);
             if (users == null)
             {
                 return NotFound();
@@ -330,7 +365,8 @@ namespace LML.NPOManagement.Controllers
                 MaxCapacity = account.MaxCapacity,
                 Name = account.Name,
                 Description = account.Description,
-                DateCreated = account.DateCreated
+                DateCreated = account.DateCreated,
+                AccountImage= accountRequest.AccountImage
             };
 
             return Ok(accountResponse);
@@ -340,12 +376,6 @@ namespace LML.NPOManagement.Controllers
         [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult<AccountUserActivityResponse>> AddAccountUserActivityProgress([FromBody] AccountUserActivityRequest accountUserActivityRequest)
         {
-            var account = HttpContext.Items["Account"] as Account2UserModel;
-            if (account == null)
-            {
-                return StatusCode(403, "Access denied");
-            }
-
             var activityModel = _mapper.Map<AccountUserActivityModel>(accountUserActivityRequest);
             var activityUser = await _accountService.AddAccountUserActivityProgress(activityModel);
             if (activityUser == null)
@@ -368,15 +398,15 @@ namespace LML.NPOManagement.Controllers
         [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest addUserToAccountRequest)
         {
-            var account = HttpContext.Items["Account"] as Account2UserModel;
-            if (account == null)
+            var account = await _accountService.GetAccountById(addUserToAccountRequest.AccountId);
+            if (account == null && addUserToAccountRequest.UserId < 0)
             {
-                return NotFound("Access denied");
+                return BadRequest();
             }
 
             var account2User = new Account2UserModel()
             {
-                AccountId = account.AccountId,
+                AccountId = addUserToAccountRequest.AccountId,
                 UserId = addUserToAccountRequest.UserId,
                 AccountRoleId = (int)addUserToAccountRequest.UserAccountRoleEnum
             };
@@ -386,29 +416,30 @@ namespace LML.NPOManagement.Controllers
             {
                 return Conflict();
             }
-            
+
             return Ok();
         }
 
-        [HttpPut("modifyAccount")]
+        [HttpPut("modifyAccount/{accountId}")]
         [Authorize(RoleAccess.AccountAdmin)]
-        public async Task<ActionResult<AccountResponse>> ModifyAccount([FromBody] AccountRequest accountRequest)
+        public async Task<ActionResult<AccountResponse>> ModifyAccount([FromBody] AccountRequest accountRequest, int accountId)
         {
-            var account = HttpContext.Items["Account"] as Account2UserModel;
-            if (account == null)
+            var account = await _accountService.GetAccountById(accountId);
+            if (account == null || accountId < 0)
             {
-                return StatusCode(403, "Access denied");
+                return BadRequest();
             }
 
             var accountModel = new AccountModel()
             {
-                Id = account.AccountId,
+                Id = accountId,
                 Name = accountRequest.Name,
                 IsVisible = accountRequest.IsVisible,
                 MaxCapacity = accountRequest.MaxCapacity,
                 OnboardingLink = accountRequest.OnboardingLink,
                 Description = accountRequest.Description,
-                StatusId = accountRequest.StatusId
+                StatusId = accountRequest.StatusId,
+                AccountImage = accountRequest.AccountImage
             };
 
             var modifyAccount = await _accountService.ModifyAccount(accountModel);
@@ -426,7 +457,8 @@ namespace LML.NPOManagement.Controllers
                 MaxCapacity = modifyAccount.MaxCapacity,
                 Name = modifyAccount.Name,
                 OnboardingLink = modifyAccount.OnboardingLink,
-                Description = modifyAccount.Description
+                Description = modifyAccount.Description,
+                AccountImage = modifyAccount.AccountImage
             };
 
             return Ok(accountResponse);
@@ -434,20 +466,20 @@ namespace LML.NPOManagement.Controllers
 
         [HttpDelete("removeUser/{userId}")]
         [Authorize(RoleAccess.AdminsAndManager)]
-        public async Task<ActionResult> RemoveUserFromAccount(int userId)
+        public async Task<ActionResult> RemoveUserFromAccount(int userId, int accountId)
         {
-            if (userId <= 0)
+            if (userId <= 0 || accountId < 0)
             {
-                return BadRequest("User Not Found");
+                return BadRequest();
             }
 
-            var account = HttpContext.Items["Account"] as Account2UserModel;
+            var account = await _accountService.GetAccountById(accountId);
             if (account == null)
             {
-                return StatusCode(403, "Access denied");
+                return BadRequest();
             }
 
-            var user = await _accountService.RemoveUserFromAccount(account.AccountId, userId);
+            var user = await _accountService.RemoveUserFromAccount(accountId, userId);
             if (!user)
             {
                 return Conflict();
@@ -456,27 +488,9 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        [HttpDelete("deleteAccount")]
-        [Authorize(RoleAccess.AccountAdmin)]
-        public async Task<ActionResult> DeleteAccount()
-        {
-            var account = HttpContext.Items["Account"] as Account2UserModel;
-            if (account == null)
-            {
-                return NotFound("Account Not Found");
-            }
-
-            var deletedAccount = await _accountService.DeleteAccount(account.AccountId);
-            if (!deletedAccount)
-            {
-                return Conflict();
-            }
-
-            return Ok();
-        }
 
         [HttpDelete("{accountId}")]
-        [Authorize(RoleAccess.SysAdminOnly)]
+        [Authorize(RoleAccess.AccountAdmin)]
         public async Task<ActionResult> DeleteAccountById(int accountId)
         {
             if (accountId <= 0)

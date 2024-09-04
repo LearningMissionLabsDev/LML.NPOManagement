@@ -367,7 +367,7 @@ namespace LML.NPOManagement.Dal.Repositories
             if (userModel != null)
             {
                 var user = _mapper.Map<UserModel, User>(userModel);
-                user.StatusId = (int)StatusEnumModel.Pending;
+                user.StatusId = (int)StatusEnumModel.Active;
 
                 await _dbContext.Users.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
