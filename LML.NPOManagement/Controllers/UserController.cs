@@ -593,6 +593,7 @@ namespace LML.NPOManagement.Controllers
             {
                 UserId = userCredentialRequest.Id,
                 RequestedUserRoleId = userCredentialRequest.RequestedUserRoleId,
+                StatusId = userCredentialRequest.StatusId,
                 Gender = userCredentialRequest.Gender,
                 FirstName = userCredentialRequest.FirstName,
                 LastName = userCredentialRequest.LastName,

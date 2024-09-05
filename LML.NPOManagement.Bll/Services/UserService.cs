@@ -228,7 +228,7 @@ namespace LML.NPOManagement.Bll.Services
             if (string.Compare(existingUser.Email, email, true) != 0)
             {
                 existingUser.Email = email;
-                existingUser.StatusId = (int)StatusEnumModel.Pending;
+                existingUser.StatusId = (int)StatusEnumModel.Active;
             }
 
             var newUserModel = await _userRepository.ModifyUserEmail(email, password, userId, existingUser.StatusId.Value);
