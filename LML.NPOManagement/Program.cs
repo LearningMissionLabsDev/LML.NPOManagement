@@ -49,12 +49,11 @@ app.UseMiddleware<JwtMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseCors(x => x
-                .AddPolicy("AllowSpecificOrigin", builder => builder.WithOrigins("https://lmstudentportal.com")
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .WithExposedHeaders("Authorization")
-                .SetIsOriginAllowed(origin => true) // allow any origin
-                .AllowCredentials()); // allow credentials
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .WithExposedHeaders("Authorization") // Expose 'Authorization' header
+    .SetIsOriginAllowed(origin => origin == "https://lmstudentportal.com") // Only allow your domain
+    .AllowCredentials()); // Allow cookies and credentials to be sent
 
 
 app.UseAuthorization();
