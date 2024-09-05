@@ -49,6 +49,7 @@ app.UseMiddleware<JwtMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseCors(x => x
+                .AddPolicy("AllowSpecificOrigin", builder => builder.WithOrigins("https://lmstudentportal.com")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .WithExposedHeaders("Authorization")
