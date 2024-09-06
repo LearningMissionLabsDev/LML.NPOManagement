@@ -180,6 +180,32 @@ namespace LML.NPOManagement.Controllers
             return Ok(userCredentialResponse);
         }
 
+        [HttpGet("contactUs/{userId}")]
+        public async Task<ActionResult<UserForContactUsResponse>> GetUserForContactUs(int userId)
+        {
+            if (userId <= 0)
+            {
+                return BadRequest();
+            }
+
+            var user = await _userService.GetUserForContactUs(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userInfo = user.UserInformations.First();
+            var userContactUsResponse = new UserForContactUsResponse()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+            };
+
+            return Ok(userContactUsResponse);
+        }
+
         [HttpGet("group/{groupId}")]
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<UsersGroupResponse>> GetGroupById(int groupId)

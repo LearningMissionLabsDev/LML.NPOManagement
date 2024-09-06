@@ -10,6 +10,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<List<UserModel>> GetUsersByCriteria(List<int>? statusIds);
         Task<List<UserModel>> GetUsersByInvestorTier(int id);
         Task<UserModel> GetUserById(int userId);
+        Task<UserModel> GetUserForContactUs(int userId);
         Task<UserModel> GetUserByEmail(string email);
         Task<List<UserIdeaModel>> GetAllIdeas();
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);

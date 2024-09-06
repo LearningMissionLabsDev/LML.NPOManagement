@@ -96,6 +96,17 @@ namespace LML.NPOManagement.Bll.Services
             return usersByAccount;
         }
 
+        public async Task<List<AccountModel>> GetAllAccountsExceptAdmins()
+        {
+            var accounts = await _accountRepository.GetAllAccountsExceptAdmins();
+            if (accounts == null)
+            {
+                return null;
+            }
+
+            return accounts;
+        }
+
         public async Task<List<AccountModel>> GetAccountsByUserId(int userId)
         {
             if (userId <= 0)
