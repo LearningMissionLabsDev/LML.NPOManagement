@@ -10,6 +10,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task<List<UserModel>> GetUsersByInvestorTier(int userId);
         Task<UserModel> GetUserById(int userId);
         Task<List<UserIdeaModel>> GetAllIdeas();
+        Task<UserModel> GetUserForContactUs(int userId);
         Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel);
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId, int statusId);
         Task<UserModel> ModifyUserEmail(string email, string password, int userId, int statusId);

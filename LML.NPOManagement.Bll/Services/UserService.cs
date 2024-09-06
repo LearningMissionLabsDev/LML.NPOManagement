@@ -138,6 +138,23 @@ namespace LML.NPOManagement.Bll.Services
             return userModel;
         }
 
+
+        public async Task<UserModel> GetUserForContactUs(int userId)
+        {
+            if (userId <= 0)
+            {
+                return null;
+            }
+
+            var userModel = await _userRepository.GetUserForContactUs(userId);
+            if (userModel == null)
+            {
+                return null;
+            }
+
+            return userModel;
+        }
+
         public async Task<List<UserModel>> GetUsersByInvestorTier(int investorTierId)
         {
             if (investorTierId <= 0)
@@ -228,7 +245,7 @@ namespace LML.NPOManagement.Bll.Services
             if (string.Compare(existingUser.Email, email, true) != 0)
             {
                 existingUser.Email = email;
-                existingUser.StatusId = (int)StatusEnumModel.Pending;
+                existingUser.StatusId = (int)StatusEnumModel.Active;
             }
 
             var newUserModel = await _userRepository.ModifyUserEmail(email, password, userId, existingUser.StatusId.Value);

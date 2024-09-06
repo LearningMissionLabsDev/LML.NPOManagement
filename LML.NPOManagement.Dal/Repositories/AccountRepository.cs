@@ -75,6 +75,38 @@ namespace LML.NPOManagement.Dal.Repositories
             return accountsModel;
         }
 
+
+        public async Task<List<AccountModel>> GetAllAccountsExceptAdmins()
+        {
+            var accounts = await _dbContext.Accounts.Where(acc => acc.Id != 1).ToListAsync();
+            if (accounts.Count < 1)
+            {
+                return null;
+            }
+
+            var accountsModel = new List<AccountModel>();
+            foreach (var account in accounts)
+            {
+                var accountModel = new AccountModel
+                {
+                    Id = account.Id,
+                    Name = account.Name,
+                    MaxCapacity = account.MaxCapacity,
+                    CreatorId = account.CreatorId,
+                    StatusId = account.StatusId,
+                    DateCreated = account.DateCreated,
+                    IsVisible = account.IsVisible,
+                    OnboardingLink = account.OnboardingLink,
+                    Description = account.Description,
+                    AccountImage = account.AccountImage,
+                    DeletedAt = account.DeletedAt
+                };
+                accountsModel.Add(accountModel);
+            }
+
+            return accountsModel;
+        }
+
         public async Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds)
         {
             var query = _dbContext.Accounts.AsQueryable();

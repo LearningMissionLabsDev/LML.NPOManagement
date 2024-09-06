@@ -166,6 +166,22 @@ namespace LML.NPOManagement.Dal.Repositories
             return _mapper.Map<List<UserIdeaModel>>(ideas);
         }
 
+        public async Task<UserModel> GetUserForContactUs(int userId)
+        {
+            if (userId <= 0)
+            {
+                return null;
+            }
+
+            var user = await _dbContext.Users.Where(x => x.Id == userId).Include(usInfo => usInfo.UserInformations).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return null;
+            }
+
+            return _mapper.Map<UserModel>(user);
+        }
+
         public async Task<UserIdeaModel> AddUserIdea(UserIdeaModel userIdeaModel)
         {
             if (userIdeaModel == null)
