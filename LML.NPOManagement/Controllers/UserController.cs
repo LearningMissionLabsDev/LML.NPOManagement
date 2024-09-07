@@ -145,7 +145,6 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Authorize]
         public async Task<ActionResult<UserCredentialResponse>> GetUserbyId(int userId)
         {
             if (userId <= 0)
