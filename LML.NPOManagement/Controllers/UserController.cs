@@ -145,6 +145,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize]
         public async Task<ActionResult<UserCredentialResponse>> GetUserbyId(int userId)
         {
             if (userId <= 0)
@@ -442,10 +443,16 @@ namespace LML.NPOManagement.Controllers
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
                     HttpContext.Response.Headers.Add("Authorization", user.Token);
+                    if (user.UserInformations.FirstOrDefault() == null)
+                    {
+                        return StatusCode(428, userResponse);
+                    }
+
                     return Ok(userResponse);
                 }
                 return Conflict();
             }
+
             return Unauthorized(401);
         }
 

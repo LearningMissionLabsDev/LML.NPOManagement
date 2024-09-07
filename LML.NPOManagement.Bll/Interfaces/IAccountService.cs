@@ -6,7 +6,7 @@ namespace LML.NPOManagement.Bll.Interfaces
     public interface IAccountService
     {
         Task<List<AccountModel>> GetAllAccounts();
-        Task<List<AccountModel>> GetAllAccountsExceptAdmins();
+        Task<List<AccountModel>> GetVisibleAccounts();
         Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds);
         Task<AccountModel> GetAccountById(int accountId);
         Task<List<AccountModel>> GetAccountsByName(string name);

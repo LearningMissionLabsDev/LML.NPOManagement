@@ -47,7 +47,6 @@ namespace LML.NPOManagement.Bll.Services
             return accounts;
         }
 
-
         public async Task<List<AccountModel>> GetAccountsByStatus(List<int>? statusIds)
         {
             var accounts = await _accountRepository.GetAccountsByStatus(statusIds);
@@ -96,9 +95,9 @@ namespace LML.NPOManagement.Bll.Services
             return usersByAccount;
         }
 
-        public async Task<List<AccountModel>> GetAllAccountsExceptAdmins()
+        public async Task<List<AccountModel>> GetVisibleAccounts()
         {
-            var accounts = await _accountRepository.GetAllAccountsExceptAdmins();
+            var accounts = await _accountRepository.GetVisibleAccounts();
             if (accounts == null)
             {
                 return null;

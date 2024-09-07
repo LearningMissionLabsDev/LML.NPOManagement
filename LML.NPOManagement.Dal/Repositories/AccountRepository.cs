@@ -76,9 +76,9 @@ namespace LML.NPOManagement.Dal.Repositories
         }
 
 
-        public async Task<List<AccountModel>> GetAllAccountsExceptAdmins()
+        public async Task<List<AccountModel>> GetVisibleAccounts()
         {
-            var accounts = await _dbContext.Accounts.Where(acc => acc.Id != 1).ToListAsync();
+            var accounts = await _dbContext.Accounts.Where(acc => acc.IsVisible == true).ToListAsync();
             if (accounts.Count < 1)
             {
                 return null;
@@ -101,6 +101,7 @@ namespace LML.NPOManagement.Dal.Repositories
                     AccountImage = account.AccountImage,
                     DeletedAt = account.DeletedAt
                 };
+
                 accountsModel.Add(accountModel);
             }
 
@@ -131,30 +132,23 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
 
-            var account = await _dbContext.Accounts.Include(acc2us => acc2us.Account2Users).ThenInclude(us => us.User).ThenInclude(usInfo => usInfo.UserInformations).Where(acc => acc.Id == accountId).FirstOrDefaultAsync();
-            if (account == null)
-            {
-                return null;
-            }
+            var account2Users = await _dbContext.Account2Users.Where(acc2User => acc2User.AccountId == accountId).Include(acc2User => acc2User.User).ToListAsync();
 
-            var users = account.Account2Users.Select(au => au.User).ToList();          
-            if (users.Count < 1)
-            {
-                return null;
-            }
-          
             var usersInformationModel = new List<UserInformationModel>();
-            foreach (var user in users)
-            {
-                var userInformation = user.UserInformations.FirstOrDefault();
-                
-               var userInfo = new UserInformationModel
+            foreach (var account in account2Users) {
+                var userInformation = await _dbContext.UserInformations.Where(userInformation => userInformation.UserId == account.User.Id).FirstOrDefaultAsync();
+
+                if (userInformation == null) continue;
+
+                var userInfo = new UserInformationModel
                 {
-                    Id = user.Id,
+                    Id = userInformation.UserId,
                     FirstName = userInformation.FirstName,
                     LastName = userInformation.LastName,
-                    UserImage = userInformation.UserImage
+                    UserImage = userInformation.UserImage,
+                    AccountRoleId = account.AccountRoleId
                 };
+
                 usersInformationModel.Add(userInfo);
             }
 

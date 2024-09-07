@@ -294,7 +294,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 return null;
             }
 
-            var user = await _dbContext.Users.Where(user => user.Email == email).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(user => user.Email == email).Include(user => user.UserInformations).FirstOrDefaultAsync();
             if (user == null)
             {
                 return null;

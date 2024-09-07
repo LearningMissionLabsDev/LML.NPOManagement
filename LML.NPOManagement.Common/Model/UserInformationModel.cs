@@ -16,6 +16,7 @@
         public string? UserImage { get; set; }
         public Gender Gender { get; set; }
         public string? Metadata { get; set; }
+        public int AccountRoleId { get; set; }
         public virtual RequestedUserTypeModel RequestedUserRole { get; set; } = null!;
         public virtual UserModel User { get; set; } = null!;
     }

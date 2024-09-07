@@ -15,6 +15,7 @@ namespace LML.NPOManagement.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
+
         public AccountController(IAccountService accountService)
         {
             var config = new MapperConfiguration(cfg =>
@@ -66,13 +67,14 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountResponses);
         }
 
-        [HttpGet("exclude-admins")]
-        public async Task<ActionResult<List<AccountResponse>>> GetAllAccountsExceptAdmins()
+        [HttpGet("filter")]
+        [Authorize(RoleAccess.SysAdminOnly)]
+        public async Task<ActionResult<List<AccountResponse>>> GetAccountsByStatus([FromQuery] List<int>? statusIds)
         {
-            var accounts = await _accountService.GetAllAccountsExceptAdmins();
+            var accounts = await _accountService.GetAccountsByStatus(statusIds);
             if (accounts == null)
             {
-                return NotFound();
+                return NotFound("Accounts by this criteria not found.");
             }
 
             var accountResponses = new List<AccountResponse>();
@@ -98,14 +100,13 @@ namespace LML.NPOManagement.Controllers
             return Ok(accountResponses);
         }
 
-        [HttpGet("filter")]
-        [Authorize(RoleAccess.SysAdminOnly)]
-        public async Task<ActionResult<List<AccountResponse>>> GetAccountsByStatus([FromQuery] List<int>? statusIds)
+        [HttpGet("visible")]
+        public async Task<ActionResult<List<AccountResponse>>> GetVisibleAccounts()
         {
-            var accounts = await _accountService.GetAccountsByStatus(statusIds);
+            var accounts = await _accountService.GetVisibleAccounts();
             if (accounts == null)
             {
-                return NotFound("Accounts by this criteria not found.");
+                return NotFound();
             }
 
             var accountResponses = new List<AccountResponse>();
@@ -270,7 +271,8 @@ namespace LML.NPOManagement.Controllers
                     UserId = userInfo.Id,
                     FirstName = userInfo.FirstName,
                     LastName = userInfo.LastName,
-                    UserImage = userInfo.UserImage
+                    UserImage = userInfo.UserImage,
+                    AccountRoleId = userInfo.AccountRoleId
                 });
             }
 
@@ -346,7 +348,7 @@ namespace LML.NPOManagement.Controllers
 
         [Authorize(RoleAccess.AllAccess)]
         [HttpPost("login")]
-        public async Task<ActionResult<Account2UserResponse>> Login([FromQuery] int accountId)
+        public async Task<ActionResult<Account2UserResponse>> Login()
         {
             var user = HttpContext.Items["User"] as UserModel;
             var account2user = HttpContext.Items["Account"] as Account2UserModel;
@@ -519,7 +521,6 @@ namespace LML.NPOManagement.Controllers
 
             return Ok();
         }
-
 
         [HttpDelete("{accountId}")]
         [Authorize(RoleAccess.AccountAdmin)]
