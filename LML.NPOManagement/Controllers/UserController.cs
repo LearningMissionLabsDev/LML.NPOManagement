@@ -147,13 +147,18 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserCredentialResponse>> GetUserbyId(int userId)
         {
+            if (HttpContext.Items["User"] is not UserModel currentUser || (!currentUser.IsSystemAdmin && currentUser.Id != userId))
+            {
+                return StatusCode(403);
+            }
+
             if (userId <= 0)
             {
                 return BadRequest();
             }
 
             var user = await _userService.GetUserById(userId);
-            if (user == null)
+            if (user == null || user.UserInformations == null || !user.UserInformations.Any())
             {
                 return NotFound();
             }
@@ -427,32 +432,39 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
+
             var user = await _userService.Login(userModel, _configuration);
-
-            if (user != null)
+            if (user == null)
             {
-                var accounts = user.Account2Users.ToList();
-                var userResponse = new UserResponse()
-                {
-                    Id = user.Id,
-                    Email = userModel.Email,
-                    UserAccounts = accounts.Select(x => new AccountMappingResponse() { AccountId = x.AccountId, AccountName = x.Account?.Name, AccountRoleId = x.AccountRoleId }).ToList()
-                };
-
-                if (user.StatusId == (int)StatusEnumModel.Active)
-                {
-                    HttpContext.Response.Headers.Add("Authorization", user.Token);
-                    if (user.UserInformations.FirstOrDefault() == null)
-                    {
-                        return StatusCode(428, userResponse);
-                    }
-
-                    return Ok(userResponse);
-                }
-                return Conflict();
+                return Unauthorized();
             }
 
-            return Unauthorized(401);
+            var accounts = user.Account2Users.ToList();
+            var userResponse = new UserResponse()
+            {
+                Id = user.Id,
+                Email = userModel.Email,
+                UserAccounts = accounts.Select(x => new AccountMappingResponse()
+                {
+                    AccountId = x.AccountId,
+                    AccountName = x.Account.Name,
+                    AccountRoleId = x.AccountRoleId
+                }).ToList()
+            };
+
+            if (user.StatusId == (int)StatusEnumModel.Active)
+            {
+                HttpContext.Response.Headers.Add("Authorization", user.Token);
+
+                if (!user.UserInformations.Any())
+                {
+                    return StatusCode(428, userResponse);
+                }
+
+                return Ok(userResponse);
+            }
+
+            return Conflict();
         }
 
         [HttpPost("registration")]
