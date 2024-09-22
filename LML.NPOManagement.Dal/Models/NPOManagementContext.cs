@@ -61,7 +61,7 @@ public partial class NpomanagementContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=lmldb.cj8tmk4otjem.eu-west-1.rds.amazonaws.com,1433;Initial Catalog=NPOManagement;User ID=lmladmin;Password=January2021;encrypt=false");
+        => optionsBuilder.UseSqlServer("Data Source=tcp:192.168.10.105,1433;Initial Catalog=NPOManagement;User ID=sa;Password=Hx6^2s%W?{U5Pu$a;encrypt=false");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

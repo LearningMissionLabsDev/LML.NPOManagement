@@ -1,0 +1,22 @@
+
+{
+    "region" : "eu-west-1",
+    "configuration" : "Release",
+    "framework"     : "net7.0",
+    "self-contained" : true,
+    "application"    : "LMStudentPortal",
+    "environment"    : "LMStudentPortal-env",
+    "enable-xray"    : true,
+    "enhanced-health-type" : "enhanced",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-0330c4a27c9e544aa,sg-0c0d3d64e775556ee\";\"aws:ec2:vpc,Subnets\"=\"subnet-070fe169b1536d4c3,subnet-05d1e37b873c00d4e\";\"aws:ec2:vpc,ELBSubnets\"=\"subnet-070fe169b1536d4c3,subnet-05d1e37b873c00d4e\";\"aws:ec2:vpc,ELBScheme\"=\"public\"",
+    "solution-stack"       : "64bit Amazon Linux 2 v2.8.1 running .NET Core",
+    "environment-type"     : "LoadBalanced",
+    "loadbalancer-type"    : "application",
+    "cname"                : "lmstudentportal-env",
+    "instance-type"        : "t3a.small",
+    "key-pair"             : "Mher",
+    "health-check-url"     : "/",
+    "instance-profile"     : "aws-elasticbeanstalk-ec2-role",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "proxy-server"         : "nginx"
+}

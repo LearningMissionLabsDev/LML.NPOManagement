@@ -9,7 +9,7 @@ namespace LML.NPOManagement.Request
         public int UserId { get; set; }
         [Required]
         public int AccountId { get; set; }
-        [Required, Range(1, 3)]
+        [Required]
         public UserAccountRoleEnum UserAccountRoleEnum { get; set; }
     }
 }
