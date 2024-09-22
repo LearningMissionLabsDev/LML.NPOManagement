@@ -432,40 +432,39 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
+            var result = await _userService.Login(userModel, _configuration);
 
-            var user = await _userService.Login(userModel, _configuration);
-            if (user == null)
+            if (result.IsSuccess)
             {
-                return Unauthorized();
-            }
-
-            var accounts = user.Account2Users.ToList();
-            var userResponse = new UserResponse()
-            {
-                Id = user.Id,
-                Email = userModel.Email,
-                UserAccounts = accounts.Select(x => new AccountMappingResponse()
+                var user = result.Data;
+                var accounts = user.Account2Users.ToList();
+                var userResponse = new UserResponse
                 {
-                    AccountId = x.AccountId,
-                    AccountName = x.Account.Name,
-                    AccountRoleId = x.AccountRoleId
-                }).ToList()
-            };
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserAccounts = accounts.Select(x => new AccountMappingResponse
+                    {
+                        AccountId = x.AccountId,
+                        AccountName = x.Account.Name,
+                        AccountRoleId = x.AccountRoleId
+                    }).ToList()
+                };
 
-            if (user.StatusId == (int)StatusEnumModel.Active)
-            {
-                HttpContext.Response.Headers.Add("Authorization", user.Token);
-
-                if (!user.UserInformations.Any())
+                if (user.StatusId == (int)StatusEnumModel.Active)
                 {
-                    return StatusCode(428, userResponse);
+                    HttpContext.Response.Headers.Add("Authorization", user.Token);
+                    if (!user.UserInformations.Any())
+                    {
+                        return StatusCode(428, userResponse);
+                    }
+
+                    return Ok(userResponse);
                 }
-
-                return Ok(userResponse);
             }
 
-            return Conflict();
+            return ControllerHelper.HandleServiceResult(this, result);
         }
+
 
         [HttpPost("registration")]
         public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
@@ -477,24 +476,18 @@ namespace LML.NPOManagement.Controllers
 
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var result = await _userService.Registration(userModel, _configuration);
-            if (result != null)
-            {
-                return Ok(result);
-            }
-
-            return BadRequest();
+            return ControllerHelper.HandleServiceResult(this, result);
         }
 
         [HttpPost("userInfoRegistration")]
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
-            var user = HttpContext.Items["User"] as UserModel;
-            if (user == null)
+            if (HttpContext.Items["User"] is not UserModel user)
             {
                 return BadRequest();
             }
 
-            var userInformationModel = new UserInformationModel()
+            var userInformationModel = new UserInformationModel
             {
                 RequestedUserRoleId = (int)userInformationRequest.UserTypeEnum,
                 UserId = user.Id,
@@ -507,8 +500,8 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var userId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
-            return Ok(userId);
+            var result = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            return ControllerHelper.HandleServiceResult(this, result);
         }
 
         [HttpPost("group")]
