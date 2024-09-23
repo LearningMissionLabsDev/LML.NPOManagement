@@ -429,29 +429,49 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("addUser")]
-        [Authorize(RoleAccess.AdminsAndManager)]
-        public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest addUserToAccountRequest)
+        public async Task<ActionResult> AddUserToAccount([FromBody] AddUserToAccountRequest request)
         {
-            var account = await _accountService.GetAccountById(addUserToAccountRequest.AccountId);
-            if (account == null && addUserToAccountRequest.UserId < 0)
+            if (HttpContext.Items["User"] is not UserModel currentUser)
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
-            var account2User = new Account2UserModel()
-            {
-                AccountId = addUserToAccountRequest.AccountId,
-                UserId = addUserToAccountRequest.UserId,
-                AccountRoleId = (int)addUserToAccountRequest.UserAccountRoleEnum
-            };
+            var account2User = _mapper.Map<AddUserToAccountRequest, Account2UserModel>(request);
 
-            var result = await _accountService.AddUserToAccount(account2User);
-            if (!result)
+            if (currentUser.IsSystemAdmin)
             {
+                var result = await _accountService.AddUserToAccount(account2User);
+                if (result)
+                {
+                    return Ok();
+                }
                 return Conflict();
             }
 
-            return Ok();
+            if (HttpContext.Items["Account"] is Account2UserModel account2UserModel)
+            {
+                if ((account2UserModel.AccountRoleId & RoleAccess.AdminsAndManager) == account2UserModel.AccountRoleId)
+                {
+                    var result = await _accountService.AddUserToAccount(account2User);
+                    if (result)
+                    {
+                        return Ok();
+                    }
+                    return Conflict();
+                }
+            }
+
+            if (request.UserId == currentUser.Id && request.UserAccountRoleEnum == UserAccountRoleEnum.Beneficiary)
+            {
+                var result = await _accountService.AddUserToAccount(account2User);
+                if (result)
+                {
+                    return Ok();
+                }
+                return Conflict();
+            }
+
+            return StatusCode(403);
         }
 
         [HttpPut("modifyAccount/{accountId}")]
