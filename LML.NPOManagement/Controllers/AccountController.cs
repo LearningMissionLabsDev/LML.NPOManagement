@@ -499,12 +499,16 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpDelete("removeUser/{userId}")]
-        [Authorize(RoleAccess.AdminsAndManager)]
         public async Task<ActionResult> RemoveUserFromAccount(int userId, int accountId)
         {
-            if (userId <= 0 || accountId < 0)
+            if (userId <= 0 || accountId <= 0)
             {
                 return BadRequest();
+            }
+
+            if (HttpContext.Items["User"] is not UserModel currentUser)
+            {
+                return Unauthorized();
             }
 
             var account = await _accountService.GetAccountById(accountId);
@@ -513,14 +517,42 @@ namespace LML.NPOManagement.Controllers
                 return BadRequest();
             }
 
-            var user = await _accountService.RemoveUserFromAccount(accountId, userId);
-            if (!user)
+            if (currentUser.IsSystemAdmin)
             {
-                return Conflict();
+                var user = await _accountService.RemoveUserFromAccount(accountId, userId);
+                if (!user)
+                {
+                    return Conflict();
+                }
+                return Ok();
             }
 
-            return Ok();
+            if (HttpContext.Items["Account"] is Account2UserModel account2UserModel)
+            {
+                if ((account2UserModel.AccountRoleId & RoleAccess.AdminsAndManager) == account2UserModel.AccountRoleId)
+                {
+                    var user = await _accountService.RemoveUserFromAccount(accountId, userId);
+                    if (!user)
+                    {
+                        return Conflict();
+                    }
+                    return Ok();
+                }
+            }
+
+            if (userId == currentUser.Id)
+            {
+                var user = await _accountService.RemoveUserFromAccount(accountId, userId);
+                if (!user)
+                {
+                    return Conflict();
+                }
+                return Ok();
+            }
+
+            return StatusCode(403);
         }
+
 
         [HttpDelete("{accountId}")]
         [Authorize(RoleAccess.AccountAdmin)]
