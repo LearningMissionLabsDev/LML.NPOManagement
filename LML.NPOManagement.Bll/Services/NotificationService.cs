@@ -18,8 +18,9 @@ namespace LML.NPOManagement.Bll.Services
         private IMapper _mapper;
         //private readonly INotificationRepository _notificationRepository;
         private readonly NpomanagementContext _dbContext;
+        private IConfiguration _configuration;
 
-        public NotificationService(/*INotificationRepository notificationRepository*/)
+        public NotificationService(/*INotificationRepository notificationRepository*/IConfiguration configuration)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -44,6 +45,7 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<User, UserModel>();
             });
             _mapper = config.CreateMapper();
+            _configuration = configuration;
             //_notificationRepository = notificationRepository;
         }
 
@@ -157,13 +159,13 @@ namespace LML.NPOManagement.Bll.Services
         
         private void SendNotification(string body, string subject, string email)
         {           
-            String FROM = "learningmissionarmenia@gmail.com";
-            String FROMNAME = "Learning Mission";                
+            String FROM = _configuration.GetSection("SMTP:Email").Value;
+            String FROMNAME = _configuration.GetSection("SMTP:Name").Value;                
             String TO = email;               
-            String SMTP_USERNAME = "AKIAWNCW772FYFDWSEEG";
-            String SMTP_PASSWORD = "BO2xx+FoiCvTo8jCSTyjijpHuF5gmT4eQcuJAQD3EwrE";       
-            String HOST = "email-smtp.eu-west-1.amazonaws.com";                
-            int PORT = 587;            
+            String SMTP_USERNAME = _configuration.GetSection("SMTP:Username").Value;
+            String SMTP_PASSWORD = _configuration.GetSection("SMTP:Password").Value;
+            String HOST = _configuration.GetSection("SMTP:Host").Value;                
+            int PORT = Convert.ToInt16(_configuration.GetSection("SMTP:Port").Value); 
             String SUBJECT = subject;       
             String BODY = body;
             MailMessage message = new MailMessage();
