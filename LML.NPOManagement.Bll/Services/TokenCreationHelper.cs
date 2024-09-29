@@ -94,7 +94,7 @@ namespace LML.NPOManagement.Bll.Services
                 {
                     RequireAudience = false,
                     RequireExpirationTime = false,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = GetSigningKey(configuration),
                     ValidateIssuer = false,
