@@ -1,4 +1,5 @@
-﻿using LML.NPOManagement.Common;
+﻿using LML.NPOManagement.Bll.Shared;
+using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using Microsoft.Extensions.Configuration;
 
@@ -23,9 +24,9 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<bool> DeleteGroup(int groupId);
         Task<UserModel> ActivationUser(string token, IConfiguration configuration);
         Task<bool> AddUserToGroup(int userId,int groupId);
-        Task<UserModel> Login(UserModel userModel, IConfiguration configuration);
-        Task<UserModel> Registration(UserModel userModel, IConfiguration configuration);
-        Task<int?> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
+        Task<ServiceResult<UserModel>> Login(UserModel userModel, IConfiguration configuration);
+        Task<ServiceResult<UserModel>> Registration(UserModel userModel, IConfiguration configuration);
+        Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
         Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> CreateGroup(UsersGroupModel userGroupModel);
         Task<List<UsersGroupModel>> GetAllGroups();

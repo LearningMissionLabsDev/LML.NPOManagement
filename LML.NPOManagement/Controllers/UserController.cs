@@ -147,13 +147,18 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserCredentialResponse>> GetUserbyId(int userId)
         {
+            if (HttpContext.Items["User"] is not UserModel currentUser || (!currentUser.IsSystemAdmin && currentUser.Id != userId))
+            {
+                return StatusCode(403);
+            }
+
             if (userId <= 0)
             {
                 return BadRequest();
             }
 
             var user = await _userService.GetUserById(userId);
-            if (user == null)
+            if (user == null || user.UserInformations == null || !user.UserInformations.Any())
             {
                 return NotFound();
             }
@@ -427,33 +432,39 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
-            var user = await _userService.Login(userModel, _configuration);
+            var result = await _userService.Login(userModel, _configuration);
 
-            if (user != null)
+            if (result.IsSuccess)
             {
+                var user = result.Data;
                 var accounts = user.Account2Users.ToList();
-                var userResponse = new UserResponse()
+                var userResponse = new UserResponse
                 {
                     Id = user.Id,
-                    Email = userModel.Email,
-                    UserAccounts = accounts.Select(x => new AccountMappingResponse() { AccountId = x.AccountId, AccountName = x.Account?.Name, AccountRoleId = x.AccountRoleId }).ToList()
+                    Email = user.Email,
+                    UserAccounts = accounts.Select(x => new AccountMappingResponse
+                    {
+                        AccountId = x.AccountId,
+                        AccountName = x.Account.Name,
+                        AccountRoleId = x.AccountRoleId
+                    }).ToList()
                 };
 
                 if (user.StatusId == (int)StatusEnumModel.Active)
                 {
                     HttpContext.Response.Headers.Add("Authorization", user.Token);
-                    if (user.UserInformations.FirstOrDefault() == null)
+                    if (!user.UserInformations.Any())
                     {
                         return StatusCode(428, userResponse);
                     }
 
                     return Ok(userResponse);
                 }
-                return Conflict();
             }
 
-            return Unauthorized(401);
+            return ControllerHelper.HandleServiceResult(this, result);
         }
+
 
         [HttpPost("registration")]
         public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
@@ -465,24 +476,18 @@ namespace LML.NPOManagement.Controllers
 
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
             var result = await _userService.Registration(userModel, _configuration);
-            if (result != null)
-            {
-                return Ok(result);
-            }
-
-            return BadRequest();
+            return ControllerHelper.HandleServiceResult(this, result);
         }
 
         [HttpPost("userInfoRegistration")]
         public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
         {
-            var user = HttpContext.Items["User"] as UserModel;
-            if (user == null)
+            if (HttpContext.Items["User"] is not UserModel user)
             {
                 return BadRequest();
             }
 
-            var userInformationModel = new UserInformationModel()
+            var userInformationModel = new UserInformationModel
             {
                 RequestedUserRoleId = (int)userInformationRequest.UserTypeEnum,
                 UserId = user.Id,
@@ -495,8 +500,8 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            var userId = await _userService.UserInformationRegistration(userInformationModel, _configuration);
-            return Ok(userId);
+            var result = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            return ControllerHelper.HandleServiceResult(this, result);
         }
 
         [HttpPost("group")]

@@ -1,5 +1,5 @@
-﻿using FluentEmail.Core;
-using LML.NPOManagement.Bll.Interfaces;
+﻿using LML.NPOManagement.Bll.Interfaces;
+using LML.NPOManagement.Bll.Shared;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
@@ -292,58 +292,62 @@ namespace LML.NPOManagement.Bll.Services
             return user;
         }
 
-        public async Task<UserModel> Login(UserModel userModel, IConfiguration configuration)
+        public async Task<ServiceResult<UserModel>> Login(UserModel userModel, IConfiguration configuration)
         {
-            var user = await _userRepository.GetUserByEmail(userModel.Email);
-            if (user != null && BC.Verify(userModel.Password, user.Password))
-            {
-                var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
-                if (accounts != null)
-                {
-                    user.Account2Users = accounts;
-                }
-
-                user.Password = null;
-                user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration, _userRepository);
-
-                return user;
-            }
-
-            return null;
-        }
-
-        public async Task<UserModel> Registration(UserModel userModel, IConfiguration configuration)
-        {
-            if(userModel == null)
-            {
-                return null;
-            }
-
             var user = await _userRepository.GetUserByEmail(userModel.Email);
             if (user == null)
             {
-                userModel.Password = BC.HashPassword(userModel.Password);
-                await _userRepository.AddUser(userModel);
-
-                var newUser = await _userRepository.GetUserByEmail(userModel.Email);
-                newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration, _userRepository);
-                newUser.Password = null;
-
-                return newUser;
+                return ServiceResult<UserModel>.Failure("User not found with the provided email.", ServiceStatusCode.UserNotFound);
             }
 
-            return null;
+            if (!BC.Verify(userModel.Password, user.Password))
+            {
+                return ServiceResult<UserModel>.Failure("Incorrect password.", ServiceStatusCode.InvalidCredentials);
+            }
+
+            var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
+            if (accounts != null)
+            {
+                user.Account2Users = accounts;
+            }
+
+            user.Password = null;
+            user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration, _userRepository);
+            return ServiceResult<UserModel>.Success(user);
         }
 
-        public async Task<int?> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration)
+        public async Task<ServiceResult<UserModel>> Registration(UserModel userModel, IConfiguration configuration)
+        {
+            if (userModel == null)
+            {
+                return ServiceResult<UserModel>.Failure("Invalid user data.", ServiceStatusCode.BadRequest);
+            }
+
+            var existingUser = await _userRepository.GetUserByEmail(userModel.Email);
+            if (existingUser != null)
+            {
+                return ServiceResult<UserModel>.Failure("A user with this email already exists.", ServiceStatusCode.Conflict);
+            }
+
+            userModel.Password = BC.HashPassword(userModel.Password);
+            await _userRepository.AddUser(userModel);
+
+            var newUser = await _userRepository.GetUserByEmail(userModel.Email);
+            newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration, _userRepository);
+            newUser.Password = null;
+
+            return ServiceResult<UserModel>.Success(newUser);
+        }
+
+        public async Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration)
         {
             if (userInformationModel == null)
             {
-                return null;
+                return ServiceResult<int>.Failure("Invalid user information data.", ServiceStatusCode.BadRequest);
             }
 
             await _userRepository.AddUserInformation(userInformationModel);
-            return userInformationModel.UserId;
+            return ServiceResult<int>.Success(userInformationModel.UserId);
         }
 
         public async Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups)
