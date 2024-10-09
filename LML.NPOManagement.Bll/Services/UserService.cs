@@ -138,7 +138,6 @@ namespace LML.NPOManagement.Bll.Services
             return userModel;
         }
 
-
         public async Task<UserModel> GetUserForContactUs(int userId)
         {
             if (userId <= 0)

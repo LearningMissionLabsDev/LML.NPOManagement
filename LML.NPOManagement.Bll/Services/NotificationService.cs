@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
+using System.Runtime.CompilerServices;
 
 namespace LML.NPOManagement.Bll.Services
 {
@@ -17,10 +18,13 @@ namespace LML.NPOManagement.Bll.Services
     {
         private IMapper _mapper;
         //private readonly INotificationRepository _notificationRepository;
+        private IUserRepository _userRepository;
         private readonly NpomanagementContext _dbContext;
         private IConfiguration _configuration;
 
-        public NotificationService(/*INotificationRepository notificationRepository*/IConfiguration configuration)
+
+
+        public NotificationService(/*INotificationRepository notificationRepository*/IConfiguration configuration, IUserRepository userRepository)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -46,6 +50,7 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
             _configuration = configuration;
+            _userRepository = userRepository;
             //_notificationRepository = notificationRepository;
         }
 
@@ -127,18 +132,22 @@ namespace LML.NPOManagement.Bll.Services
             }           
         }
 
-        public async void SendNotificationUserAsync(UserModel userModel, NotificationModel notificationModel, string body)
+        public async Task<bool> SendNotificationUserAsync(UserModel userModel, NotificationModel notificationModel, string body)
         {
             notificationModel.NotificationTypeEnum = NotificationTypeEnum.ByRegistration;
             if (notificationModel.Subject == null)
             {
                 notificationModel.Subject = HtmlSubject();
             }
-            var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
+            //var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
+            var user = await _userRepository.GetUserById(userModel.Id);
+            var userInfo = user.UserInformations.FirstOrDefault();
+
             body = body.Replace("@firstName", userInfo.FirstName);
             body = body.Replace("@lastName", userInfo.LastName);
 
-            SendNotification(body, notificationModel.Subject, userModel.Email);
+            SendNotification(body, notificationModel.Subject, user.Email);
+            return true;
         }
 
         public async void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel, string body)
@@ -198,11 +207,14 @@ namespace LML.NPOManagement.Bll.Services
             {
                 notificationModel.Subject = HtmlSubject();
             }
-            //string token = await TokenCreationHelper.GenerateJwtToken(userModel, configuration);
-            //string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
-            //var uri = $"{clientVerificationURL}?token={token}";
-            //body = body.Replace("@verifiyCode", uri);
-            //SendNotification(body, notificationModel.Subject, userModel.Email);
+            string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration, _userRepository);
+            string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
+            var uri = $"{clientVerificationURL}?token={token}";
+            var userInfo = userModel.UserInformations.FirstOrDefault();
+            body = body.Replace("@verifiyCode", uri);
+            body = body.Replace("@firstName@", userInfo.FirstName);
+            body = body.Replace("@lastName@", userInfo.LastName);
+            SendNotification(body, notificationModel.Subject, userModel.Email);
         }
 
         private string HtmlSubject()
