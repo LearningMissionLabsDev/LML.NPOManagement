@@ -349,7 +349,7 @@ namespace LML.NPOManagement.Dal.Repositories
                 {
                     AccountId = account2UserModel.AccountId,
                     UserId = account2UserModel.UserId,
-                    AccountRoleId = account2UserModel.AccountRoleId
+                    AccountRoleId = (int)account2UserModel.UserAccountRoleEnum
                 };
                 account.Account2Users.Add(accountUser);
                 await _dbContext.SaveChangesAsync();
