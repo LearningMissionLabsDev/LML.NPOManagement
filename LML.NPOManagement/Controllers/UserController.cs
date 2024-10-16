@@ -390,7 +390,7 @@ namespace LML.NPOManagement.Controllers
             var key = template + "RegistracionNotification.html";
             var body = await GetFileByKeyAsync(bucketName, key);
 
-            _notificationService.SendNotificationUserAsync(user, new NotificationModel(), body);
+            var status = await _notificationService.SendNotificationUserAsync(user, new NotificationModel(), body);
 
             return Ok();
         }
@@ -500,7 +500,17 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
+            var newUser = await _userService.GetUserById(userInformationModel.UserId);
+
             var result = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+
+            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            var template = _configuration.GetSection("AppSettings:Templates").Value;
+            var key = "NotificationTemplates/CheckingEmail.html";
+            var body = await GetFileByKeyAsync(bucketName, key);
+
+            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
+
             return ControllerHelper.HandleServiceResult(this, result);
         }
 
@@ -590,11 +600,11 @@ namespace LML.NPOManagement.Controllers
 
             if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
             {
-                //var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-                //var key = "NotificationTemplates/CheckingEmail.html";
-                //var body = await GetFileByKeyAsync(bucketName, key);
+                var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+                var key = "NotificationTemplates/CheckingEmail.html";
+                var body = await GetFileByKeyAsync(bucketName, key);
 
-                //_notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);
+                _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);
             }
             return Ok();
         }
