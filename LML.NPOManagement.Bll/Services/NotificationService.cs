@@ -15,7 +15,6 @@ namespace LML.NPOManagement.Bll.Services
     public class NotificationService : INotificationService
     {
         private IMapper _mapper;
-        //private readonly INotificationRepository _notificationRepository;
         private IUserRepository _userRepository;
         private readonly NpomanagementContext _dbContext;
         private IConfiguration _configuration;
@@ -23,7 +22,7 @@ namespace LML.NPOManagement.Bll.Services
 
 
 
-        public NotificationService(/*INotificationRepository notificationRepository*/IConfiguration configuration, IUserRepository userRepository, IAmazonS3 s3Client)
+        public NotificationService(IConfiguration configuration, IUserRepository userRepository, IAmazonS3 s3Client)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -35,7 +34,6 @@ namespace LML.NPOManagement.Bll.Services
                 cfg.CreateMap<Notification, NotificationModel>();
                 cfg.CreateMap<UserInformation, UserInformationModel>();
                 cfg.CreateMap<UserInventory, UserInventoryModel>();
-                //cfg.CreateMap<UserType, UserTypeModel>();
                 cfg.CreateMap<AttachmentModel, Dal.Models.Attachment>();
                 cfg.CreateMap<DonationModel, Donation>();
                 cfg.CreateMap<AccountModel, Account>();
@@ -139,7 +137,6 @@ namespace LML.NPOManagement.Bll.Services
             {
                 notificationModel.Subject = HtmlSubject();
             }
-            //var userInfo = await _dbContext.UserInformations.Where(usi => usi.UserId == userModel.Id).FirstOrDefaultAsync();
             var user = await _userRepository.GetUserById(userModel.Id);
             var userInfo = user.UserInformations.FirstOrDefault();
 
@@ -191,7 +188,7 @@ namespace LML.NPOManagement.Bll.Services
                 {
                     Console.WriteLine("Attempting to send email...");
                     //production send real email
-                    //client.Send(message);
+                    client.Send(message);
                     Console.WriteLine("Email sent!");
                 }
                 catch (Exception ex)
@@ -202,21 +199,7 @@ namespace LML.NPOManagement.Bll.Services
             }
         }
 
-        /* public async void CheckingEmail(UserModel userModel, NotificationModel notificationModel, IConfiguration configuration, string body)
-         {
-             if (notificationModel.Subject == null)
-             {
-                 notificationModel.Subject = HtmlSubject();
-             }
-             string token = TokenCreationHelper.GenerateJwtToken(userModel, configuration, _userRepository);
-             string clientVerificationURL = configuration.GetSection("AppSettings:ClientVerificationURL").Value;
-             var uri = $"{clientVerificationURL}?token={token}";
-             var userInfo = userModel.UserInformations.FirstOrDefault();
-             body = body.Replace("@verifiyCode", uri);
-             body = body.Replace("@firstName", userInfo.FirstName);
-             body = body.Replace("@lastName", userInfo.LastName);
-             SendNotification(body, notificationModel.Subject, userModel.Email);
-         }*/
+
 
         public async void PasswordRecoverRequest(UserModel user)
         {
@@ -272,7 +255,6 @@ namespace LML.NPOManagement.Bll.Services
             var userInfo = user.UserInformations.FirstOrDefault();
 
             var template = await GetTemplateByFileName("RegistracionNotification.html");
-
 
             template = template.Replace("@firstName", userInfo.FirstName);
             template = template.Replace("@lastName", userInfo.LastName);

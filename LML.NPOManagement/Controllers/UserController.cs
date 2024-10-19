@@ -405,10 +405,10 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        [HttpPost("resetpassword")]
-        public async Task<ActionResult> ResetPassword([FromBody] ModifyUserPasswordRequest userRequest, [FromQuery] string token)
+        [HttpPost("resetPassword")]
+        public async Task<ActionResult> ResetPassword([FromBody] ResetUserPasswordRequest userRequest, [FromQuery] string token)
         {
-            if (userRequest.OldPassword != userRequest.NewPassword || string.IsNullOrEmpty(token))
+            if (userRequest.NewPassword != userRequest.ConfirmPassword || string.IsNullOrEmpty(token))
             {
                 return StatusCode(409);
             }
@@ -587,11 +587,6 @@ namespace LML.NPOManagement.Controllers
             {
                 if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
                 {
-                    /*var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-                    var key = "NotificationTemplates/CheckingEmail.html";
-                    var body = await GetFileByKeyAsync(bucketName, key);
-
-                    _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);*/
                     _notificationService.EmailVerificationRequest(modifyUser);
                 }
                 return Ok();
@@ -618,11 +613,6 @@ namespace LML.NPOManagement.Controllers
 
             if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
             {
-                /*var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-                var key = "NotificationTemplates/CheckingEmail.html";
-                var body = await GetFileByKeyAsync(bucketName, key);
-
-                _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);*/
                 _notificationService.EmailVerificationRequest(modifyUser);
 
             }

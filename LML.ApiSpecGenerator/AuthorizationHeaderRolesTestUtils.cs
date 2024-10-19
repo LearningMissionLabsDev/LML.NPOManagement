@@ -1,13 +1,13 @@
-﻿using LML.NPOManagement.Common;
+﻿using LML.NPOManagement.Bll.Services;
+using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using System.Reflection;
 using System.Text;
-using LML.NPOManagement.Bll.Services;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 
 namespace LML.ApiSpecGenerator
 {
@@ -340,7 +340,7 @@ namespace LML.ApiSpecGenerator
             foreach (var method in methods)
             {
                 if (!specializedMethods.Contains(method))
-                { 
+                {
                     return false;
                 }
             }
