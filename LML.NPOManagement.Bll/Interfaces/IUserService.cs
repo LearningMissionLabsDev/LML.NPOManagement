@@ -1,7 +1,6 @@
 ﻿using LML.NPOManagement.Bll.Shared;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using Microsoft.Extensions.Configuration;
 
 namespace LML.NPOManagement.Bll.Interfaces
 {
@@ -18,15 +17,16 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<UserModel> ModifyUserCredentials(string email, string password, int userId);
         Task<UserModel> ModifyUserEmail(string email, string password, int userId);
         Task<bool> ModifyUserPassword(string oldPassword, string newPassword, int userId);
+        Task<ServiceResult<bool>> ResetUserPassword(string password, string token);
         Task<bool> ModifyUserInfo(UserCredential userInformationModel);
         Task<UserModel> DeleteUser(int userId);
         Task<bool> DeleteUserFromGroup(int userId, int groupId);
         Task<bool> DeleteGroup(int groupId);
-        Task<UserModel> ActivationUser(string token, IConfiguration configuration);
-        Task<bool> AddUserToGroup(int userId,int groupId);
-        Task<ServiceResult<UserModel>> Login(UserModel userModel, IConfiguration configuration);
-        Task<ServiceResult<UserModel>> Registration(UserModel userModel, IConfiguration configuration);
-        Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration);
+        Task<UserModel> ActivationUser(string token);
+        Task<bool> AddUserToGroup(int userId, int groupId);
+        Task<ServiceResult<UserModel>> Login(UserModel userModel);
+        Task<ServiceResult<UserModel>> Registration(UserModel userModel);
+        Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel);
         Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> CreateGroup(UsersGroupModel userGroupModel);
         Task<List<UsersGroupModel>> GetAllGroups();

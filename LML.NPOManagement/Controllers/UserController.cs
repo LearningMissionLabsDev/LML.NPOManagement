@@ -1,5 +1,4 @@
-﻿using Amazon.S3;
-using AutoMapper;
+﻿using AutoMapper;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
 using LML.NPOManagement.Common;
@@ -17,10 +16,8 @@ namespace LML.NPOManagement.Controllers
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
-        private readonly IConfiguration _configuration;
-        private readonly IAmazonS3 _s3Client;
 
-        public UserController(IUserService userService, INotificationService notificationService, IConfiguration configuration, IAmazonS3 s3Client)
+        public UserController(IUserService userService, INotificationService notificationService)
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -37,8 +34,6 @@ namespace LML.NPOManagement.Controllers
             _mapper = config.CreateMapper();
             _userService = userService;
             _notificationService = notificationService;
-            _configuration = configuration;
-            _s3Client = s3Client;
         }
 
         [HttpGet]
@@ -328,6 +323,20 @@ namespace LML.NPOManagement.Controllers
             return Ok(users);
         }
 
+        [HttpPost("recover")]
+        public async Task<ActionResult<UserResponse>> RecoverPassword([FromBody] UserEmailRequest userEmailRequest)
+        {
+            var user = await _userService.GetUserByEmail(userEmailRequest.Email);
+            if (user == null)
+            {
+                return BadRequest("Wrong Email");
+            }
+            _notificationService.PasswordRecoverRequest(user);
+
+            return Ok();
+
+        }
+
         [HttpGet("idea")]
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<List<UserIdeaResponse>>> GetIdeas()
@@ -377,22 +386,35 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpGet("verifyEmail")]
-        public async Task<ActionResult> VerifyEmail([FromQuery] string token)
+        public async Task<ActionResult<bool>> VerifyEmail([FromQuery] string token)
         {
             if (string.IsNullOrEmpty(token))
             {
                 return BadRequest("Please check your token");
             }
 
-            var user = await _userService.ActivationUser(token, _configuration);
-            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+            var user = await _userService.ActivationUser(token);
+            /*var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
             var template = _configuration.GetSection("AppSettings:Templates").Value;
             var key = template + "RegistracionNotification.html";
             var body = await GetFileByKeyAsync(bucketName, key);
 
-            var status = await _notificationService.SendNotificationUserAsync(user, new NotificationModel(), body);
+            var status = await _notificationService.SendNotificationUserAsync(user, new NotificationModel(), body);*/
+            _notificationService.EmailVerificationConfirmation(user);
 
             return Ok();
+        }
+
+        [HttpPost("resetpassword")]
+        public async Task<ActionResult> ResetPassword([FromBody] ModifyUserPasswordRequest userRequest, [FromQuery] string token)
+        {
+            if (userRequest.OldPassword != userRequest.NewPassword || string.IsNullOrEmpty(token))
+            {
+                return StatusCode(409);
+            }
+            var result = await _userService.ResetUserPassword(userRequest.NewPassword, token);
+
+            return ControllerHelper.HandleServiceResult(this, result);
         }
 
         [HttpGet("logout")]
@@ -432,7 +454,7 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserResponse>> Login([FromBody] LoginRequest loginRequest)
         {
             var userModel = _mapper.Map<LoginRequest, UserModel>(loginRequest);
-            var result = await _userService.Login(userModel, _configuration);
+            var result = await _userService.Login(userModel);
 
             if (result.IsSuccess)
             {
@@ -465,7 +487,6 @@ namespace LML.NPOManagement.Controllers
             return ControllerHelper.HandleServiceResult(this, result);
         }
 
-
         [HttpPost("registration")]
         public async Task<ActionResult<UserModel>> Registration([FromBody] UserRequest userRequest)
         {
@@ -475,7 +496,7 @@ namespace LML.NPOManagement.Controllers
             }
 
             var userModel = _mapper.Map<UserRequest, UserModel>(userRequest);
-            var result = await _userService.Registration(userModel, _configuration);
+            var result = await _userService.Registration(userModel);
             return ControllerHelper.HandleServiceResult(this, result);
         }
 
@@ -502,16 +523,12 @@ namespace LML.NPOManagement.Controllers
 
             var newUser = await _userService.GetUserById(userInformationModel.UserId);
 
-            var result = await _userService.UserInformationRegistration(userInformationModel, _configuration);
+            var result = await _userService.UserInformationRegistration(userInformationModel);
 
-            var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-            var template = _configuration.GetSection("AppSettings:Templates").Value;
-            var key = "NotificationTemplates/CheckingEmail.html";
-            var body = await GetFileByKeyAsync(bucketName, key);
-
-            _notificationService.CheckingEmail(newUser, new NotificationModel(), _configuration, body);
+            _notificationService.EmailVerificationRequest(newUser);
 
             return ControllerHelper.HandleServiceResult(this, result);
+
         }
 
         [HttpPost("group")]
@@ -570,11 +587,12 @@ namespace LML.NPOManagement.Controllers
             {
                 if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
                 {
-                    var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+                    /*var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
                     var key = "NotificationTemplates/CheckingEmail.html";
                     var body = await GetFileByKeyAsync(bucketName, key);
 
-                    _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);
+                    _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);*/
+                    _notificationService.EmailVerificationRequest(modifyUser);
                 }
                 return Ok();
             }
@@ -600,11 +618,13 @@ namespace LML.NPOManagement.Controllers
 
             if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
             {
-                var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
+                /*var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
                 var key = "NotificationTemplates/CheckingEmail.html";
                 var body = await GetFileByKeyAsync(bucketName, key);
 
-                _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);
+                _notificationService.CheckingEmail(modifyUser, new NotificationModel(), _configuration, body);*/
+                _notificationService.EmailVerificationRequest(modifyUser);
+
             }
             return Ok();
         }
@@ -714,18 +734,5 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        private async Task<string> GetFileByKeyAsync(string bucketName, string key)
-        {
-            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
-            if (!bucketExists)
-            {
-                return null;
-            }
-
-            var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
-            var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();
-
-            return streamReader;
-        }
     }
 }

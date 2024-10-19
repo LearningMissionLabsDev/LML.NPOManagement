@@ -1,13 +1,10 @@
 using Amazon.S3;
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Bll.Services;
-using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using LML.NPOManagement.Middeware;
-using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +31,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 //builder.Services.AddScoped<INotificationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInvestorRepository, InvestorRepository>();
-builder.Services.AddScoped <NpomanagementContext>();
+builder.Services.AddScoped<NpomanagementContext>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

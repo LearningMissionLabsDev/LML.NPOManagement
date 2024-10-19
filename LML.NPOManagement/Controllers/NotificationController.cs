@@ -7,7 +7,6 @@ using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Request;
 using LML.NPOManagement.Response;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -53,18 +52,18 @@ namespace LML.NPOManagement.Controllers
                 cfg.CreateMap<LoginRequest, UserModel>();
             });
             _mapper = config.CreateMapper();
-            _notificationService = notificationService;  
+            _notificationService = notificationService;
             _accountService = accountService;
             _userService = userService;
             _s3Client = s3Client;
             _configuration = configuration;
-        }      
+        }
 
         // GET: api/<NotificationController>
         [HttpGet]
         [Authorize(RoleAccess.AccountAdmin)]
         public async Task<List<NotificationResponse>> Get()
-        {  
+        {
             var notification = await _notificationService.GetAllNotifications();
             return _mapper.Map<List<NotificationModel>, List<NotificationResponse>>(notification);
         }
@@ -87,34 +86,34 @@ namespace LML.NPOManagement.Controllers
         // POST api/<NotificationController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] NotificationRequest notificationRequest)
-        {                
+        {
             var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
             var template = _configuration.GetSection("AppSettings:Templates").Value;
             var key = template + notificationRequest.Language.ToString() + notificationRequest.BodyName;
             var body = await GetFileByKeyAsync(bucketName, key);
 
             switch (notificationRequest.NotificationTransportEnum)
-            {             
+            {
                 case NotificationTransportEnum.Email:
                     var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
                     var notificationModel = _notificationService.AddNotification(notification);
                     break;
-                
+
                 case NotificationTransportEnum.Sms:
                     break;
-                
+
                 case NotificationTransportEnum.Post:
                     break;
-  
+
                 case NotificationTransportEnum.Other:
                     break;
             }
             return Ok();
-        }    
+        }
 
         // POST api/<NotificationController>
         [HttpPost("send")]
-        public async Task<ActionResult> SendNotification(int id, [FromBody] NotificationRequest notificationRequest )
+        public async Task<ActionResult> SendNotification(int id, [FromBody] NotificationRequest notificationRequest)
         {
             var notificationModel = await _notificationService.GetNotificationById(id);
             if (notificationModel == null)
@@ -124,7 +123,7 @@ namespace LML.NPOManagement.Controllers
             var notification = _mapper.Map<NotificationRequest, NotificationModel>(notificationRequest);
             var modifyNotification = await _notificationService.ModifyNotification(notification, id);
 
-            switch (notificationModel.NotificationTypeEnum  )
+            switch (notificationModel.NotificationTypeEnum)
             {
                 case NotificationTypeEnum.ByIndividuals:
                     var users = await _userService.GetAllUsers();
@@ -150,14 +149,14 @@ namespace LML.NPOManagement.Controllers
                 default:
                     return BadRequest();
             }
-        }      
+        }
 
         // PUT api/<NotificationController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] NotificationRequest notificationRequest)
         {
             var notification = await _notificationService.GetNotificationById(id);
-            if(notification == null)
+            if (notification == null)
             {
                 return BadRequest();
             }

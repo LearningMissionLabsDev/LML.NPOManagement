@@ -11,20 +11,22 @@ namespace LML.NPOManagement.Bll.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
-        public async Task<UserModel> ActivationUser(string token, IConfiguration configuration)
+        public async Task<UserModel> ActivationUser(string token)
         {
             if (string.IsNullOrEmpty(token))
             {
                 return null;
             }
 
-            var newUser = await TokenCreationHelper.ValidateJwtToken(token, configuration, _userRepository);
+            var newUser = await TokenCreationHelper.ValidateJwtToken(token, _configuration, _userRepository);
             if (newUser == null)
             {
                 return null;
@@ -71,7 +73,8 @@ namespace LML.NPOManagement.Bll.Services
         public async Task<List<UserModel>> GetUsersByCriteria(List<int>? statusIds)
         {
             var userModel = await _userRepository.GetUsersByCriteria(statusIds);
-            if (userModel == null) {
+            if (userModel == null)
+            {
                 return null;
             }
 
@@ -228,7 +231,7 @@ namespace LML.NPOManagement.Bll.Services
             if (user != null)
             {
                 return null;
-            }     
+            }
 
             var existingUser = await _userRepository.GetUserById(userId);
             if (existingUser == null)
@@ -280,6 +283,25 @@ namespace LML.NPOManagement.Bll.Services
             return isSuccessful;
         }
 
+        public async Task<ServiceResult<bool>> ResetUserPassword(string password, string token)
+        {
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(token))
+            {
+                return ServiceResult<bool>.Failure("No password provided", ServiceStatusCode.BadRequest);
+            }
+            var user = await TokenCreationHelper.ValidateJwtToken(token, _configuration, _userRepository);
+            if (user == null)
+            {
+                return ServiceResult<bool>.Failure("Invalid Token", ServiceStatusCode.Unauthorized);
+            }
+
+            var hashedPassword = BC.HashPassword(password);
+            var isSuccessful = await _userRepository.ModifyUserPassword(hashedPassword, user.Id);
+
+            return ServiceResult<bool>.Success(isSuccessful);
+
+        }
+
         public async Task<bool> ModifyUserInfo(UserCredential userInformationModel)
         {
             if (userInformationModel == null)
@@ -291,7 +313,7 @@ namespace LML.NPOManagement.Bll.Services
             return user;
         }
 
-        public async Task<ServiceResult<UserModel>> Login(UserModel userModel, IConfiguration configuration)
+        public async Task<ServiceResult<UserModel>> Login(UserModel userModel)
         {
             var user = await _userRepository.GetUserByEmail(userModel.Email);
             if (user == null)
@@ -311,11 +333,11 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             user.Password = null;
-            user.Token = TokenCreationHelper.GenerateJwtToken(user, configuration, _userRepository);
+            user.Token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository);
             return ServiceResult<UserModel>.Success(user);
         }
 
-        public async Task<ServiceResult<UserModel>> Registration(UserModel userModel, IConfiguration configuration)
+        public async Task<ServiceResult<UserModel>> Registration(UserModel userModel)
         {
             if (userModel == null)
             {
@@ -332,13 +354,13 @@ namespace LML.NPOManagement.Bll.Services
             await _userRepository.AddUser(userModel);
 
             var newUser = await _userRepository.GetUserByEmail(userModel.Email);
-            newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, configuration, _userRepository);
+            newUser.Token = TokenCreationHelper.GenerateJwtToken(newUser, _configuration, _userRepository);
             newUser.Password = null;
 
             return ServiceResult<UserModel>.Success(newUser);
         }
 
-        public async Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel, IConfiguration configuration)
+        public async Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel/*, IConfiguration configuration*/)
         {
             if (userInformationModel == null)
             {

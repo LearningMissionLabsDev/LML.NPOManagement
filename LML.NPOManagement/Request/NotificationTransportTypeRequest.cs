@@ -6,6 +6,6 @@ namespace LML.NPOManagement.Request
     {
         [Required]
         [StringLength(100)]
-        public string Description { get; set; } 
+        public string Description { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿namespace LML.NPOManagement.Response
-{ 
+{
     public class UserInventoryResponse
     {
         public int InventoryTypeId { get; set; }

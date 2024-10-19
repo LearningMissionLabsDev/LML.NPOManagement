@@ -2,10 +2,11 @@
 
 namespace LML.NPOManagement.Request
 {
-    public class InventoryTypeRequest
+    public class UserEmailRequest
     {
+        [EmailAddress]
         [Required]
-        [StringLength(100)]
-        public string Description { get; set; }
+        public string Email { get; set; }
+
     }
 }

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace LML.NPOManagement.Request
-{ 
+{
     public class UserInventoryRequest
     {
         [Required]

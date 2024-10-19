@@ -30,8 +30,8 @@ namespace LML.NPOManagement.Middeware
                                 //Title = isDev ? $"{ex.Message}" : "An error occurred.",
                                 //Detail = isDev ? ex.StackTrace : null
 
-                                Title = $"{ex.Message}" ,
-                                Detail = ex.StackTrace 
+                                Title = $"{ex.Message}",
+                                Detail = ex.StackTrace
                             }));
                     }
                 });
