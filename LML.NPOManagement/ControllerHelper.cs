@@ -21,6 +21,7 @@ namespace LML.NPOManagement
                 ServiceStatusCode.Conflict => controller.Conflict(result.ErrorMessage),
                 ServiceStatusCode.BadRequest => controller.BadRequest(result.ErrorMessage),
                 ServiceStatusCode.Unauthorized => controller.Unauthorized(result.ErrorMessage),
+                ServiceStatusCode.UserInactive => controller.UnprocessableEntity(result.ErrorMessage),
                 _ => controller.StatusCode(500, "Internal Server Error")
             };
         }

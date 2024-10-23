@@ -3,6 +3,7 @@ using LML.NPOManagement.Bll.Shared;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 
@@ -19,22 +20,25 @@ namespace LML.NPOManagement.Bll.Services
             _configuration = configuration;
         }
 
-        public async Task<UserModel> ActivationUser(string token)
+        public async Task<ServiceResult<UserModel>> ActivationUser(string token)
         {
             if (string.IsNullOrEmpty(token))
             {
-                return null;
+                ServiceResult<UserModel>.Failure("Invalid Token.", ServiceStatusCode.Unauthorized);
             }
 
-            var newUser = await TokenCreationHelper.ValidateJwtToken(token, _configuration, _userRepository);
-            if (newUser == null)
+            var user = await TokenCreationHelper.ValidateJwtToken(token, _configuration, _userRepository);
+            if (user == null)
             {
-                return null;
+               return ServiceResult<UserModel>.Failure("Invalid Token.", ServiceStatusCode.Unauthorized);
             }
-            await _userRepository.UpdateUserStatus(newUser.Id, StatusEnumModel.Active);
-            newUser.StatusId = (int)StatusEnumModel.Active;
 
-            return newUser;
+            await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Active);
+
+            var newUser = await _userRepository.GetUserById(user.Id);
+            
+
+            return ServiceResult<UserModel>.Success(newUser);
         }
 
         public async Task<UserModel> DeleteUser(int userId)
@@ -326,6 +330,11 @@ namespace LML.NPOManagement.Bll.Services
                 return ServiceResult<UserModel>.Failure("Incorrect password.", ServiceStatusCode.InvalidCredentials);
             }
 
+            if (user.StatusId == (int)StatusEnumModel.Pending)
+            {
+                return ServiceResult<UserModel>.Failure("Email is not verified", ServiceStatusCode.UserInactive);
+            }
+
             var accounts = await _userRepository.GetUsersInfoAccount(user.Id);
             if (accounts != null)
             {
@@ -360,7 +369,7 @@ namespace LML.NPOManagement.Bll.Services
             return ServiceResult<UserModel>.Success(newUser);
         }
 
-        public async Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel/*, IConfiguration configuration*/)
+        public async Task<ServiceResult<int>> UserInformationRegistration(UserInformationModel userInformationModel)
         {
             if (userInformationModel == null)
             {

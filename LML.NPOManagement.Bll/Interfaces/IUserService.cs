@@ -22,7 +22,7 @@ namespace LML.NPOManagement.Bll.Interfaces
         Task<UserModel> DeleteUser(int userId);
         Task<bool> DeleteUserFromGroup(int userId, int groupId);
         Task<bool> DeleteGroup(int groupId);
-        Task<UserModel> ActivationUser(string token);
+        Task<ServiceResult<UserModel>> ActivationUser(string token);
         Task<bool> AddUserToGroup(int userId, int groupId);
         Task<ServiceResult<UserModel>> Login(UserModel userModel);
         Task<ServiceResult<UserModel>> Registration(UserModel userModel);

@@ -385,7 +385,7 @@ namespace LML.NPOManagement.Controllers
             return Ok();
         }
 
-        [HttpGet("verifyEmail")]
+        [HttpPost("verifyEmail")]
         public async Task<ActionResult<bool>> VerifyEmail([FromQuery] string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -393,16 +393,13 @@ namespace LML.NPOManagement.Controllers
                 return BadRequest("Please check your token");
             }
 
-            var user = await _userService.ActivationUser(token);
-            /*var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-            var template = _configuration.GetSection("AppSettings:Templates").Value;
-            var key = template + "RegistracionNotification.html";
-            var body = await GetFileByKeyAsync(bucketName, key);
+            var result = await _userService.ActivationUser(token);
+            if (result.IsSuccess)
+            {
+                _notificationService.EmailVerificationConfirmation(result.Data);
+            }
 
-            var status = await _notificationService.SendNotificationUserAsync(user, new NotificationModel(), body);*/
-            _notificationService.EmailVerificationConfirmation(user);
-
-            return Ok();
+            return ControllerHelper.HandleServiceResult(this, result);
         }
 
         [HttpPost("resetPassword")]
@@ -482,6 +479,7 @@ namespace LML.NPOManagement.Controllers
 
                     return Ok(userResponse);
                 }
+
             }
 
             return ControllerHelper.HandleServiceResult(this, result);
