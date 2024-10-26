@@ -213,7 +213,7 @@ namespace LML.NPOManagement.Bll.Services
 
             string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository);
 
-            string passwordResetUrl = _configuration.GetSection("AppSettings:PasswordResetURL").Value;
+            string passwordResetUrl = _configuration.GetSection("AppSettings:ClientVerificationURL").Value;
             var uri = $"{passwordResetUrl}?token={token}";
 
             template = template.Replace("@resetLink", uri);
