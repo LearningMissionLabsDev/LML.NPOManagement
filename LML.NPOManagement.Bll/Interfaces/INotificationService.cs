@@ -12,9 +12,9 @@ namespace LML.NPOManagement.Bll.Interfaces
         public void SendNotifications(List<UserModel> userModels, NotificationModel notificationModel, string body);
         public Task<bool> SendNotificationUserAsync(UserModel userModel, NotificationModel notificationModel, string body);
         public void SendNotificationInvestor(DonationModel donationModel, NotificationModel notificationModel, string body);
-        public void PasswordRecoverRequest(UserModel user);
-        public void EmailVerificationRequest(UserModel user);
-        public void EmailVerificationConfirmation(UserModel user);
+        public void PasswordRecoverRequest(UserModel user, string lang);
+        public void EmailVerificationRequest(UserModel user, string lang);
+        public void EmailVerificationConfirmation(UserModel user, string lang);
 
 
     }
