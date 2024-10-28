@@ -201,7 +201,7 @@ namespace LML.NPOManagement.Bll.Services
 
 
 
-        public async void PasswordRecoverRequest(UserModel user)
+        public async void PasswordRecoverRequest(UserModel user, string? lang)
         {
             if (user == null)
             {
@@ -209,13 +209,13 @@ namespace LML.NPOManagement.Bll.Services
             }
             var userInfo = user.UserInformations.FirstOrDefault();
 
-            var template = await GetTemplateByFileName("RecoverPassword.html");
+            var template = await GetTemplateByFileName("RecoverPassword.html", lang);
 
-            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository);
+            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository, 5);
 
             string passwordResetUrl = _configuration.GetSection("AppSettings:ClientVerificationURL").Value;
             var uri = $"{passwordResetUrl}?token={token}";
-
+            Console.WriteLine(token);
             template = template.Replace("@resetLink", uri);
             template = template.Replace("@firstName", userInfo.FirstName);
             template = template.Replace("@lastName", userInfo.LastName);
@@ -224,7 +224,7 @@ namespace LML.NPOManagement.Bll.Services
 
         }
 
-        public async void EmailVerificationRequest(UserModel user)
+        public async void EmailVerificationRequest(UserModel user, string lang)
         {
             if (user == null)
             {
@@ -232,9 +232,9 @@ namespace LML.NPOManagement.Bll.Services
             }
             var userInfo = user.UserInformations.FirstOrDefault();
 
-            var template = await GetTemplateByFileName("CheckingEmail.html");
+            var template = await GetTemplateByFileName("CheckingEmail.html", lang);
 
-            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository);
+            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository, 50);
 
             string verificationUrl = _configuration.GetSection("AppSettings:PasswordResetURL").Value;
             var uri = $"{verificationUrl}?token={token}";
@@ -246,7 +246,7 @@ namespace LML.NPOManagement.Bll.Services
 
         }
 
-        public async void EmailVerificationConfirmation(UserModel user)
+        public async void EmailVerificationConfirmation(UserModel user, string lang)
         {
             if (user == null)
             {
@@ -254,7 +254,7 @@ namespace LML.NPOManagement.Bll.Services
             }
             var userInfo = user.UserInformations.FirstOrDefault();
 
-            var template = await GetTemplateByFileName("RegistracionNotification.html");
+            var template = await GetTemplateByFileName("RegistracionNotification.html", lang);
 
             template = template.Replace("@firstName", userInfo.FirstName);
             template = template.Replace("@lastName", userInfo.LastName);
@@ -262,10 +262,12 @@ namespace LML.NPOManagement.Bll.Services
 
         }
 
-        private async Task<string> GetTemplateByFileName(string templateName)
+        private async Task<string> GetTemplateByFileName(string templateName, string lang)
         {
+            var validLangs = new HashSet<string> { "am", "en" };
+            lang = validLangs.Contains(lang) ? lang : "en";
             var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
-            var template = _configuration.GetSection("AppSettings:Templates").Value;
+            var template = _configuration.GetSection("AppSettings:Templates").Value + lang + "/";
             var key = template + templateName;
 
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
@@ -273,11 +275,12 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-
+            
             var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
             var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();
-
             return streamReader;
+            
+
         }
 
         private string HtmlSubject()

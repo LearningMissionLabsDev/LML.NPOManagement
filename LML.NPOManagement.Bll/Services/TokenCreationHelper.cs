@@ -23,7 +23,7 @@ namespace LML.NPOManagement.Bll.Services
             return _signingKey;
         }
 
-        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository, int accountId = 0)
+        public static string GenerateJwtToken(UserModel user, IConfiguration configuration, IUserRepository userRepository, int accountId = 0, int expire = 0)
         {
             string token = "";
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -47,7 +47,7 @@ namespace LML.NPOManagement.Bll.Services
                     Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id.ToString()),
                 }),
-                    Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
+                    Expires = DateTime.UtcNow.AddMinutes(expire > 0 ? expire : Convert.ToInt16(configuration.GetSection("AppSettings:TokenExpiration").Value)),
                     SigningCredentials = new SigningCredentials(GetSigningKey(configuration), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var createdToken = tokenHandler.CreateToken(tokenDescriptor);

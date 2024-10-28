@@ -2,7 +2,7 @@
 {
     public enum ServiceStatusCode
     {
-        Success = 1,        
+        Success = 1,
         UserNotFound = 2,  
         InvalidCredentials = 3,
         AccountNotFound = 4,
@@ -11,6 +11,7 @@
         Conflict = 7,
         BadRequest = 8,
         InternalServerError = 9,
-        Unauthorized = 10
+        Unauthorized = 10,
+        Acepted = 11
     }
 }

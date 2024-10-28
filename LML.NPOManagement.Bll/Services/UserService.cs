@@ -32,6 +32,11 @@ namespace LML.NPOManagement.Bll.Services
             {
                return ServiceResult<UserModel>.Failure("Invalid Token.", ServiceStatusCode.Unauthorized);
             }
+            user = await _userRepository.GetUserById(user.Id);
+            if(user.StatusId == (int)StatusEnumModel.Active)
+            {
+                ServiceResult<UserModel>.Failure("already active", ServiceStatusCode.Acepted);
+            }
 
             await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Active);
 

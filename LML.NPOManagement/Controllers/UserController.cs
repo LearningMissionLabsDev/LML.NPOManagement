@@ -324,14 +324,14 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("recover")]
-        public async Task<ActionResult<UserResponse>> RecoverPassword([FromBody] UserEmailRequest userEmailRequest)
+        public async Task<ActionResult<UserResponse>> RecoverPassword([FromBody] UserEmailRequest userEmailRequest, [FromQuery] string lang = "en")
         {
             var user = await _userService.GetUserByEmail(userEmailRequest.Email);
             if (user == null)
             {
                 return BadRequest("Wrong Email");
             }
-            _notificationService.PasswordRecoverRequest(user);
+            _notificationService.PasswordRecoverRequest(user, lang);
 
             return Ok();
 
@@ -386,7 +386,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("verifyEmail")]
-        public async Task<ActionResult<bool>> VerifyEmail([FromQuery] string token)
+        public async Task<ActionResult<bool>> VerifyEmail([FromQuery] string token, [FromQuery] string lang = "en")
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -396,7 +396,7 @@ namespace LML.NPOManagement.Controllers
             var result = await _userService.ActivationUser(token);
             if (result.IsSuccess)
             {
-                _notificationService.EmailVerificationConfirmation(result.Data);
+                _notificationService.EmailVerificationConfirmation(result.Data, lang);
             }
 
             return ControllerHelper.HandleServiceResult(this, result);
@@ -499,7 +499,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPost("userInfoRegistration")]
-        public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest)
+        public async Task<ActionResult<int>> UserInfoRegistration([FromBody] UserInformationRequest userInformationRequest, [FromQuery] string lang = "en")
         {
             if (HttpContext.Items["User"] is not UserModel user)
             {
@@ -524,7 +524,7 @@ namespace LML.NPOManagement.Controllers
 
             var newUser = await _userService.GetUserById(userInformationModel.UserId);
 
-            _notificationService.EmailVerificationRequest(newUser);
+            _notificationService.EmailVerificationRequest(newUser, lang);
 
             return ControllerHelper.HandleServiceResult(this, result);
 
@@ -572,7 +572,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> Put([FromBody] UserRequest userRequest)
+        public async Task<ActionResult> Put([FromBody] UserRequest userRequest, [FromQuery] string lang = "en")
         {
             var user = HttpContext.Items["User"] as UserModel;
             if (user == null)
@@ -586,7 +586,7 @@ namespace LML.NPOManagement.Controllers
             {
                 if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
                 {
-                    _notificationService.EmailVerificationRequest(modifyUser);
+                    _notificationService.EmailVerificationRequest(modifyUser, lang);
                 }
                 return Ok();
             }
@@ -595,7 +595,7 @@ namespace LML.NPOManagement.Controllers
         }
 
         [HttpPut("modifyEmail")]
-        public async Task<ActionResult> ModifyUserEmail([FromBody] LoginRequest loginRequest)
+        public async Task<ActionResult> ModifyUserEmail([FromBody] LoginRequest loginRequest, [FromQuery] string lang = "en")
         {
             var user = HttpContext.Items["User"] as UserModel;
             if (user == null)
@@ -612,7 +612,7 @@ namespace LML.NPOManagement.Controllers
 
             if (modifyUser.StatusId == (int)StatusEnumModel.Pending)
             {
-                _notificationService.EmailVerificationRequest(modifyUser);
+                _notificationService.EmailVerificationRequest(modifyUser, lang);
 
             }
             return Ok();
