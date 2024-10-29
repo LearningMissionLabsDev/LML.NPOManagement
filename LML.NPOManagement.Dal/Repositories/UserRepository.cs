@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using FluentEmail.Core;
-using Grpc.Core;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Models;
@@ -51,7 +49,7 @@ namespace LML.NPOManagement.Dal.Repositories
             if (user.StatusId != (int)status)
             {
                 user.StatusId = (int)status;
-                if(status == StatusEnumModel.Deleted)
+                if (status == StatusEnumModel.Deleted)
                 {
                     var userInfo = user.UserInformations.Where(info => info.UserId == user.Id).FirstOrDefault();
                     if (userInfo != null)

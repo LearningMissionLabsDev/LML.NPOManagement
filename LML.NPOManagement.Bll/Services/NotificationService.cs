@@ -275,11 +275,11 @@ namespace LML.NPOManagement.Bll.Services
             {
                 return null;
             }
-            
+
             var s3Object = await _s3Client.GetObjectAsync(bucketName, key);
             var streamReader = new StreamReader(s3Object.ResponseStream).ReadToEnd();
             return streamReader;
-            
+
 
         }
 

@@ -3,7 +3,7 @@
     public enum ServiceStatusCode
     {
         Success = 1,
-        UserNotFound = 2,  
+        UserNotFound = 2,
         InvalidCredentials = 3,
         AccountNotFound = 4,
         UserInactive = 5,

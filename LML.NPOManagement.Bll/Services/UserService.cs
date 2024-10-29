@@ -3,7 +3,6 @@ using LML.NPOManagement.Bll.Shared;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using BC = BCrypt.Net.BCrypt;
 
@@ -30,10 +29,10 @@ namespace LML.NPOManagement.Bll.Services
             var user = await TokenCreationHelper.ValidateJwtToken(token, _configuration, _userRepository);
             if (user == null)
             {
-               return ServiceResult<UserModel>.Failure("Invalid Token.", ServiceStatusCode.Unauthorized);
+                return ServiceResult<UserModel>.Failure("Invalid Token.", ServiceStatusCode.Unauthorized);
             }
             user = await _userRepository.GetUserById(user.Id);
-            if(user.StatusId == (int)StatusEnumModel.Active)
+            if (user.StatusId == (int)StatusEnumModel.Active)
             {
                 ServiceResult<UserModel>.Failure("already active", ServiceStatusCode.Acepted);
             }
@@ -41,7 +40,7 @@ namespace LML.NPOManagement.Bll.Services
             await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Active);
 
             var newUser = await _userRepository.GetUserById(user.Id);
-            
+
 
             return ServiceResult<UserModel>.Success(newUser);
         }

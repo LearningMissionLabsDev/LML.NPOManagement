@@ -519,7 +519,7 @@ namespace LML.NPOManagement.Controllers
                 DateOfBirth = userInformationRequest.DateOfBirth,
             };
 
-            
+
             var result = await _userService.UserInformationRegistration(userInformationModel);
 
             var newUser = await _userService.GetUserById(userInformationModel.UserId);

@@ -1,4 +1,4 @@
-﻿namespace LML.NPOManagement.Common 
+﻿namespace LML.NPOManagement.Common
 {
     public class InvestorInformationModel
     {

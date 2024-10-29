@@ -1,7 +1,4 @@
-﻿
-using System.Security.Principal;
-
-namespace LML.NPOManagement.Common.Model
+﻿namespace LML.NPOManagement.Common.Model
 {
     public class AccountStatusModel
     {

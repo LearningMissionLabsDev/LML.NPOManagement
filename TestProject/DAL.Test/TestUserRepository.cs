@@ -701,7 +701,7 @@ namespace TestProject.DAL.Test
 
             // Act
             var result = await userRepository.DeleteUserFromGroup(-1, -1);
-            
+
             // Assert
             Assert.IsNull(result, "Expected null, when IDs are negative.");
         }

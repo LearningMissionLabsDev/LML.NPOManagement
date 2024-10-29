@@ -2,7 +2,7 @@
 
 namespace LML.NPOManagement.Common
 {
-    public class NotificationModel 
+    public class NotificationModel
     {
         public int Id { get; set; }
         public int NotificationTypeId { get; set; }

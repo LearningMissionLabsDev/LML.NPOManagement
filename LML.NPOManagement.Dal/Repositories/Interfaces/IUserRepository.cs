@@ -24,7 +24,7 @@ namespace LML.NPOManagement.Dal.Repositories.Interfaces
         Task<UserModel> GetUserByEmail(string email);
         Task<List<SearchModel>> GetSearchResults(string searchParam, bool includeGroups);
         Task<UsersGroupModel> AddGroup(UsersGroupModel groupModel);
-        Task<bool> AddUserToGroup(int userId,int groupId);
+        Task<bool> AddUserToGroup(int userId, int groupId);
         Task<List<UsersGroupModel>> GetAllGroups();
         Task<List<UsersGroupModel>> GetGroupsByName(string groupName);
         Task<UsersGroupModel> GetGroupById(int groupId);

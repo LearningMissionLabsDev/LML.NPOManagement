@@ -9,7 +9,7 @@
         Beneficiary = 8
     }
 
-    public static class RoleAccess 
+    public static class RoleAccess
     {
         public const int SysAdminOnly = (int)UserAccountRoleEnum.SysAdmin;
         public const int AllAccess = (int)UserAccountRoleEnum.SysAdmin

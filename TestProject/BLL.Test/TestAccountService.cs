@@ -1,6 +1,6 @@
 ﻿using LML.NPOManagement.Bll.Services;
-using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Common;
+using LML.NPOManagement.Common.Model;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -253,7 +253,7 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            int idleUsersAccountId = 1; 
+            int idleUsersAccountId = 1;
             int accountRoleId = 1;
 
             accountRepositoryMock.Setup(repo => repo.GetAccountRoleProgress(idleUsersAccountId)).ReturnsAsync((List<AccountUserActivityModel>)null);
@@ -271,7 +271,7 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            int existingAccountId = 1; 
+            int existingAccountId = 1;
             int requestedAccountRoleId = 1;
 
             var accountUserActivityModeles = new List<AccountUserActivityModel> {
@@ -294,8 +294,8 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            int existingAccountId = 1; 
-            int requestedAccountRoleId = 1; 
+            int existingAccountId = 1;
+            int requestedAccountRoleId = 1;
 
             var accountUserActivityModeles = new List<AccountUserActivityModel> {
                 new AccountUserActivityModel { Account2UserModel = new Account2UserModel { AccountRoleId = requestedAccountRoleId } }
@@ -305,7 +305,7 @@ namespace TestProject.BLL.Test
 
             // Act
             var result = await accountService.GetAccountRoleProgress(existingAccountId, requestedAccountRoleId);
-            
+
             // Assert 
             Assert.IsTrue(result.SequenceEqual(accountUserActivityModeles), "Expected non-null result when matching account user activities exist");
         }
@@ -333,7 +333,7 @@ namespace TestProject.BLL.Test
 
             // Act
             var resultEmptyName = await accountService.AddAccount(new AccountModel { Name = string.Empty });
-            var resultNullName = await accountService.AddAccount(new AccountModel {});
+            var resultNullName = await accountService.AddAccount(new AccountModel { });
 
             // Assert
             Assert.IsNull(resultEmptyName, "Expected null when accountModel name is empty");
@@ -404,7 +404,7 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            var existingAccountModel = new Account2UserModel { AccountId = 1 }; 
+            var existingAccountModel = new Account2UserModel { AccountId = 1 };
 
             accountRepositoryMock.Setup(repo => repo.GetAccountById(existingAccountModel.AccountId)).ReturnsAsync((AccountModel)null);
 
@@ -422,7 +422,7 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            var account2UserModel = new Account2UserModel { AccountId = 1 }; 
+            var account2UserModel = new Account2UserModel { AccountId = 1 };
             var account = new AccountModel { Id = account2UserModel.AccountId };
 
             accountRepositoryMock.Setup(repo => repo.GetAccountById(account2UserModel.AccountId)).ReturnsAsync(account);
@@ -442,7 +442,7 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            var account2UserModel = new Account2UserModel { AccountId = 1 }; 
+            var account2UserModel = new Account2UserModel { AccountId = 1 };
             var account = new AccountModel { Id = account2UserModel.AccountId };
 
             accountRepositoryMock.Setup(repo => repo.GetAccountById(account2UserModel.AccountId)).ReturnsAsync(account);
@@ -496,7 +496,7 @@ namespace TestProject.BLL.Test
 
             var account2UserModels = new List<Account2UserModel>
             {
-                new Account2UserModel { Id = 1 } 
+                new Account2UserModel { Id = 1 }
             };
 
             accountRepositoryMock.Setup(repo => repo.GetAccount2Users()).ReturnsAsync(account2UserModels);
@@ -521,7 +521,7 @@ namespace TestProject.BLL.Test
                 new Account2UserModel { Id = 1 }
             };
 
-            var activityUserModel = new AccountUserActivityModel { Account2UserId = 1 }; 
+            var activityUserModel = new AccountUserActivityModel { Account2UserId = 1 };
 
             accountRepositoryMock.Setup(repo => repo.GetAccount2Users()).ReturnsAsync(account2UserModels);
             accountRepositoryMock.Setup(repo => repo.AddAccountUserActivityProgress(activityUserModel)).ReturnsAsync(activityUserModel); // Simulate successful addition
@@ -575,7 +575,7 @@ namespace TestProject.BLL.Test
             var accountRepositoryMock = GetAccountRepository();
             var accountService = GetAccountService(accountRepositoryMock);
 
-            var accountToModify = new AccountModel { Id = 1 }; 
+            var accountToModify = new AccountModel { Id = 1 };
             var modifiedAccount = new AccountModel { Id = accountToModify.Id, Name = "Modified Name" };
             accountRepositoryMock.Setup(repo => repo.ModifyAccount(accountToModify)).ReturnsAsync(modifiedAccount);
 
@@ -688,7 +688,7 @@ namespace TestProject.BLL.Test
             int accountIdToDelete = 1;
 
             accountRepositoryMock.Setup(repo => repo.DeleteAccount(accountIdToDelete)).ReturnsAsync(true);
-            
+
             // Act
             var result = await accountService.DeleteAccount(accountIdToDelete);
 

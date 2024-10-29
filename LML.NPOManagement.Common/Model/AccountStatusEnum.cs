@@ -2,7 +2,7 @@
 {
     public enum AccountStatusEnum
     {
-        Pending=1,
+        Pending = 1,
         Active,
         Deleted
     }
