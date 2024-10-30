@@ -11,7 +11,6 @@
         Conflict = 7,
         BadRequest = 8,
         InternalServerError = 9,
-        Unauthorized = 10,
-        Acepted = 11
+        Unauthorized = 10
     }
 }
