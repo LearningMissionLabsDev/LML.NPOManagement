@@ -210,8 +210,9 @@ namespace LML.NPOManagement.Bll.Services
             var userInfo = user.UserInformations.FirstOrDefault();
 
             var template = await GetTemplateByFileName("RecoverPassword.html", lang);
+            int timeout = Convert.ToInt16(_configuration.GetSection("AppSettings:PasswordResetTokenExpiration").Value);
 
-            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository, 5);
+            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository, timeout);
 
             string passwordResetUrl = _configuration.GetSection("AppSettings:ClientVerificationURL").Value;
             var uri = $"{passwordResetUrl}?token={token}";
@@ -234,9 +235,9 @@ namespace LML.NPOManagement.Bll.Services
 
             var template = await GetTemplateByFileName("CheckingEmail.html", lang);
 
-            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository, 50);
+            string token = TokenCreationHelper.GenerateJwtToken(user, _configuration, _userRepository);
 
-            string verificationUrl = _configuration.GetSection("AppSettings:PasswordResetURL").Value;
+            string verificationUrl = _configuration.GetSection("AppSettings:ClientVerificationURL").Value;
             var uri = $"{verificationUrl}?token={token}";
 
             template = template.Replace("@verifiyCode", uri);
@@ -264,7 +265,7 @@ namespace LML.NPOManagement.Bll.Services
 
         private async Task<string> GetTemplateByFileName(string templateName, string lang)
         {
-            var validLangs = new HashSet<string> { "am", "en" };
+            var validLangs = _configuration.GetSection("AppSettings:localizations").Get<List<string>>();
             lang = validLangs.Contains(lang) ? lang : "en";
             var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
             var template = _configuration.GetSection("AppSettings:Templates").Value + lang + "/";

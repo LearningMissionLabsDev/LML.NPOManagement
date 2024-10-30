@@ -34,13 +34,10 @@ namespace LML.NPOManagement.Bll.Services
             user = await _userRepository.GetUserById(user.Id);
             if (user.StatusId == (int)StatusEnumModel.Active)
             {
-                ServiceResult<UserModel>.Failure("already active", ServiceStatusCode.Acepted);
+                ServiceResult<UserModel>.Success(user);
             }
 
-            await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Active);
-
-            var newUser = await _userRepository.GetUserById(user.Id);
-
+            var newUser = await _userRepository.UpdateUserStatus(user.Id, StatusEnumModel.Active);
 
             return ServiceResult<UserModel>.Success(newUser);
         }
