@@ -400,7 +400,7 @@ namespace LML.NPOManagement.Controllers
                 Name = account.Name,
                 Description = account.Description,
                 DateCreated = account.DateCreated,
-                AccountImage= accountRequest.AccountImage
+                AccountImage = accountRequest.AccountImage
             };
 
             return Ok(accountResponse);

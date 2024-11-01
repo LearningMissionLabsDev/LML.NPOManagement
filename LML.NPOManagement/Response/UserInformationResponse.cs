@@ -11,6 +11,6 @@ namespace LML.NPOManagement.Response
         public string? MiddleName { get; set; }
         public string? UserImage { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public int AccountRoleId {get; set;}
+        public int AccountRoleId { get; set; }
     }
 }

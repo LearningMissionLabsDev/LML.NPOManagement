@@ -1,5 +1,5 @@
 ﻿namespace LML.NPOManagement.Response
-{ 
+{
     public class InvestorInformationResponse
     {
         public int Id { get; set; }

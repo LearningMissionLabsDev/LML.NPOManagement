@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Common.Model;
-
-namespace LML.NPOManagement.Common.Model
+﻿namespace LML.NPOManagement.Common.Model
 {
     public partial class UsersGroupModel
     {

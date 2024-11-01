@@ -60,7 +60,7 @@ namespace LML.NPOManagement.Controllers
         public async Task<IEnumerable<UserInventoryResponse>> Get()//???????
         {
             var inventories = await _userInventoryService.GetAllUserInventories();
-            return _mapper.Map<List<UserInventoryModel>,List<UserInventoryResponse>>(inventories);
+            return _mapper.Map<List<UserInventoryModel>, List<UserInventoryResponse>>(inventories);
         }
 
         // GET: api/<UserInventoryController>
@@ -68,12 +68,12 @@ namespace LML.NPOManagement.Controllers
         [Authorize(RoleAccess.AllAccess)]
         public async Task<ActionResult<string>> GetInventoryType(string type, DateTime dateTimeStart, DateTime dateTimeFinsh)
         {
-            if(type == null)
+            if (type == null)
             {
                 return BadRequest();
             }
             var inventoryAmount = await _userInventoryService.GetAllInventoryTypes(type, dateTimeStart, dateTimeFinsh);
-            if(inventoryAmount == null)
+            if (inventoryAmount == null)
             {
                 return NotFound();
             }
@@ -83,7 +83,7 @@ namespace LML.NPOManagement.Controllers
         // GET: api/<UserInventoryController>
         [HttpGet("inventoryByTime")]
         public async Task<ActionResult<UserInventoryResponse>> GetInventoryByTime(DateTime dateTimeStart, DateTime dateTimeFinsh)
-        {            
+        {
             var inventories = await _userInventoryService.GetInventoryByYear(dateTimeStart, dateTimeFinsh);
             if (inventories == null)
             {
@@ -97,12 +97,12 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserInventoryResponse>> GetInventoryUserByTime(int id, DateTime dateTimeStart, DateTime dateTimeFinsh)//convert datetime 2 avelacnel 2 kalonka status ev amount quantity
         {
             var inventory = await _userService.GetUserById(id);
-            if(inventory == null)
+            if (inventory == null)
             {
                 return BadRequest("Not user");
             }
             var inventories = await _userInventoryService.GetInventoryUserByYear(dateTimeStart, dateTimeFinsh, id);
-            if(inventories == null)
+            if (inventories == null)
             {
                 return BadRequest("Not inventory");
             }
@@ -111,10 +111,10 @@ namespace LML.NPOManagement.Controllers
 
         // GET api/<UserInventoryController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult< UserInventoryResponse>> Get(int id)//jnjel
+        public async Task<ActionResult<UserInventoryResponse>> Get(int id)//jnjel
         {
             var inventory = await _userInventoryService.GetUserInventoryById(id);
-            if(inventory == null)
+            if (inventory == null)
             {
                 return BadRequest();
             }
@@ -131,7 +131,7 @@ namespace LML.NPOManagement.Controllers
                 return BadRequest();
             }
             var userInventories = await _userInventoryService.GetInventoryByUser(id);
-            if(userInventories == null)
+            if (userInventories == null)
             {
                 return BadRequest();
             }
@@ -143,18 +143,18 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserInventoryResponse>> Post([FromBody] UserInventoryRequest userInventoryRequest)
         {
             var user = await _userService.GetUserById(userInventoryRequest.UserId);
-            if(user == null)
+            if (user == null)
             {
                 return BadRequest();
             }
             var inventoryType = await _userInventoryService.GetUserInventoryTypeById(userInventoryRequest.InventoryTypeId);
-            if(inventoryType == null)
+            if (inventoryType == null)
             {
                 return BadRequest();
             }
-            var inventoryModel = _mapper.Map<UserInventoryRequest,UserInventoryModel>(userInventoryRequest);
+            var inventoryModel = _mapper.Map<UserInventoryRequest, UserInventoryModel>(userInventoryRequest);
             var inventory = await _userInventoryService.AddUserInventory(inventoryModel);
-            var inventoryResponse = _mapper.Map<UserInventoryModel,UserInventoryResponse>(inventory);
+            var inventoryResponse = _mapper.Map<UserInventoryModel, UserInventoryResponse>(inventory);
             return Ok(inventoryResponse);
         }
 
@@ -162,9 +162,9 @@ namespace LML.NPOManagement.Controllers
         [HttpPost("inventoryType")]
         public async Task<ActionResult<InventoryTypeResponse>> PostInventoryType([FromBody] InventoryTypeRequest inventoryTypeRequest)
         {
-            var inventoryType = _mapper.Map<InventoryTypeRequest,InventoryTypeModel>(inventoryTypeRequest);
+            var inventoryType = _mapper.Map<InventoryTypeRequest, InventoryTypeModel>(inventoryTypeRequest);
             var newInventory = await _userInventoryService.AddInventoryType(inventoryType);
-            return Ok(_mapper.Map<InventoryTypeModel,InventoryTypeResponse>(newInventory));
+            return Ok(_mapper.Map<InventoryTypeModel, InventoryTypeResponse>(newInventory));
         }
 
         // PUT api/<UserInventoryController>/5
@@ -172,7 +172,7 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<UserInventoryResponse>> Put(int id, [FromBody] UserInventoryRequest userInventoryRequest)
         {
             var inventory = await _userInventoryService.GetUserInventoryById(id);
-            if( inventory == null)
+            if (inventory == null)
             {
                 return BadRequest();
             }
@@ -200,8 +200,8 @@ namespace LML.NPOManagement.Controllers
             {
                 return BadRequest();
             }
-            var newInventory = await _userInventoryService.DeleteInventory(id);  
-            return Ok(newInventory);          
+            var newInventory = await _userInventoryService.DeleteInventory(id);
+            return Ok(newInventory);
         }
     }
 }

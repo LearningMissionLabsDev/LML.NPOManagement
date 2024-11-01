@@ -268,7 +268,7 @@ namespace TestProject.DAL.Test
             var accounts = new List<Account> { new Account { Id = 2, StatusId = (int)AccountStatusEnum.Active } };
 
             var account2User = new Account2User();
-            var accountUserActivity = new AccountUserActivity {};
+            var accountUserActivity = new AccountUserActivity { };
             account2User.AccountUserActivities.Add(accountUserActivity);
             accounts[0].Account2Users.Add(account2User);
 
@@ -447,7 +447,7 @@ namespace TestProject.DAL.Test
             var accountRepository = GetAccountRepository(mockedDbContext);
 
             var accountToModify = new Account { Id = 1, StatusId = (int)AccountStatusEnum.Deleted };
-            var accountModelToModify = new AccountModel { Id = 1, StatusId = (int)AccountStatusEnum.Deleted }; 
+            var accountModelToModify = new AccountModel { Id = 1, StatusId = (int)AccountStatusEnum.Deleted };
 
             var accounts = new List<Account> {
                 accountToModify,
@@ -470,7 +470,7 @@ namespace TestProject.DAL.Test
             var mockedDbContext = GetMockedDbContext();
             var accountRepository = GetAccountRepository(mockedDbContext);
 
-            var accounModelToModify = new AccountModel { Id = 1, Name = "New Name", Description = "New Description"};
+            var accounModelToModify = new AccountModel { Id = 1, Name = "New Name", Description = "New Description" };
             var account = new Account { Id = 1, Name = "Old Name", Description = "Old Description" };
 
             var accounts = new List<Account> { account };

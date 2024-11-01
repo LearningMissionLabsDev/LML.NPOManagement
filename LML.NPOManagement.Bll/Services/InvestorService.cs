@@ -2,7 +2,6 @@
 using LML.NPOManagement.Bll.Interfaces;
 using LML.NPOManagement.Common;
 using LML.NPOManagement.Common.Model;
-using LML.NPOManagement.Dal;
 using LML.NPOManagement.Dal.Models;
 using LML.NPOManagement.Dal.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -40,12 +39,12 @@ namespace LML.NPOManagement.Bll.Services
             });
             _mapper = config.CreateMapper();
             _investorRepository = investorRepository;
-           
+
         }
 
         public async Task<int> AddDonation(DonationModel donationModel)
         {
-            var donation =  _mapper.Map<DonationModel, Donation>(donationModel);
+            var donation = _mapper.Map<DonationModel, Donation>(donationModel);
             _dbContext.Donations.Add(donation);
             _dbContext.SaveChanges();
             return donation.Id;
@@ -115,9 +114,9 @@ namespace LML.NPOManagement.Bll.Services
             return null;
         }
 
-        public async Task<List<DonationModel>> GetDonationByYear(DateTime dateTimeStart,DateTime dateTimeFinish)
+        public async Task<List<DonationModel>> GetDonationByYear(DateTime dateTimeStart, DateTime dateTimeFinish)
         {
-            if ((dateTimeStart >= DateTime.UtcNow || dateTimeFinish >= DateTime.UtcNow) && dateTimeStart >= dateTimeFinish )
+            if ((dateTimeStart >= DateTime.UtcNow || dateTimeFinish >= DateTime.UtcNow) && dateTimeStart >= dateTimeFinish)
             {
                 return null;
             }

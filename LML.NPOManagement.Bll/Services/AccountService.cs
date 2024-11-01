@@ -27,7 +27,7 @@ namespace LML.NPOManagement.Bll.Services
             }
 
             var accountModel = await _accountRepository.GetAccountById(accountId);
-            
+
             if (accountModel == null)
             {
                 return null;
@@ -252,8 +252,8 @@ namespace LML.NPOManagement.Bll.Services
                 return null;
             }
 
-            var account2UserCheck =  account2User.FirstOrDefault(acc => acc.Id == accountUserActivityModel.Account2UserId);
-            if(account2UserCheck == null)
+            var account2UserCheck = account2User.FirstOrDefault(acc => acc.Id == accountUserActivityModel.Account2UserId);
+            if (account2UserCheck == null)
             {
                 return null;
             }

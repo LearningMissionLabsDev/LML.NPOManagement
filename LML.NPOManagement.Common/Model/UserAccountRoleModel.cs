@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LML.NPOManagement.Common.Model;
+﻿namespace LML.NPOManagement.Common.Model;
 
 public class UserAccountRoleModel
 {

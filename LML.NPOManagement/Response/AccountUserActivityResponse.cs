@@ -1,6 +1,4 @@
-﻿using LML.NPOManagement.Dal.Models;
-
-namespace LML.NPOManagement.Response
+﻿namespace LML.NPOManagement.Response
 {
     public class AccountUserActivityResponse
     {

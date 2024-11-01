@@ -11,7 +11,7 @@ namespace LML.NPOManagement.Dal.Repositories
     {
         private readonly IMapper _mapper;
         private readonly NpomanagementContext _dbContext;
-        
+
         public AccountRepository(NpomanagementContext context)
         {
             var config = new MapperConfiguration(cfg =>
@@ -135,7 +135,8 @@ namespace LML.NPOManagement.Dal.Repositories
             var account2Users = await _dbContext.Account2Users.Where(acc2User => acc2User.AccountId == accountId).Include(acc2User => acc2User.User).ToListAsync();
 
             var usersInformationModel = new List<UserInformationModel>();
-            foreach (var account in account2Users) {
+            foreach (var account in account2Users)
+            {
                 var userInformation = await _dbContext.UserInformations.Where(userInformation => userInformation.UserId == account.User.Id).FirstOrDefaultAsync();
 
                 if (userInformation == null) continue;
@@ -408,7 +409,7 @@ namespace LML.NPOManagement.Dal.Repositories
             {
                 return null;
             }
-            
+
             var activityMapping = userProgress.Select(map => new AccountUserActivityModel
             {
                 Account2UserId = map.Account2UserId,
@@ -434,9 +435,9 @@ namespace LML.NPOManagement.Dal.Repositories
             await _dbContext.AccountUserActivities.AddAsync(userActivity);
             await _dbContext.SaveChangesAsync();
             var activity = await _dbContext.AccountUserActivities.FirstOrDefaultAsync(act => act.Id == userActivity.Id);
-            if (activity == null) 
-            { 
-                return null; 
+            if (activity == null)
+            {
+                return null;
             }
 
             var userActivityModel = new AccountUserActivityModel()

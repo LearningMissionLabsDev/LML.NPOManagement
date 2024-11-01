@@ -22,7 +22,7 @@ namespace LML.NPOManagement.Dal.Repositories
 
         public async Task AddInvestor(UserInformationModel userInformationModel)
         {
-           await _dbContext.InvestorInformations.AddAsync(new InvestorInformation()
+            await _dbContext.InvestorInformations.AddAsync(new InvestorInformation()
             {
                 UserId = userInformationModel.UserId,
                 InvestorTierId = Convert.ToInt16(InvestorTierEnum.Basic)

@@ -4,6 +4,6 @@ namespace LML.NPOManagement.Response
 {
     public class InvestorTierResponse
     {
-        public InvestorTierEnum InvestorTierEnum { get;set; }
+        public InvestorTierEnum InvestorTierEnum { get; set; }
     }
 }

@@ -61,8 +61,8 @@ namespace LML.NPOManagement.Controllers
         public async Task<IEnumerable<InvestorInformationResponse>> GetAllInvestorInformations()
         {
             var investor = await _investorInformationService.GetAllInvestorInformations();
-            return  _mapper.Map<List<InvestorInformationModel>, List<InvestorInformationResponse>>(investor);
-           
+            return _mapper.Map<List<InvestorInformationModel>, List<InvestorInformationResponse>>(investor);
+
         }
 
         // GET api/<InvestorInformationController>/5
@@ -71,7 +71,7 @@ namespace LML.NPOManagement.Controllers
         {
             var investor = await _investorInformationService.GetInvestorInformationById(id);
             return _mapper.Map<InvestorInformationModel, InvestorInformationResponse>(investor);
-          
+
         }
 
         // GET: api/<InvestorInformationController>
@@ -79,7 +79,7 @@ namespace LML.NPOManagement.Controllers
         public async Task<IEnumerable<DonationResponse>> GetAllDonation()
         {
             var donation = await _investorInformationService.GetAllDonation();
-            return _mapper.Map<List<DonationModel>,List<DonationResponse>>(donation);
+            return _mapper.Map<List<DonationModel>, List<DonationResponse>>(donation);
         }
 
         // GET api/<InvestorInformationController>/5
@@ -87,12 +87,12 @@ namespace LML.NPOManagement.Controllers
         public async Task<DonationResponse> GetDonationById(int id)
         {
             var donation = await _investorInformationService.GetDonationById(id);
-            return _mapper.Map<DonationModel,DonationResponse>(donation);
+            return _mapper.Map<DonationModel, DonationResponse>(donation);
         }
 
         // GET api/<InvestorInformationController>/5
         [HttpGet("year")]
-        public async Task<ActionResult<DonationResponse>> GetDonationByYear(DateTime dateTimeStart,DateTime dateTimeFinish)
+        public async Task<ActionResult<DonationResponse>> GetDonationByYear(DateTime dateTimeStart, DateTime dateTimeFinish)
         {
             var donations = await _investorInformationService.GetDonationByYear(dateTimeStart, dateTimeFinish);
             if (donations == null)
@@ -101,7 +101,7 @@ namespace LML.NPOManagement.Controllers
             }
             var donation = _mapper.Map<List<DonationModel>, List<DonationResponse>>(donations);
             return Ok(donation);
-           
+
         }
 
         // POST api/<InvestorInformationController>
@@ -109,11 +109,11 @@ namespace LML.NPOManagement.Controllers
         public async Task<ActionResult<int>> Post([FromBody] DonationRequest donationRequest)
         {
             var investor = await _investorInformationService.GetInvestorInformationById(donationRequest.InvestorId);
-            if(investor == null)
+            if (investor == null)
             {
                 return StatusCode(409);
             }
-            var donationModel = _mapper.Map<DonationRequest,DonationModel>(donationRequest);
+            var donationModel = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
             var result = await _investorInformationService.AddDonation(donationModel);
             var bucketName = _configuration.GetSection("AppSettings:BucketName").Value;
             var template = _configuration.GetSection("AppSettings:Templates").Value;
@@ -127,7 +127,7 @@ namespace LML.NPOManagement.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] DonationRequest donationRequest)
         {
-            var donation =  _mapper.Map<DonationRequest, DonationModel>(donationRequest);
+            var donation = _mapper.Map<DonationRequest, DonationModel>(donationRequest);
             var modifyDonation = await _investorInformationService.ModifyDonation(donation, id);
             if (modifyDonation != null)
             {
