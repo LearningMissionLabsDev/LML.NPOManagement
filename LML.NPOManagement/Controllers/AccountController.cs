@@ -437,6 +437,7 @@ namespace LML.NPOManagement.Controllers
             }
 
             var account2User = _mapper.Map<AddUserToAccountRequest, Account2UserModel>(request);
+            account2User.AccountRoleId = (int)request.UserAccountRoleEnum;
 
             if (currentUser.IsSystemAdmin)
             {
