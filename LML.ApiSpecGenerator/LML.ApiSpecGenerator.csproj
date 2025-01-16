@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="NLog.Config" Version="4.7.15" />
+    <PackageReference Include="NLog.Web" Version="5.3.15" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LML.NPOManagement\LML.NPOManagement.csproj" />
     <ProjectReference Include="..\LML.NPOManagement.Dal\LML.NPOManagement.Dal.csproj" />
   </ItemGroup>
