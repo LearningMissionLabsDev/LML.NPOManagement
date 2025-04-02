@@ -17,5 +17,6 @@ namespace LML.NPOManagement.Response
         public DateTime DateCreated { get; set; }
         public DateTime? DeletedAt { get; set; }
         public int? AccountRoleId { get; set; }
+        public string? Role { get; set; }
     }
 }

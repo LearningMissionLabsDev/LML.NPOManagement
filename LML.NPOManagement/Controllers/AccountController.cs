@@ -103,6 +103,11 @@ namespace LML.NPOManagement.Controllers
         [HttpGet("visible")]
         public async Task<ActionResult<List<AccountResponse>>> GetVisibleAccounts()
         {
+            var user = HttpContext.Items["User"] as UserModel;
+            if (user == null)
+            {
+                return StatusCode(401);
+            }
             var accounts = await _accountService.GetVisibleAccounts();
             if (accounts == null)
             {
@@ -112,6 +117,10 @@ namespace LML.NPOManagement.Controllers
             var accountResponses = new List<AccountResponse>();
             foreach (var account in accounts)
             {
+                var account2User = user.Account2Users.FirstOrDefault(a2u => a2u.AccountId == account.Id);
+                UserAccountRoleEnum? accountRoleId = account2User?.AccountRoleId != null
+    ? (UserAccountRoleEnum?)account2User.AccountRoleId
+    : null;
                 var newAccountResponse = new AccountResponse()
                 {
                     Id = account.Id,
@@ -124,6 +133,7 @@ namespace LML.NPOManagement.Controllers
                     Description = account.Description,
                     DateCreated = account.DateCreated,
                     AccountImage = account.AccountImage,
+                    Role = accountRoleId?.GetDescription(),
                     DeletedAt = account.DeletedAt
                 };
                 accountResponses.Add(newAccountResponse);
@@ -298,15 +308,16 @@ namespace LML.NPOManagement.Controllers
             foreach (var account in accounts)
             {
                 var account2User = user.Account2Users.FirstOrDefault(a2u => a2u.AccountId == account.Id);
-                var accountRoleId = account2User?.AccountRoleId;
-
+                UserAccountRoleEnum? accountRoleId = account2User?.AccountRoleId != null
+    ? (UserAccountRoleEnum?)account2User.AccountRoleId
+    : null;
                 accountResponses.Add(new AccountResponse()
                 {
                     Id = account.Id,
                     Name = account.Name,
                     Description = account.Description,
                     AccountImage = account.AccountImage,
-                    AccountRoleId = accountRoleId
+                    Role = accountRoleId?.GetDescription(),
                 });
             }
 
@@ -437,6 +448,7 @@ namespace LML.NPOManagement.Controllers
             }
 
             var account2User = _mapper.Map<AddUserToAccountRequest, Account2UserModel>(request);
+            account2User.AccountRoleId = (int)request.UserAccountRoleEnum;
 
             if (currentUser.IsSystemAdmin)
             {
@@ -461,7 +473,7 @@ namespace LML.NPOManagement.Controllers
                 }
             }
 
-            if (request.UserId == currentUser.Id && request.UserAccountRoleEnum == UserAccountRoleEnum.Beneficiary)
+            if (request.UserId == currentUser.Id && request.UserAccountRoleEnum == UserAccountRoleEnum.Beneficiary || request.UserAccountRoleEnum == UserAccountRoleEnum.AccountManager)
             {
                 var result = await _accountService.AddUserToAccount(account2User);
                 if (result)
