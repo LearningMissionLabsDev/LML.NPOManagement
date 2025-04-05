@@ -20,6 +20,7 @@
         public string? OnboardingLink { get; set; }
         public string? Description { get; set; }
         public string? AccountImage { get; set; }
+        public string? Role { get; set; }
         public virtual ICollection<Account2UserModel> Account2Users { get; } = new List<Account2UserModel>();
         public virtual UserModel Creator { get; set; } = null!;
         public virtual AccountStatusModel Status { get; set; } = null!;
